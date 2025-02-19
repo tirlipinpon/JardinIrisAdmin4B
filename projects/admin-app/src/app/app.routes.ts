@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import {HomeComponent} from "./pages/home/home.component";
 import {authenticationRoutes} from "./features/authentication/authentication.routes";
 
 export const routes: Routes = [
