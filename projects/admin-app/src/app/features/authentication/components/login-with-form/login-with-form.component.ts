@@ -16,8 +16,8 @@ export class LoginWithFormComponent {
   private readonly application = inject(AuthenticationApplication);
 
   loginForm = inject(FormBuilder).group({
-    email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', Validators.required)
+    email: new FormControl('aa@aa.com', [Validators.required, Validators.email]),
+    password: new FormControl('aaa', Validators.required)
   });
 
   save(): void {

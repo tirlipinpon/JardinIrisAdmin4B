@@ -1,9 +1,10 @@
-import {Component, Inject} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {Component} from '@angular/core';
+import {ReactiveFormsModule} from "@angular/forms";
+import {SearchWithFormComponent} from "../../features/searchBar/components/search-with-form/search-with-form.component";
 
 @Component({
   selector: 'app-home',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, SearchWithFormComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })

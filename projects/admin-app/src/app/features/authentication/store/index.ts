@@ -38,7 +38,7 @@ export const AuthenticationStore= signalStore(
     {
       logIn: rxMethod<AuthenticationType>(
         pipe(
-          tap(()=> updateState(store, 'update loading', {isLoading: true})),
+          tap(()=> updateState(store, '[AUTH] update loading', {isLoading: true})),
           concatMap(input => {
             return infra.login(input.login, input.password).pipe(
               tapResponse({
