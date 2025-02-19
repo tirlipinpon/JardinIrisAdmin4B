@@ -30,7 +30,7 @@ export const AuthenticationStore= signalStore(
   { providedIn: 'root' },
   withState(initialValue),
   withComputed(store => ({ // like slice
-    isAuthenticated: computed(() => store.user())
+    isAuthenticated: computed(() => store.user() !== undefined)
   })),
   withMethods((store, infra = inject(AuthenticationInfrastructure))=> (
     {
