@@ -1,0 +1,19 @@
+<form [formGroup]="loginForm" (submit)="save()">
+  <div class="row">
+    <mat-form-field>
+      <mat-label>Enter your email</mat-label>
+      <input matInput placeholder="pat@example.com" [formControl]="email" required>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Enter your password</mat-label>
+      <input matInput placeholder="****" [formControl]="password" type="password" required>
+    </mat-form-field>
+
+    <button mat-fab extended color="primary" [disabled]="! isValid">
+      <mat-icon>favorite</mat-icon>
+      Log in
+    </button>
+  </div>
+</form>
+
