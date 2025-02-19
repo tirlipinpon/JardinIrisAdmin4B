@@ -4,8 +4,9 @@ import {patchState, signalStore, withComputed, withMethods, withState} from "@ng
 import {rxMethod} from "@ngrx/signals/rxjs-interop";
 import {concatMap, pipe, tap} from "rxjs";
 import {computed, inject} from "@angular/core";
-import {AuthenticationInfrastructure} from "../../services/authentication.infrastructure";
+import {AuthenticationInfrastructure} from "../services/authentication.infrastructure";
 import {tapResponse} from "@ngrx/operators";
+import {updateState, withDevtools} from "@angular-architects/ngrx-toolkit";
 
 // etat a creer
 export interface AuthenticationState {
@@ -28,6 +29,7 @@ const initialValue: AuthenticationState = {
 // reducer / store ...
 export const AuthenticationStore= signalStore(
   { providedIn: 'root' },
+  withDevtools('auth'),
   withState(initialValue),
   withComputed(store => ({ // like slice
     isAuthenticated: computed(() => store.user() !== undefined)
@@ -36,7 +38,7 @@ export const AuthenticationStore= signalStore(
     {
       logIn: rxMethod<AuthenticationType>(
         pipe(
-          tap(()=> patchState(store, {isLoading: true})),
+          tap(()=> updateState(store, 'update loading', {isLoading: true})),
           concatMap(input => {
             return infra.login(input.login, input.password).pipe(
               tapResponse({

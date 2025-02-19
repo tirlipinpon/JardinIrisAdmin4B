@@ -1,5 +1,5 @@
 import {effect, inject, Injectable, Signal} from "@angular/core";
-import {AuthenticationStore} from "../authentication/store";
+import {AuthenticationStore} from "../store";
 import {Router} from "@angular/router";
 
 @Injectable({providedIn: 'root'})

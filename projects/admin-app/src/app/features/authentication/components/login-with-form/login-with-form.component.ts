@@ -4,7 +4,7 @@ import {MatInputModule} from "@angular/material/input";
 import {MatFormField, MatFormFieldModule} from "@angular/material/form-field";
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
-import {AuthenticationApplication} from "../../../services/authentication.application";
+import {AuthenticationApplication} from "../../services/authentication.application";
 
 @Component({
   selector: 'app-login-with-form',

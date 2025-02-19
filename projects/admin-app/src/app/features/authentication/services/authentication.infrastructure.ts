@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { delay, Observable, of } from "rxjs";
-import { AuthenticationUser} from "../authentication/models/authentication-user";
+import { AuthenticationUser} from "../models/authentication-user";
 
 const fakeService: AuthenticationInfrastructure = {
   login(email, password): Observable<AuthenticationUser> {

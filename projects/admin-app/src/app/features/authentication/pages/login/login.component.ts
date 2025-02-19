@@ -1,6 +1,6 @@
 import {Component, inject} from '@angular/core';
 import {LoginWithFormComponent} from "../../components/login-with-form/login-with-form.component";
-import {AuthenticationApplication} from "../../../services/authentication.application";
+import {AuthenticationApplication} from "../../services/authentication.application";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 
 @Component({
