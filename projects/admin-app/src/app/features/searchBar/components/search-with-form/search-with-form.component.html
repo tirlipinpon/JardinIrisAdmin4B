@@ -1,0 +1,17 @@
+
+<section>
+  <div>
+    <input type="text" [(ngModel)]="url_post" placeholder="mettre le lien URL de l article ici." size="50" style="
+    padding: 20px;
+    font-size: 15px;
+    width: 100%;">
+  </div>
+  <div>
+    <button  (click)="process()" [disabled]="isLoading()" style="
+    padding: 20px;
+    width: 100%;
+    font-size: 22px;
+    margin: 20px 0 0 0;
+    background-color: aliceblue;">Clicker ici pour faire le résumé de l 'article.</button>
+  </div>
+</section>

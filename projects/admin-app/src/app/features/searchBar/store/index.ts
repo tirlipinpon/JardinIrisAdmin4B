@@ -12,7 +12,8 @@ export interface SearchState {
 }
 
 export type SearchType = {
-  url: string
+  cptSearchArticle: number,
+  url?: string
 }
 
 // valeur initiale
@@ -29,16 +30,13 @@ export const SearchStore= signalStore(
   })),
   withMethods((store, infra = inject(SearchInfrastructure))=> (
     {
-      search: rxMethod<SearchType>(
+      searchArticleValide: rxMethod<SearchType>(
         pipe(
-          tap(()=>  {
-            console.log('search')
-            return updateState(store, '[search] update loading', {isLoading: true})
-          }),
+          tap(()=> updateState(store, '[search] update loading', {isLoading: true})    ),
           concatMap(input => {
-            return infra.search(input.url).pipe(
+            return infra.searchArticleValide(input.cptSearchArticle).pipe(
               tapResponse({
-                next: article => patchState(store, {article, isLoading: false}),
+                next: article => patchState(store, article),
                 error: error => patchState(store, {isLoading: false})
               })
             )
