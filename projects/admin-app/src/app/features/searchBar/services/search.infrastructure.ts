@@ -1,9 +1,6 @@
 import {inject, Injectable} from "@angular/core";
-import {delay, Observable, of} from "rxjs";
+import {Observable} from "rxjs";
 import {TheNewsApiService} from "./the-news-api.service";
-import {AuthenticationUser} from "../../authentication/models/authentication-user";
-import {AuthenticationInfrastructure} from "../../authentication/services/authentication.infrastructure";
-import {SearchState, SearchStore, SearchType} from "../store";
 
 
 
