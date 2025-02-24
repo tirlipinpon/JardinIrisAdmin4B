@@ -17,7 +17,8 @@ import {SearchState, SearchStore, SearchType} from "../store";
 export class SearchInfrastructure {
   constructor(private theNewsApiService: TheNewsApiService) {}
 
-  searchArticleValide(cptSearchArticle: number): Observable<SearchState> {
+  searchArticleValideInfra(cptSearchArticle: number): Observable<{ url: string; image_url: string }[]> {
     return this.theNewsApiService.getNewsApi(cptSearchArticle);
   }
+
 }

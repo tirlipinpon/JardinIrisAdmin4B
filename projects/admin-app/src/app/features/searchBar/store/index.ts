@@ -7,7 +7,7 @@ import {tapResponse} from "@ngrx/operators";
 import {SearchInfrastructure} from "../services/search.infrastructure";
 
 export interface SearchState {
-  article: string | undefined;
+  article: { url: string; image_url: string }[];
   isLoading: boolean;
 }
 
@@ -15,10 +15,20 @@ export type SearchType = {
   cptSearchArticle: number,
   url?: string
 }
+export enum CathegoriesBlog {
+  ARBRE = "arbre",
+  ECOLOGIE = "écologie",
+  FLEUR = "fleur",
+  JARDIN = "jardin",
+  NATURE = "nature",
+  PLANTE = "plante",
+  POTAGER = "potager",
+  FAUNE = "faune"
+}
 
 // valeur initiale
 const initialValue: SearchState = {
-  article: undefined,
+  article: [],
   isLoading: false
 }
 export const SearchStore= signalStore(
@@ -30,13 +40,13 @@ export const SearchStore= signalStore(
   })),
   withMethods((store, infra = inject(SearchInfrastructure))=> (
     {
-      searchArticleValide: rxMethod<SearchType>(
+      searchArticleValideStore: rxMethod<SearchType>(
         pipe(
           tap(()=> updateState(store, '[search] update loading', {isLoading: true})    ),
           concatMap(input => {
-            return infra.searchArticleValide(input.cptSearchArticle).pipe(
+            return infra.searchArticleValideInfra(input.cptSearchArticle).pipe(
               tapResponse({
-                next: article => patchState(store, article),
+                next: articles => patchState(store, { article: articles, isLoading: false }),
                 error: error => patchState(store, {isLoading: false})
               })
             )

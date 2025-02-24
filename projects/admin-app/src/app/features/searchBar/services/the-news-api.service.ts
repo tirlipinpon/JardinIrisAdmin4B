@@ -1,23 +1,14 @@
 import {inject, Injectable} from "@angular/core";
-import {delay, Observable, of} from "rxjs";
-import {SearchState} from "../store";
-import {SearchInfrastructure} from "./search.infrastructure";
+import {Observable} from "rxjs";
+import {environment} from "../../../../../../../environment";
+import {HttpClient} from "@angular/common/http";
+import {afficherCategories} from "../../../utils/afficherCategories";
+import {formatCurrentDateUs} from "../../../utils/getFormattedDate";
+import { map } from 'rxjs/operators';
 
-
-const fakeService: any = {
-  getNewsApi(): Observable<any> {
-    const searchType: any = {
-      article: 'https://www.google.com',
-      isLoading: false
-    };
-
-    return of(searchType).pipe(delay(1500));
-  }
-}
 
 @Injectable({
-  providedIn: 'root',
-  useValue: fakeService
+  providedIn: 'root'
 })
 export class TheNewsApiService {
   private criteriaList = ['Europe','Belgique']
@@ -39,7 +30,21 @@ export class TheNewsApiService {
     &page=1`;
 
   http = inject(HttpClient);
-  getNewsApi(cptSearchArticle: number): Observable<any> {
-    return of('article').pipe(delay(1500));
+
+  getNewsApi(cptSearchArticle: number): Observable<{ url: string; image_url: string }[]> {
+    const apiUrl = cptSearchArticle === 1 ? this.apiUrl : this.apiUrl2;
+    return this.http.get<any>(apiUrl).pipe(
+      map(news => this.mapperNewsApi(news))
+    );
   }
+
+  mapperNewsApi(news: any): {url: string, image_url: string}[] {
+    return news.data.map((article: any) => {
+      return {
+        url: article.url,
+        image_url: article.image_url
+      };
+    });
+  }
+
 }

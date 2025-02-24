@@ -6,11 +6,11 @@ import {SearchStore} from "../store";
 export class SearchApplication {
   private readonly store = inject(SearchStore);
 
-  searchArticleValide(cptSearchArticle: number) {
-    this.store.searchArticleValide({cptSearchArticle});
+  searchArticleValideAppli(cptSearchArticle: number) {
+    this.store.searchArticleValideStore({cptSearchArticle});
   }
 
-  get isSearching(): Signal<boolean> {
+  get isSearchingAppli(): Signal<boolean> {
     return this.store.isSearching;
   }
 }
