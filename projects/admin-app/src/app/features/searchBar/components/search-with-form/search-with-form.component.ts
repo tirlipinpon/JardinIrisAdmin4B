@@ -12,15 +12,11 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 export class SearchWithFormComponent {
   private readonly application = inject(SearchApplication)
   url_post = "";
-  isLoading =  this.application.isSearchingAppli;
-  constructor() {
-    console.log('isLoading', this.isLoading())
-  }
-
+  isLoading =  this.application.isSearching;
 
   async process() {
     if (!this.url_post.length) {
-      this.application.searchArticleValideAppli(1)
+      await this.application.searchArticle(1);
     }
   }
 

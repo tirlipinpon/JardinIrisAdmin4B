@@ -11,13 +11,13 @@ import { map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class TheNewsApiService {
-  private criteriaList = ['Europe','Belgique']
+  private criteriaList = ['Belgique','Europe']
   private apiUrl = `https://api.thenewsapi.com/v1/news/all?api_token=${environment.newsApiToken}
     &search_fields=title,description,main_text
     &categories=general,tech,travel,entertainment,business,food,politics
     &exclude_categories=sports
-    &published_on=${formatCurrentDateUs()}
-    &search=Belgique+(${afficherCategories('|')})
+    &published_on=${'2025-02-23'}
+    &search=${this.criteriaList[0]}+(${afficherCategories('|')})
     &language=fr,nl,en
     &page=1`;
   private apiUrl2 = `https://api.thenewsapi.com/v1/news/all?api_token=${environment.newsApiToken}
@@ -25,7 +25,7 @@ export class TheNewsApiService {
     &categories=general,tech,travel,entertainment,business,food,politics
     &exclude_categories=sports
     &published_on=${formatCurrentDateUs()}
-    &search=Europe+(${afficherCategories('|')})
+    &search=${this.criteriaList[1]}+(${afficherCategories('|')})
     &language=fr,nl,en
     &page=1`;
 
