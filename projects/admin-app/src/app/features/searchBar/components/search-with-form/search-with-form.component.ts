@@ -16,7 +16,7 @@ export class SearchWithFormComponent {
 
   async process() {
     if (!this.url_post.length) {
-      await this.application.searchArticle();
+      this.application.searchArticle();
     }
   }
 
