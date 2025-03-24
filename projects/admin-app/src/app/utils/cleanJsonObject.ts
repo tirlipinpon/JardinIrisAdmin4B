@@ -15,3 +15,13 @@ export function extractHTMLBlock(input: string): string {
   }
   return input; // Si aucun bloc JSON trouvé,
 }
+
+export function  parseJsonSafe(jsonString: string | null): any | null {
+  if (!jsonString) return null;
+  try {
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.error('Invalid JSON string:', jsonString);
+    return null;
+  }
+}

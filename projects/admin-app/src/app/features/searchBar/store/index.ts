@@ -14,6 +14,7 @@ export interface SearchState {
   articleGeneratedDesign: string | null;
   imageUrl: string | null;
   meteo: string | null;
+  imagesArticle: { fk_post: number; url_image: string; chapitre_id: number; chapitre_key_word: string }[];
 }
 
 export type SearchType = {
@@ -39,7 +40,8 @@ const initialValue: SearchState = {
   articleGenerated: '',
   articleGeneratedDesign: '',
   imageUrl: '',
-  meteo: ''
+  meteo: '',
+  imagesArticle: []
 }
 export const SearchStore= signalStore(
   { providedIn: 'root' },
@@ -50,7 +52,8 @@ export const SearchStore= signalStore(
     articlesFound: computed(() =>  store.articles().length>0),
     getArticlesFound: computed(() =>  store.articles()),
     getArticleValide: computed(() =>  store.articleValide()),
-    getArticleGenerated: computed(() =>  store.articleGenerated())
+    getArticleGenerated: computed(() =>  store.articleGenerated()),
+    getArticleGeneratedDesign: computed(() =>  store.articleGeneratedDesign()),
   })),
   withMethods((store, infra = inject(SearchInfrastructure))=> (
     {
@@ -116,6 +119,19 @@ export const SearchStore= signalStore(
             return from(infra.meteoArticleGenerated()).pipe(
               tapResponse({
                 next: meteo => patchState(store, { meteo: meteo, isLoading: false }),
+                error: error => patchState(store, {isLoading: false})
+              })
+            )
+          })
+        )
+      ),
+      imagesArticle: rxMethod<any>(
+        pipe(
+          tap(()=> updateState(store, '[imagesArticle] update loading', {isLoading: true})    ),
+          concatMap((input) => {
+            return from(infra.getKeyWordsFromChapitreInArticleAndSetImageUrl(input.articleGeneratedDesign)).pipe(
+              tapResponse({
+                next: imagesArticle => patchState(store, { imagesArticle: imagesArticle, isLoading: false }),
                 error: error => patchState(store, {isLoading: false})
               })
             )
