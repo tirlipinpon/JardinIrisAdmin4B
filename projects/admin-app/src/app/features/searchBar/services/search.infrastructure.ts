@@ -28,23 +28,18 @@ export class SearchInfrastructure {
     , private getPromptsService: GetPromptsService
     , private unsplashImageService: UnsplashImageService
     , private supabaseService: SupabaseService
-
   ) {}
 
   searchArticle(cptSearchArticle: number): Observable<{ url: string; image_url: string  }[]> {
      // return this.theNewsApiService.getNewsApi(cptSearchArticle);
-    // Données mockées selon cptSearchArticle
     return new Observable<{ url: string; image_url: string }[]>(subscriber => {
       console.log(`Recherche d'articles avec paramètre: ${cptSearchArticle}`);
-
       // Données mockées selon cptSearchArticle
-      const mockArticles = cptSearchArticle === 0 ?
-        [] :
-        [];
-
+      const mockArticles = cptSearchArticle === 0 ? [] : [];
+      //{ url: 'https://example.com/article1', image_url: 'https://example.com/image1.jpg' }
       // Simuler un délai de réseau de 1 seconde
       setTimeout(() => {
-        console.log('Réponse reçue après 1 seconde');
+        // console.log('Réponse reçue après 1 seconde');
         subscriber.next(mockArticles);
         subscriber.complete();
       }, 1000);
@@ -55,14 +50,11 @@ export class SearchInfrastructure {
     // Données mockées selon cptSearchArticle
     return new Observable<string>(subscriber => {
       console.log(`Recherche d'idée dans le mois courrent`);
-
       // Données mockées selon cptSearchArticle
-      const mockArticles = 'idee de jardinage';
-
-
+      const mockArticles = '';
       // Simuler un délai de réseau de 1 seconde
       setTimeout(() => {
-        console.log('Réponse reçue après 1 seconde');
+        // console.log('Réponse reçue après 1 seconde');
         subscriber.next(mockArticles);
         subscriber.complete();
       }, 1000);

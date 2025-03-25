@@ -22,8 +22,14 @@ export class SearchApplication {
     }
   }
 
+  searchIdea(): void {
+      this.messageService.sendMessage('message', 'Idée recherche en cours');
+      this.store.searchIdea();
+  }
+
   private initializeEffects(): void {
     this.isSearchingEffect();
+    this.isIdeaEffect();
   }
 
   get isSearching(): Signal<boolean> {
@@ -32,19 +38,28 @@ export class SearchApplication {
 
   private isSearchingEffect(): void {
     effect(() => {
-      console.log("Effet déclenché - Articles:", this.store.articles());
 
-      if (!this.store.isArticlesNull()) {
-        if (this.store.isArticlesFound()) {
+      if (this.store.getArticles()) {
+        if (this.store.isArticlesFound() ) {
           this.messageService.sendMessage('success', 'Articles trouvés');
         } else if (this.cptSearchArticle < 2) {
           this.messageService.sendMessage('message', 'Articles recherche élargie pour l’Europe');
           this.store.searchArticle(this.cptSearchArticle++);
-        } else if (!this.store.isIdeaByMonth()) {  // Correction : éviter de dupliquer le test
-          this.messageService.sendMessage('message', 'Articles non trouvés en Europe, recherche dans la liste d’idées');
-          this.store.searchIdea();
-        } else {
-          this.messageService.sendMessage('message', 'Articles trouvés dans la liste d’idées');
+        } else if (this.cptSearchArticle === 2) {
+          this.messageService.sendMessage('fail', 'Articles non trouvés en Europe');
+        }
+      }
+    });
+  }
+
+  private isIdeaEffect(): void {
+    effect(() => {
+      console.log('getIdeaByMonth() = ', this.store.getIdeaByMonth())
+      if(this.store.getIdeaByMonth()!==null) {
+        if (!this.store.isIdeaByMonth()) {
+          this.messageService.sendMessage('error', 'Idée non trouvé  dans la liste');
+        } else if (this.store.isIdeaByMonth()) {
+          this.messageService.sendMessage('message', 'Idée trouvés dans la liste');
         }
       }
     });

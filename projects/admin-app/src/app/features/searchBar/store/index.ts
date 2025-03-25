@@ -34,10 +34,15 @@ export const SearchStore= signalStore(
   withDevtools('search'),
   withState(initialValue),
   withComputed(store => ({ // like slice
-    isSearching: computed(() => store.isLoading()),
-    isArticlesFound: computed(() => { const articles = store.articles(); return articles !== null && articles.length > 0; }),
-    isArticlesNull: computed(() =>  store.articles()===null),
-    isIdeaByMonth: computed(() =>  store.ideaByMonth()!==null),
+    isLoading: computed(() => store.isLoading()),
+    isArticlesFound: computed(() => {  const articles = store.articles();
+      return articles !== null && articles.length > 0 && articles[0].url.length > 1;
+    }),
+    isIdeaByMonth: computed(() =>  {  const ideaByMonth = store.ideaByMonth();
+      return ideaByMonth!==null &&  ideaByMonth.length > 0
+    }),
+    getArticles: computed(() =>  store.articles()),
+    getIdeaByMonth: computed(() =>  store.ideaByMonth()),
   })),
   withMethods((store, infra = inject(SearchInfrastructure))=> (
     {
@@ -47,8 +52,7 @@ export const SearchStore= signalStore(
           concatMap((input: number) => {
             return infra.searchArticle(input).pipe(
               tapResponse({
-                next: articles => patchState(store, {
-                  articles: articles.length ? [...articles] :  [...[]], isLoading: false }),
+                next: articles => patchState(store, { articles: articles, isLoading: false }),
                 error: error => patchState(store, {isLoading: false})
               })
             )

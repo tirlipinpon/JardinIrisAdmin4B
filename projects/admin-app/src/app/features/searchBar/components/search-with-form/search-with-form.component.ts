@@ -8,7 +8,7 @@ import {NgClass, NgForOf, NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-search-with-form',
-  imports: [FormsModule, MatProgressSpinnerModule, NgIf, NgClass, NgForOf],
+  imports: [FormsModule, MatProgressSpinnerModule, NgClass, NgForOf],
   templateUrl: './search-with-form.component.html',
   styleUrl: './search-with-form.component.css'
 })
@@ -39,6 +39,10 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           //statements;
           break;
         }
+        case 'fail': {
+          this.searchIdea();
+          break;
+        }
       }
     });
   }
@@ -51,6 +55,10 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
 
   async process() {
       this.application.searchArticle(this.url_post);
+  }
+
+  async searchIdea() {
+    this.application.searchIdea();
   }
 
 
