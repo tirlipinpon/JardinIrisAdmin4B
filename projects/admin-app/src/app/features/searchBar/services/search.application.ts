@@ -2,6 +2,7 @@ import { effect, inject, Injectable, Signal } from '@angular/core';
 import { SearchStore } from '../store';
 import {parseJsonSafe} from "../../../utils/cleanJsonObject";
 import {
+  MessageAction,
   SearchMessageService
 } from "./search-message.service";
 
@@ -46,12 +47,12 @@ export class SearchApplication {
     effect(() => {
       if (this.store.getArticles()) {
         if (this.store.isArticlesFound() ) {
-          this.messageService.sendSuccess('Articles trouvés.', 'article');
+          this.messageService.sendSuccess('Articles trouvés.', MessageAction.ARTICLE);
         } else if (this.cptSearchArticle < 2) {
           this.messageService.sendMessage('Articles recherche élargie pour l’Europe.');
           this.store.searchArticle(this.cptSearchArticle++);
         } else if (this.cptSearchArticle === 2) {
-          this.messageService.sendFail('Articles non trouvés en Europe.', 'article');
+          this.messageService.sendFail('Articles non trouvés en Europe.', MessageAction.ARTICLE);
         }
       }
     });
@@ -64,7 +65,7 @@ export class SearchApplication {
         if (!this.store.isIdeaByMonth()) {
           this.messageService.sendError('Idée non trouvé dans la liste.');
         } else if (this.store.isIdeaByMonth()) {
-          this.messageService.sendSuccess('Idée trouvés dans la liste.', 'idea');
+          this.messageService.sendSuccess('Idée trouvés dans la liste.', MessageAction.IDEA);
         }
       }
     });
@@ -75,7 +76,7 @@ export class SearchApplication {
       console.log('isGeneratedArticle() = ', this.store.isGeneratedArticle())
       if(this.store.getGeneratedArticle()!==null) {
         if(this.store.isGeneratedArticle()) {
-          this.messageService.sendSuccess('Article générer.', 'generatedArticle');
+          this.messageService.sendSuccess('Article générer.', MessageAction.GENERATED_ARTICLE);
         } else {
           this.messageService.sendError('Article à générer a une erreur.');
         }

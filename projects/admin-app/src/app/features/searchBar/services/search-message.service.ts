@@ -5,11 +5,22 @@ import { BehaviorSubject, Observable } from 'rxjs';
 // Types de messages
 export type MessageType = 'message' | 'error' | 'success' | 'fail';
 
+// Structure pour les actions des messages
+export const MessageAction = {
+  ARTICLE: 'article',
+  IDEA: 'idea',
+  GENERATE: 'generate',
+  GENERATED_ARTICLE: 'generatedArticle'
+} as const;
+
+// Type pour les actions (utilisant typeof pour inférer automatiquement les valeurs)
+export type MessageActionType = typeof MessageAction[keyof typeof MessageAction];
+
 // Interface de base
 interface BaseSearchMessage {
   type: MessageType;
   content: string;
-  action?: string; // Action peut être présent ou non selon le contexte
+  action?: MessageActionType;
 }
 
 // Type complet du message
@@ -24,7 +35,6 @@ export class SearchMessageService {
 
   /**
    * Méthode de base pour envoyer un message sans action
-   * Cette méthode ne doit pas être utilisée avec une action
    */
   sendMessage(content: string): void {
     this.messageSubject.next({
@@ -32,7 +42,6 @@ export class SearchMessageService {
       content
     });
   }
-
 
   /**
    * Envoyer un message d'erreur avec action obligatoire
@@ -47,7 +56,7 @@ export class SearchMessageService {
   /**
    * Envoyer un message de succès avec action obligatoire
    */
-  sendSuccess(content: string, action: string): void {
+  sendSuccess(content: string, action: MessageActionType): void {
     this.messageSubject.next({
       type: 'success',
       content,
@@ -58,7 +67,7 @@ export class SearchMessageService {
   /**
    * Envoyer un message d'échec
    */
-  sendFail(content: string, action: string): void {
+  sendFail(content: string, action: MessageActionType): void {
     this.messageSubject.next({
       type: 'fail',
       content,

@@ -1,7 +1,7 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {FormsModule} from "@angular/forms";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
-import {SearchMessage, SearchMessageService} from "../../services/search-message.service";
+import {MessageAction, SearchMessage, SearchMessageService} from "../../services/search-message.service";
 import {Subscription} from "rxjs";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {SearchApplication} from "../../services/search.application";
@@ -36,14 +36,14 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           break;
         }
         case 'success': {
-          if (msg.action === 'article' || msg.action === 'idea') {
+          if (msg.action === MessageAction.ARTICLE || msg.action === MessageAction.IDEA) {
             this.generateArticle();
           }
-          if (msg.action === 'generate'){}
+          if (msg.action === MessageAction.GENERATE){}
           break;
         }
         case 'fail': {
-          if (msg.action === 'article') {this.searchIdea();}
+          if (msg.action === MessageAction.ARTICLE) {this.searchIdea();}
           break;
         }
       }
