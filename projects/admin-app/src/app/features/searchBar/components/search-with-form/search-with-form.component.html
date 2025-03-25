@@ -1,4 +1,3 @@
-
 <section>
   <div>
     <input type="text" [(ngModel)]="url_post" placeholder="mettre le lien URL de l article ici." size="50" style="
@@ -15,3 +14,9 @@
     background-color: aliceblue;">Clicker ici pour faire le résumé de l 'article.</button>
   </div>
 </section>
+
+<div *ngFor="let msg of messages" [ngClass]="'message-' + msg.type" style="margin: 5px 0;">
+  {{ msg.content }}
+</div>
+
+

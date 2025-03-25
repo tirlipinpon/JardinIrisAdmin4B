@@ -40,18 +40,7 @@ export class SearchInfrastructure {
       // Données mockées selon cptSearchArticle
       const mockArticles = cptSearchArticle === 0 ?
         [
-          {
-            url: 'https://www.lalibre.be/belgique/societe/2023/05/15/une-nouvelle-reserve-naturelle-a-bruxelles-celebre-la-biodiversite-locale',
-            image_url: 'https://www.lalibre.be/resizer/v2/YVUGZK5AFFAJBHKHPN7T4NR4ZM.jpg?width=640&height=480&ratio=1'
-          },
-          {
-            url: 'https://www.rtbf.be/article/environnement-le-jardin-botanique-de-meise-presente-sa-nouvelle-collection-de-plantes-rares',
-            image_url: 'https://www.rtbf.be/api/media/image/hub/1d67f0df-6ac9-4b2c-9791-35c8d8af2f1d?width=1600&height=900'
-          },
-          {
-            url: 'https://www.dhnet.be/regions/bruxelles/2023/05/12/les-initiatives-citoyennes-vertes-fleurissent-a-bruxelles',
-            image_url: 'https://www.dhnet.be/resizer/v2/KERPFAYCJNEIXBBV6BXKQFITKU.jpg?width=640&height=480&ratio=1'
-          }
+
         ] :
         [
           {
