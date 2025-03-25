@@ -31,7 +31,7 @@ export class SearchInfrastructure {
 
   ) {}
 
-  searchArticle(cptSearchArticle: number): Observable<{ url: string; image_url: string }[]> {
+  searchArticle(cptSearchArticle: number): Observable<{ url: string; image_url: string  }[]> {
      // return this.theNewsApiService.getNewsApi(cptSearchArticle);
     // Données mockées selon cptSearchArticle
     return new Observable<{ url: string; image_url: string }[]>(subscriber => {
@@ -39,19 +39,8 @@ export class SearchInfrastructure {
 
       // Données mockées selon cptSearchArticle
       const mockArticles = cptSearchArticle === 0 ?
-        [
-
-        ] :
-        [
-          {
-            url: 'https://www.euronews.com/green/2023/05/14/european-green-deal-advances-with-new-biodiversity-protection-measures',
-            image_url: 'https://static.euronews.com/articles/stories/07/26/11/58/1000x563_cmsv2_c5d8b02c-2b77-55d6-9d3a-7c91e93dfac3-7261158.jpg'
-          },
-          {
-            url: 'https://www.politico.eu/article/eu-agriculture-ministers-agree-on-new-sustainable-farming-practices',
-            image_url: 'https://www.politico.eu/wp-content/uploads/2023/05/14/GettyImages-1252355409-scaled.jpg'
-          }
-        ];
+        [] :
+        [];
 
       // Simuler un délai de réseau de 1 seconde
       setTimeout(() => {
@@ -62,7 +51,23 @@ export class SearchInfrastructure {
     });
   }
 
+  searchIdea(): Observable<string> {
+    // Données mockées selon cptSearchArticle
+    return new Observable<string>(subscriber => {
+      console.log(`Recherche d'idée dans le mois courrent`);
 
+      // Données mockées selon cptSearchArticle
+      const mockArticles = 'idee de jardinage';
+
+
+      // Simuler un délai de réseau de 1 seconde
+      setTimeout(() => {
+        console.log('Réponse reçue après 1 seconde');
+        subscriber.next(mockArticles);
+        subscriber.complete();
+      }, 1000);
+    });
+  }
 
 
 }

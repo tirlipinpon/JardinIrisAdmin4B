@@ -17,7 +17,7 @@ export class SearchApplication {
 
   searchArticle(url_post: string): void {
     if (!url_post.length) {
-      this.messageService.sendMessage('message', 'Articles recherche en cours');
+      this.messageService.sendMessage('message', 'Articles recherche en cours pour la Belgique');
       this.store.searchArticle(this.cptSearchArticle++);
     }
   }
@@ -32,15 +32,23 @@ export class SearchApplication {
 
   private isSearchingEffect(): void {
     effect(() => {
+      console.log("Effet déclenché - Articles:", this.store.articles());
+
       if (!this.store.isArticlesNull()) {
         if (this.store.isArticlesFound()) {
           this.messageService.sendMessage('success', 'Articles trouvés');
-        } else if (this.cptSearchArticle < 3) {
+        } else if (this.cptSearchArticle < 2) {
+          this.messageService.sendMessage('message', 'Articles recherche élargie pour l’Europe');
           this.store.searchArticle(this.cptSearchArticle++);
-          this.messageService.sendMessage('message', 'Articles non trouvé recherche élargie');
+        } else if (!this.store.isIdeaByMonth()) {  // Correction : éviter de dupliquer le test
+          this.messageService.sendMessage('message', 'Articles non trouvés en Europe, recherche dans la liste d’idées');
+          this.store.searchIdea();
+        } else {
+          this.messageService.sendMessage('message', 'Articles trouvés dans la liste d’idées');
         }
       }
     });
   }
+
 
 }
