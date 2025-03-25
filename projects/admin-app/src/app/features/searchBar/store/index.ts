@@ -10,6 +10,7 @@ export interface SearchState {
   articles: { url: string; image_url: string }[] | null;
   ideaByMonth: string | null;
   isLoading: boolean;
+  generatedArticle: string | null;
 }
 
 export enum CathegoriesBlog {
@@ -27,7 +28,8 @@ export enum CathegoriesBlog {
 const initialValue: SearchState = {
   articles: null,
   isLoading: false,
-  ideaByMonth: null
+  ideaByMonth: null,
+  generatedArticle: null
 }
 export const SearchStore= signalStore(
   { providedIn: 'root' },
@@ -43,6 +45,10 @@ export const SearchStore= signalStore(
     }),
     getArticles: computed(() =>  store.articles()),
     getIdeaByMonth: computed(() =>  store.ideaByMonth()),
+    getGeneratedArticle: computed(() =>  store.generatedArticle()),
+    isGeneratedArticle: computed(() =>  {  const generatedArticle = store.generatedArticle();
+      return generatedArticle!==null &&  generatedArticle.length > 0
+    }),
   })),
   withMethods((store, infra = inject(SearchInfrastructure))=> (
     {
@@ -66,6 +72,19 @@ export const SearchStore= signalStore(
             return infra.searchIdea().pipe(
               tapResponse({
                 next: idea => patchState(store, { ideaByMonth: idea, isLoading: false }),
+                error: error => patchState(store, {isLoading: false})
+              })
+            )
+          })
+        )
+      ),
+      generateArticle: rxMethod<void>(
+        pipe(
+          tap(()=> updateState(store, '[generateArticle] update loading', {isLoading: true})    ),
+          concatMap(() => {
+            return infra.generateArticle().pipe(
+              tapResponse({
+                next: generatedArticle => patchState(store, { generatedArticle: generatedArticle, isLoading: false }),
                 error: error => patchState(store, {isLoading: false})
               })
             )

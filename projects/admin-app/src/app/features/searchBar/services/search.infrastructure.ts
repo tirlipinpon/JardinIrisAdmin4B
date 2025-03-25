@@ -51,7 +51,23 @@ export class SearchInfrastructure {
     return new Observable<string>(subscriber => {
       console.log(`Recherche d'idée dans le mois courrent`);
       // Données mockées selon cptSearchArticle
-      const mockArticles = '';
+      const mockArticles = 'dummy idee recue';
+      // Simuler un délai de réseau de 1 seconde
+      setTimeout(() => {
+        // console.log('Réponse reçue après 1 seconde');
+        subscriber.next(mockArticles);
+        subscriber.complete();
+      }, 1000);
+    });
+  }
+
+
+  generateArticle(): Observable<string> {
+    // Données mockées selon cptSearchArticle
+    return new Observable<string>(subscriber => {
+      console.log(`Génération d article`);
+      // Données mockées selon cptSearchArticle
+      const mockArticles = 'dummy article a ete genere voici l article';
       // Simuler un délai de réseau de 1 seconde
       setTimeout(() => {
         // console.log('Réponse reçue après 1 seconde');

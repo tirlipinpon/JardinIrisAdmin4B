@@ -15,21 +15,27 @@ export class SearchApplication {
     this.initializeEffects();
   }
 
+  private initializeEffects(): void {
+    this.isSearchingEffect();
+    this.isIdeaEffect();
+    this.isGeneratedArticle();
+  }
+
   searchArticle(url_post: string): void {
     if (!url_post.length) {
-      this.messageService.sendMessage('message', 'Articles recherche en cours pour la Belgique');
+      this.messageService.sendMessage('Articles recherche en cour pour la Belgique.');
       this.store.searchArticle(this.cptSearchArticle++);
     }
   }
 
   searchIdea(): void {
-      this.messageService.sendMessage('message', 'Idée recherche en cours');
+      this.messageService.sendMessage('Idée recherche en cour.');
       this.store.searchIdea();
   }
 
-  private initializeEffects(): void {
-    this.isSearchingEffect();
-    this.isIdeaEffect();
+  generateArticle(): void {
+    this.messageService.sendMessage('Géneration d article en cour.');
+    this.store.generateArticle();
   }
 
   get isSearching(): Signal<boolean> {
@@ -38,15 +44,14 @@ export class SearchApplication {
 
   private isSearchingEffect(): void {
     effect(() => {
-
       if (this.store.getArticles()) {
         if (this.store.isArticlesFound() ) {
-          this.messageService.sendMessage('success', 'Articles trouvés');
+          this.messageService.sendSuccess('Articles trouvés.', 'article');
         } else if (this.cptSearchArticle < 2) {
-          this.messageService.sendMessage('message', 'Articles recherche élargie pour l’Europe');
+          this.messageService.sendMessage('Articles recherche élargie pour l’Europe.');
           this.store.searchArticle(this.cptSearchArticle++);
         } else if (this.cptSearchArticle === 2) {
-          this.messageService.sendMessage('fail', 'Articles non trouvés en Europe');
+          this.messageService.sendFail('Articles non trouvés en Europe.', 'article');
         }
       }
     });
@@ -57,13 +62,25 @@ export class SearchApplication {
       console.log('getIdeaByMonth() = ', this.store.getIdeaByMonth())
       if(this.store.getIdeaByMonth()!==null) {
         if (!this.store.isIdeaByMonth()) {
-          this.messageService.sendMessage('error', 'Idée non trouvé  dans la liste');
+          this.messageService.sendError('Idée non trouvé dans la liste.');
         } else if (this.store.isIdeaByMonth()) {
-          this.messageService.sendMessage('message', 'Idée trouvés dans la liste');
+          this.messageService.sendSuccess('Idée trouvés dans la liste.', 'idea');
         }
       }
     });
   }
 
+  private isGeneratedArticle(): void {
+    effect(() => {
+      console.log('isGeneratedArticle() = ', this.store.isGeneratedArticle())
+      if(this.store.getGeneratedArticle()!==null) {
+        if(this.store.isGeneratedArticle()) {
+          this.messageService.sendSuccess('Article générer.', 'generatedArticle');
+        } else {
+          this.messageService.sendError('Article à générer a une erreur.');
+        }
+      }
+    });
+  }
 
 }
