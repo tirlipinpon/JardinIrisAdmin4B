@@ -19,8 +19,8 @@ export class SearchApplication {
   private initializeEffects(): void {
     this.isSearchingEffect();
     this.isIdeaEffect();
-    this.isGeneratedArticle();
-    this.isformatedInHtmlArticle();
+    this.isGeneratedArticleEffect();
+    this.isFormatedInHtmlArticleEffect();
   }
 
   get isSearching(): Signal<boolean> {
@@ -76,7 +76,7 @@ export class SearchApplication {
     });
   }
 
-  private isGeneratedArticle(): void {
+  private isGeneratedArticleEffect(): void {
     effect(() => {
       if(this.store.getGeneratedArticle()!==null) {
         if(this.store.isGeneratedArticle()) {
@@ -88,7 +88,7 @@ export class SearchApplication {
     });
   }
 
-  private isformatedInHtmlArticle(): void {
+  private isFormatedInHtmlArticleEffect(): void {
     effect(() => {
       if(this.store.getFormatedInHtmlArticle()!==null) {
         if(this.store.isFormatedInHtmlArticle()) {

@@ -38,7 +38,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           if (msg.action === MessageAction.ARTICLE || msg.action === MessageAction.IDEA) {
             this.generateArticle();
           }
-          else if (msg.action === MessageAction.GENERATE){
+          else if (msg.action === MessageAction.GENERATED_ARTICLE){
             this.formatInHtmlArticle();
           }
           break;

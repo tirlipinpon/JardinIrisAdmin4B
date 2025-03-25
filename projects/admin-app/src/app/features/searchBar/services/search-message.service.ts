@@ -9,7 +9,6 @@ export type MessageType = 'message' | 'error' | 'success' | 'fail';
 export const MessageAction = {
   ARTICLE: 'article',
   IDEA: 'idea',
-  GENERATE: 'generate',
   GENERATED_ARTICLE: 'generatedArticle',
   FORMATED_IN_HTML_ARTICLE: 'FormatedInHtmlArticle',
 } as const;
