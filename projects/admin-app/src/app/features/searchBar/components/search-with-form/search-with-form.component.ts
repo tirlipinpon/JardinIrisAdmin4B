@@ -25,7 +25,6 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
   ngOnInit() {
     this.messageSubscription = this.messageService.message$.subscribe(msg => {
       if (msg) { this.messages.push(msg); }
-
       switch (msg?.type) {
         case 'message': {
           //statements;
@@ -39,7 +38,9 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           if (msg.action === MessageAction.ARTICLE || msg.action === MessageAction.IDEA) {
             this.generateArticle();
           }
-          if (msg.action === MessageAction.GENERATE){}
+          else if (msg.action === MessageAction.GENERATE){
+            this.formatInHtmlArticle();
+          }
           break;
         }
         case 'fail': {
@@ -66,6 +67,10 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
 
   async generateArticle() {
     this.application.generateArticle();
+  }
+
+  async formatInHtmlArticle() {
+    this.application.formatInHtmlArticle();
   }
 
 

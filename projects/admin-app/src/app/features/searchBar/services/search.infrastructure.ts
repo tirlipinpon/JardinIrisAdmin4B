@@ -33,13 +33,9 @@ export class SearchInfrastructure {
   searchArticle(cptSearchArticle: number): Observable<{ url: string; image_url: string  }[]> {
      // return this.theNewsApiService.getNewsApi(cptSearchArticle);
     return new Observable<{ url: string; image_url: string }[]>(subscriber => {
-      console.log(`Recherche d'articles avec paramètre: ${cptSearchArticle}`);
-      // Données mockées selon cptSearchArticle
       const mockArticles = cptSearchArticle === 0 ? [] : [];
       //{ url: 'https://example.com/article1', image_url: 'https://example.com/image1.jpg' }
-      // Simuler un délai de réseau de 1 seconde
       setTimeout(() => {
-        // console.log('Réponse reçue après 1 seconde');
         subscriber.next(mockArticles);
         subscriber.complete();
       }, 1000);
@@ -47,35 +43,34 @@ export class SearchInfrastructure {
   }
 
   searchIdea(): Observable<string> {
-    // Données mockées selon cptSearchArticle
     return new Observable<string>(subscriber => {
       console.log(`Recherche d'idée dans le mois courrent`);
-      // Données mockées selon cptSearchArticle
-      const mockArticles = 'dummy idee recue';
-      // Simuler un délai de réseau de 1 seconde
+      const mockArticles = `dummy idee recue`;
       setTimeout(() => {
-        // console.log('Réponse reçue après 1 seconde');
         subscriber.next(mockArticles);
         subscriber.complete();
       }, 1000);
     });
   }
-
 
   generateArticle(): Observable<string> {
-    // Données mockées selon cptSearchArticle
     return new Observable<string>(subscriber => {
-      console.log(`Génération d article`);
-      // Données mockées selon cptSearchArticle
-      const mockArticles = 'dummy article a ete genere voici l article';
-      // Simuler un délai de réseau de 1 seconde
+      const mockArticles = `dummy article a ete genere voici l article`;
       setTimeout(() => {
-        // console.log('Réponse reçue après 1 seconde');
         subscriber.next(mockArticles);
         subscriber.complete();
       }, 1000);
     });
   }
 
+  formatInHtmlArticle(): Observable<string> {
+    return new Observable<string>(subscriber => {
+      const mockArticles = `<div>dummy article a ete formate voici l article</div>`;
+      setTimeout(() => {
+        subscriber.next(mockArticles);
+        subscriber.complete();
+      }, 1000);
+    });
+  }
 
 }

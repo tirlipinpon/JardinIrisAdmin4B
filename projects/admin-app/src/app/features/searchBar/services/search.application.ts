@@ -20,6 +20,11 @@ export class SearchApplication {
     this.isSearchingEffect();
     this.isIdeaEffect();
     this.isGeneratedArticle();
+    this.isformatedInHtmlArticle();
+  }
+
+  get isSearching(): Signal<boolean> {
+    return this.store.isLoading;
   }
 
   searchArticle(url_post: string): void {
@@ -39,8 +44,9 @@ export class SearchApplication {
     this.store.generateArticle();
   }
 
-  get isSearching(): Signal<boolean> {
-    return this.store.isLoading;
+  formatInHtmlArticle(): void {
+    this.messageService.sendMessage('Formatage en Html d article en cour.');
+    this.store.formatInHtmlArticle();
   }
 
   private isSearchingEffect(): void {
@@ -60,7 +66,6 @@ export class SearchApplication {
 
   private isIdeaEffect(): void {
     effect(() => {
-      console.log('getIdeaByMonth() = ', this.store.getIdeaByMonth())
       if(this.store.getIdeaByMonth()!==null) {
         if (!this.store.isIdeaByMonth()) {
           this.messageService.sendError('Idée non trouvé dans la liste.');
@@ -73,12 +78,23 @@ export class SearchApplication {
 
   private isGeneratedArticle(): void {
     effect(() => {
-      console.log('isGeneratedArticle() = ', this.store.isGeneratedArticle())
       if(this.store.getGeneratedArticle()!==null) {
         if(this.store.isGeneratedArticle()) {
-          this.messageService.sendSuccess('Article générer.', MessageAction.GENERATED_ARTICLE);
+          this.messageService.sendSuccess('Géneration terminé.', MessageAction.GENERATED_ARTICLE);
         } else {
-          this.messageService.sendError('Article à générer a une erreur.');
+          this.messageService.sendError('Géneration a une erreur.');
+        }
+      }
+    });
+  }
+
+  private isformatedInHtmlArticle(): void {
+    effect(() => {
+      if(this.store.getFormatedInHtmlArticle()!==null) {
+        if(this.store.isFormatedInHtmlArticle()) {
+          this.messageService.sendSuccess('Formatage en html terminé.', MessageAction.FORMATED_IN_HTML_ARTICLE);
+        } else {
+          this.messageService.sendError('Formatage en html a une erreur.');
         }
       }
     });

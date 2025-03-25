@@ -10,7 +10,8 @@ export const MessageAction = {
   ARTICLE: 'article',
   IDEA: 'idea',
   GENERATE: 'generate',
-  GENERATED_ARTICLE: 'generatedArticle'
+  GENERATED_ARTICLE: 'generatedArticle',
+  FORMATED_IN_HTML_ARTICLE: 'FormatedInHtmlArticle',
 } as const;
 
 // Type pour les actions (utilisant typeof pour inférer automatiquement les valeurs)

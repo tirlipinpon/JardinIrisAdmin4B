@@ -11,6 +11,7 @@ export interface SearchState {
   ideaByMonth: string | null;
   isLoading: boolean;
   generatedArticle: string | null;
+  formatedInHtmlArticle: string | null;
 }
 
 export enum CathegoriesBlog {
@@ -29,7 +30,8 @@ const initialValue: SearchState = {
   articles: null,
   isLoading: false,
   ideaByMonth: null,
-  generatedArticle: null
+  generatedArticle: null,
+  formatedInHtmlArticle: null,
 }
 export const SearchStore= signalStore(
   { providedIn: 'root' },
@@ -48,6 +50,10 @@ export const SearchStore= signalStore(
     getGeneratedArticle: computed(() =>  store.generatedArticle()),
     isGeneratedArticle: computed(() =>  {  const generatedArticle = store.generatedArticle();
       return generatedArticle!==null &&  generatedArticle.length > 0
+    }),
+    getFormatedInHtmlArticle: computed(() =>  store.formatedInHtmlArticle()),
+    isFormatedInHtmlArticle: computed(() =>  {  const formatedInHtmlArticle = store.formatedInHtmlArticle();
+      return formatedInHtmlArticle!==null &&  formatedInHtmlArticle.length > 0
     }),
   })),
   withMethods((store, infra = inject(SearchInfrastructure))=> (
@@ -85,6 +91,19 @@ export const SearchStore= signalStore(
             return infra.generateArticle().pipe(
               tapResponse({
                 next: generatedArticle => patchState(store, { generatedArticle: generatedArticle, isLoading: false }),
+                error: error => patchState(store, {isLoading: false})
+              })
+            )
+          })
+        )
+      ),
+      formatInHtmlArticle: rxMethod<void>(
+        pipe(
+          tap(()=> updateState(store, '[formatInHtmlArticle] update loading', {isLoading: true})    ),
+          concatMap(() => {
+            return infra.formatInHtmlArticle().pipe(
+              tapResponse({
+                next: formatedInHtmlArticle => patchState(store, { formatedInHtmlArticle: formatedInHtmlArticle, isLoading: false }),
                 error: error => patchState(store, {isLoading: false})
               })
             )
