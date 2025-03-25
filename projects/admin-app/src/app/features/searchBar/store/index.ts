@@ -7,20 +7,10 @@ import {tapResponse} from "@ngrx/operators";
 import {SearchInfrastructure} from "../services/search.infrastructure";
 
 export interface SearchState {
-  articles: { url: string; image_url: string }[];
+  articles: { url: string; image_url: string }[] | null;
   isLoading: boolean;
-  articleValide: string | null;
-  articleGenerated: string | null;
-  articleGeneratedDesign: string | null;
-  imageUrl: string | null;
-  meteo: string | null;
-  imagesArticle: { fk_post: number; url_image: string; chapitre_id: number; chapitre_key_word: string }[];
 }
 
-export type SearchType = {
-  cptSearchArticle: number,
-  url?: string
-}
 export enum CathegoriesBlog {
   ARBRE = "arbre",
   ECOLOGIE = "écologie",
@@ -34,14 +24,8 @@ export enum CathegoriesBlog {
 
 // valeur initiale
 const initialValue: SearchState = {
-  articles: [],
+  articles: null,
   isLoading: false,
-  articleValide: null,
-  articleGenerated: '',
-  articleGeneratedDesign: '',
-  imageUrl: '',
-  meteo: '',
-  imagesArticle: []
 }
 export const SearchStore= signalStore(
   { providedIn: 'root' },
@@ -49,102 +33,18 @@ export const SearchStore= signalStore(
   withState(initialValue),
   withComputed(store => ({ // like slice
     isSearching: computed(() => store.isLoading()),
-    articlesFound: computed(() =>  store.articles().length>0),
-    getArticlesFound: computed(() =>  store.articles()),
-    getArticleValide: computed(() =>  store.articleValide()),
-    getArticleGenerated: computed(() =>  store.articleGenerated()),
-    getArticleGeneratedDesign: computed(() =>  store.articleGeneratedDesign()),
+    isArticlesFound: computed(() => { const articles = store.articles(); return articles !== null && articles.length > 0; }),
+    isArticlesNull: computed(() =>  store.articles()===null),
   })),
   withMethods((store, infra = inject(SearchInfrastructure))=> (
     {
-      searchArticle: rxMethod<SearchType>(
+      searchArticle: rxMethod<any>(
         pipe(
           tap(()=> updateState(store, '[searchArticle] update loading', {isLoading: true})    ),
-          concatMap(input => {
-            return infra.searchArticle(input.cptSearchArticle).pipe(
+          concatMap((input: number) => {
+            return infra.searchArticle(input).pipe(
               tapResponse({
                 next: articles => patchState(store, { articles: articles, isLoading: false }),
-                error: error => patchState(store, {isLoading: false})
-              })
-            )
-          })
-        )
-      ),
-      searchArticleValide: rxMethod<any>(
-        pipe(
-          tap(()=> updateState(store, '[searchArticleValide] update loading', {isLoading: true})    ),
-          concatMap((input) => {
-            return from(infra.searchArticleValide(input)).pipe(
-              tapResponse({
-                next: articleValide => patchState(store, { articleValide: articleValide, isLoading: false }),
-                error: error => patchState(store, {isLoading: false})
-              })
-            )
-          })
-        )
-      ),
-      generateArticle: rxMethod<any>(
-        pipe(
-          tap((data)=> {
-            console.log('generateArticle', data)
-            updateState(store, '[articleGenerated] update loading', {isLoading: true,imageUrl: data.image_url})
-          }),
-          concatMap((input) => {
-            return from(infra.generateArticle(input.url)).pipe(
-              tapResponse({
-                next: articleGenerated => patchState(store, { articleGenerated: articleGenerated, isLoading: false }),
-                error: error => patchState(store, {isLoading: false})
-              })
-            )
-          })
-        )
-      ),
-      designArticle: rxMethod<any>(
-        pipe(
-          tap(()=> updateState(store, '[designArticle] update loading', {isLoading: true})    ),
-          concatMap((input) => {
-            return from(infra.designArticleGenerated(input.article)).pipe(
-              tapResponse({
-                next: articleGenerated => patchState(store, { articleGeneratedDesign: articleGenerated, isLoading: false }),
-                error: error => patchState(store, {isLoading: false})
-              })
-            )
-          })
-        )
-      ),
-      meteoArticle: rxMethod<void>(
-        pipe(
-          tap(()=> updateState(store, '[meteoArticle] update loading', {isLoading: true})    ),
-          concatMap(() => {
-            return from(infra.meteoArticleGenerated()).pipe(
-              tapResponse({
-                next: meteo => patchState(store, { meteo: meteo, isLoading: false }),
-                error: error => patchState(store, {isLoading: false})
-              })
-            )
-          })
-        )
-      ),
-      imagesArticle: rxMethod<any>(
-        pipe(
-          tap(()=> updateState(store, '[imagesArticle] update loading', {isLoading: true})    ),
-          concatMap((input) => {
-            return from(infra.getKeyWordsFromChapitreInArticleAndSetImageUrl(input.articleGeneratedDesign)).pipe(
-              tapResponse({
-                next: imagesArticle => patchState(store, { imagesArticle: imagesArticle, isLoading: false }),
-                error: error => patchState(store, {isLoading: false})
-              })
-            )
-          })
-        )
-      ),
-      generateImage: rxMethod<any>(
-        pipe(
-          tap(()=> updateState(store, '[generateArticle] update loading', {isLoading: true})    ),
-          concatMap((input) => {
-            return from(infra.searchArticleValide(input)).pipe(
-              tapResponse({
-                next: articleValide => patchState(store, { articleValide: articleValide, isLoading: false }),
                 error: error => patchState(store, {isLoading: false})
               })
             )

@@ -11,7 +11,7 @@ import { map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class TheNewsApiService {
-  private criteriaList = ['Belgique','Europe']
+  private criteriaList = ['Belgique','Europe'];
   private apiUrl = `https://api.thenewsapi.com/v1/news/all?api_token=${environment.newsApiToken}
     &search_fields=title,description,main_text
     &categories=general,tech,travel,entertainment,business,food,politics
