@@ -22,6 +22,7 @@ export class SearchApplication {
     this.isGeneratedArticleEffect();
     this.isFormatedInHtmlArticleEffect();
     this.isUpgradedArticleEffect();
+    this.isMeteo();
   }
 
   get isSearching(): Signal<boolean> {
@@ -45,7 +46,11 @@ export class SearchApplication {
       this.messageService.sendMessage('Sauvegarde de l url de post a generer.');
       this.store.saveUrlPost(url_post);
     }
+  }
 
+  upgradeArticle(): void {
+    this.messageService.sendMessage('Upgrade article en cour.');
+    this.store.upgradeArticle();
   }
 
   formatInHtmlArticle(): void {
@@ -53,9 +58,19 @@ export class SearchApplication {
     this.store.formatInHtmlArticle();
   }
 
-  upgradeArticle(): void {
-    this.messageService.sendMessage('Upgrade article en cour.');
-    this.store.upgradeArticle();
+  checkMeteo(): void {
+    this.messageService.sendMessage('Météo en cour.');
+    this.store.checkMeteo();
+  }
+
+  savePost(): void {
+    this.messageService.sendMessage('Enregistrement du post en cour.');
+    // this.store.savePost(this.store.formatInHtmlArticle);
+  }
+
+  addImagesInArticle(): void {
+    this.messageService.sendMessage('Ajout images d article en cour.');
+    this.store.addImagesInArticle();
   }
 
   private isSearchingEffect(): void {
@@ -116,6 +131,18 @@ export class SearchApplication {
           this.messageService.sendSuccess('Formatage en html terminé.', MessageAction.FORMATED_IN_HTML_ARTICLE);
         } else {
           this.messageService.sendError('Formatage en html a une erreur.');
+        }
+      }
+    });
+  }
+
+  private isMeteo(): void {
+    effect(() => {
+      if(this.store.getMeteo()!==null) {
+        if(this.store.isMeteo()) {
+          this.messageService.sendSuccess('Météo terminé.', MessageAction.METEO);
+        } else {
+          this.messageService.sendError('Météo a une erreur.');
         }
       }
     });

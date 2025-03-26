@@ -16,6 +16,7 @@ export interface SearchState {
   generatedArticle: string | null;
   upgradedArticle: string | null;
   formatedInHtmlArticle: string | null;
+  meteo: string | null;
   post: Post | null;
 }
 
@@ -38,6 +39,7 @@ const initialValue: SearchState = {
   generatedArticle: null,
   upgradedArticle: null,
   formatedInHtmlArticle: null,
+  meteo: null,
   post: null,
   urlPost: null
 
@@ -67,6 +69,10 @@ export const SearchStore= signalStore(
     getFormatedInHtmlArticle: computed(() =>  store.formatedInHtmlArticle()),
     isFormatedInHtmlArticle: computed(() =>  {  const formatedInHtmlArticle = store.formatedInHtmlArticle();
       return formatedInHtmlArticle!==null &&  formatedInHtmlArticle.length > 0
+    }),
+    getMeteo: computed(() =>  store.meteo()),
+    isMeteo: computed(() =>  {  const meteo = store.meteo();
+      return meteo!==null &&  meteo.length > 0
     }),
   })),
   withMethods((store, infra = inject(SearchInfrastructure))=> (
@@ -123,7 +129,7 @@ export const SearchStore= signalStore(
         pipe(
           tap(() => updateState(store, '[upgradeArticle] update loading', { isLoading: true })),
           switchMap(() => {
-            const generatedArticle = store.generatedArticle();
+            const generatedArticle = store.getGeneratedArticle();
             if (!generatedArticle) {
               patchState(store, { isLoading: false });
               return EMPTY;
@@ -140,8 +146,62 @@ export const SearchStore= signalStore(
       formatInHtmlArticle: rxMethod<void>(
         pipe(
           tap(()=> updateState(store, '[formatInHtmlArticle] update loading', {isLoading: true})    ),
-          concatMap(() => {
-            return infra.formatInHtmlArticle().pipe(
+          switchMap(() => {
+            const getUpgradedArticle = store.getUpgradedArticle();
+            if (!getUpgradedArticle) {
+              patchState(store, { isLoading: false });
+              return EMPTY;
+            }
+            return infra.formatInHtmlArticle(getUpgradedArticle).pipe(
+              tapResponse({
+                next: formatedInHtmlArticle => patchState(store, { formatedInHtmlArticle: formatedInHtmlArticle, isLoading: false }),
+                error: error => patchState(store, {isLoading: false})
+              })
+            )
+          })
+        )
+      ),
+      checkMeteo: rxMethod<void>(
+        pipe(
+          tap(() => updateState(store, '[checkMeteo] update loading', { isLoading: true })),
+          switchMap(() => {
+            return infra.checkMeteo().pipe(
+              tapResponse({
+                next: (meteo) => patchState(store, { meteo: meteo, isLoading: false }),
+                error: () => patchState(store, { isLoading: false }),
+              })
+            );
+          })
+        )
+      ),
+      // savePost: rxMethod<void>(
+      //   pipe(
+      //     tap(()=> updateState(store, '[savePost] update loading', {isLoading: true})    ),
+      //     switchMap(() => {
+      //       const getFormatedInHtmlArticle = store.getFormatedInHtmlArticle();
+      //       if (!getFormatedInHtmlArticle) {
+      //         patchState(store, { isLoading: false });
+      //         return EMPTY;
+      //       }
+      //       return infra.savePost(getFormatedInHtmlArticle).pipe(
+      //         tapResponse({
+      //           next: formatedInHtmlArticle => patchState(store, { formatedInHtmlArticle: formatedInHtmlArticle, isLoading: false }),
+      //           error: error => patchState(store, {isLoading: false})
+      //         })
+      //       )
+      //     })
+      //   )
+      // ),
+      addImagesInArticle: rxMethod<void>(
+        pipe(
+          tap(()=> updateState(store, '[addImagesInArticle] update loading', {isLoading: true})    ),
+          switchMap(() => {
+            const getFormatedInHtmlArticle = store.getFormatedInHtmlArticle();
+            if (!getFormatedInHtmlArticle) {
+              patchState(store, { isLoading: false });
+              return EMPTY;
+            }
+            return infra.addImagesInArticle(getFormatedInHtmlArticle).pipe(
               tapResponse({
                 next: formatedInHtmlArticle => patchState(store, { formatedInHtmlArticle: formatedInHtmlArticle, isLoading: false }),
                 error: error => patchState(store, {isLoading: false})

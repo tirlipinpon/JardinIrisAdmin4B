@@ -37,11 +37,14 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
         case 'success': {
           if (msg.action === MessageAction.ARTICLE || msg.action === MessageAction.IDEA) {
             this.generateArticle();
-          }
-          else if (msg.action === MessageAction.GENERATED_ARTICLE) {
+          } else if (msg.action === MessageAction.GENERATED_ARTICLE) {
             this.upgradeArticle();
           } else if (msg.action === MessageAction.UPGRADED_ARTICLE) {
             this.formatInHtmlArticle();
+          } else if (msg.action === MessageAction.FORMATED_IN_HTML_ARTICLE) {
+            this.checkMeteo();
+          } else if (msg.action === MessageAction.METEO) {
+            // this.addImagesInArticle();
           }
           break;
         }
@@ -75,12 +78,25 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
     this.application.generateArticle(url_post);
   }
 
+  async upgradeArticle() {
+    this.application.upgradeArticle();
+  }
+
   async formatInHtmlArticle() {
     this.application.formatInHtmlArticle();
   }
 
-  async upgradeArticle() {
-    this.application.upgradeArticle();
+  async checkMeteo() {
+    this.application.checkMeteo();
+  }
+
+  async savePost() {
+    this.application.savePost();
+  }
+
+
+  async addImagesInArticle() {
+    this.application.addImagesInArticle();
   }
 
 }
