@@ -27,11 +27,9 @@ export class SearchApplication {
     return this.store.isLoading;
   }
 
-  searchArticle(url_post: string): void {
-    if (!url_post.length) {
+  searchArticle(): void {
       this.messageService.sendMessage('Articles recherche en cour pour la Belgique.');
       this.store.searchArticle(this.cptSearchArticle++);
-    }
   }
 
   searchIdea(): void {
@@ -39,9 +37,9 @@ export class SearchApplication {
       this.store.searchIdea();
   }
 
-  generateArticle(): void {
+  generateArticle(url_post?: string): void {
     this.messageService.sendMessage('Géneration d article en cour.');
-    this.store.generateArticle();
+    this.store.generateArticle(url_post);
   }
 
   formatInHtmlArticle(): void {

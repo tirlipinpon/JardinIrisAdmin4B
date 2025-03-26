@@ -58,7 +58,11 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
   }
 
   async process() {
-      this.application.searchArticle(this.url_post);
+    if(!this.url_post.length) {
+      this.application.searchArticle();
+    } else {
+      this.application.generateArticle(this.url_post);
+    }
   }
 
   async searchIdea() {

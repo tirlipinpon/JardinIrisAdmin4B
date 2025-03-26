@@ -5,6 +5,7 @@ import {rxMethod} from "@ngrx/signals/rxjs-interop";
 import {concatMap, from, pipe, tap} from "rxjs";
 import {tapResponse} from "@ngrx/operators";
 import {SearchInfrastructure} from "../services/search.infrastructure";
+import {Post} from "../../../types/post";
 
 export interface SearchState {
   articles: { url: string; image_url: string }[] | null;
@@ -12,6 +13,7 @@ export interface SearchState {
   isLoading: boolean;
   generatedArticle: string | null;
   formatedInHtmlArticle: string | null;
+  post: Post | null;
 }
 
 export enum CathegoriesBlog {
@@ -32,6 +34,8 @@ const initialValue: SearchState = {
   ideaByMonth: null,
   generatedArticle: null,
   formatedInHtmlArticle: null,
+  post: null
+
 }
 export const SearchStore= signalStore(
   { providedIn: 'root' },
@@ -84,11 +88,11 @@ export const SearchStore= signalStore(
           })
         )
       ),
-      generateArticle: rxMethod<void>(
+      generateArticle: rxMethod<string | undefined>(
         pipe(
-          tap(()=> updateState(store, '[generateArticle] update loading', {isLoading: true})    ),
-          concatMap(() => {
-            return infra.generateArticle().pipe(
+          tap(() => updateState(store, '[generateArticle] update loading', {isLoading: true})    ),
+          concatMap((input?: string) => {
+            return infra.generateArticle(input).pipe(
               tapResponse({
                 next: generatedArticle => patchState(store, { generatedArticle: generatedArticle, isLoading: false }),
                 error: error => patchState(store, {isLoading: false})
