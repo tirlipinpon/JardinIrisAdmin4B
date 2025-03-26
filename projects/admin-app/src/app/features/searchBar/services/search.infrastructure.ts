@@ -1,5 +1,5 @@
 import {inject, Injectable} from "@angular/core";
-import {Observable} from "rxjs";
+import {from, Observable} from "rxjs";
 import {TheNewsApiService} from "./the-news-api.service";
 import {OpenaiApiService} from "./openai-api.service";
 import {GetPromptsService} from "./get-prompts.service";
@@ -7,6 +7,9 @@ import {PerplexityApiService} from "./perplexity-api.service";
 import {extractJSONBlock} from "../../../utils/cleanJsonObject";
 import {UnsplashImageService} from "./unsplash-image.service";
 import {SupabaseService} from "./supabase/supabase.service";
+import {PostgrestError} from "@supabase/supabase-js";
+import {map} from "rxjs/operators";
+import {Post} from "../../../types/post";
 
 @Injectable({
   providedIn: 'root',
@@ -31,10 +34,26 @@ export class SearchInfrastructure {
   ) {}
 
   searchArticle(cptSearchArticle: number): Observable<{ url: string; image_url: string  }[]> {
-     // return this.theNewsApiService.getNewsApi(cptSearchArticle);
-    return new Observable<{ url: string; image_url: string }[]>(subscriber => {
-      const mock = cptSearchArticle === 0 ? [] : [];
-      //{ url: 'https://example.com/article1', image_url: 'https://example.com/image1.jpg' }
+    return this.theNewsApiService.getNewsApi(cptSearchArticle);
+    // return new Observable<{ url: string; image_url: string }[]>(subscriber => {
+    //   const mock = cptSearchArticle === 0 ? [] : [];
+    //   //{ url: 'https://example.com/article1', image_url: 'https://example.com/image1.jpg' }
+    //   setTimeout(() => {
+    //     subscriber.next(mock);
+    //     subscriber.complete();
+    //   }, 1000);
+    // });
+  }
+
+  selectArticle(articleValid: { url: string; image_url: string }[]): Observable<{ valid: boolean | null, explication:{raisonArticle1: string | null}, url: string | null, image_url: string | null }> {
+    return new Observable<{ valid: boolean | null, explication:{raisonArticle1: string | null}, url: string | null, image_url: string | null }>(subscriber => {
+      const mock =
+        {
+        valid: Math.random() > 0.5,
+        explication: { raisonArticle1: "Pourquoi cet article est pertinent ou non pertinent pour le blog de jardinier en Belgique." },
+        url: articleValid[0].url,
+        image_url: articleValid[0].image_url
+        };
       setTimeout(() => {
         subscriber.next(mock);
         subscriber.complete();
@@ -42,15 +61,27 @@ export class SearchInfrastructure {
     });
   }
 
-  searchIdea(): Observable<string> {
-    return new Observable<string>(subscriber => {
-      console.log(`Recherche d'idée dans le mois courrent`);
-      const mock = `dummy idee recue`;
-      setTimeout(() => {
-        subscriber.next(mock);
-        subscriber.complete();
-      }, 1000);
-    });
+
+  searchIdea(): Observable<{ id: number | null, description: string | null }> {
+    return from(this.supabaseService.getFirstIdeaPostByMonth(new Date().getMonth()+1, new Date().getFullYear()))
+      .pipe(
+        map(result => {
+          if ('id' in result) {
+            return result;
+          } else {
+            console.error('Erreur lors de la récupération des idées:', result);
+            throw result;
+          }
+        })
+      );
+    // return new Observable<string>(subscriber => {
+    //   console.log(`Recherche d'idée dans le mois courrent`);
+    //   const mock = `dummy idee recue`;
+    //   setTimeout(() => {
+    //     subscriber.next(mock);
+    //     subscriber.complete();
+    //   }, 1000);
+    // });
   }
 
   generateArticle(url_post?: string): Observable<string> {
@@ -105,6 +136,15 @@ int un ratio d'efficacité hydrique de 2,64 hectolitres/hectolitre.
         subscriber.complete();
       }, 1000);
     });
+  }
+
+  savePost(post: Post): Observable<number> {
+    return new Observable<number>(subscriber => {
+      const mock = 1;
+      setTimeout(() => {
+        subscriber.next(mock);
+      })
+    })
   }
 
   addImagesInArticle(getFormatedInHtmlArticle: string): Observable<string> {

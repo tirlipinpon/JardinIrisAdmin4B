@@ -8,6 +8,7 @@ export type MessageType = 'message' | 'error' | 'success' | 'fail';
 // Structure pour les actions des messages
 export const MessageAction = {
   ARTICLE: 'article',
+  ARTICLE_VALID: 'articleValid',
   IDEA: 'idea',
   GENERATED_ARTICLE: 'generatedArticle',
   UPGRADED_ARTICLE: 'upgradedArticle',

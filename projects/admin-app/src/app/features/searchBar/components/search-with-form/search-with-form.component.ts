@@ -35,7 +35,9 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           break;
         }
         case 'success': {
-          if (msg.action === MessageAction.ARTICLE || msg.action === MessageAction.IDEA) {
+          if (msg.action === MessageAction.ARTICLE) {
+            this.selectArticle();
+          } else if (msg.action === MessageAction.ARTICLE_VALID || msg.action === MessageAction.IDEA) {
             this.generateArticle();
           } else if (msg.action === MessageAction.GENERATED_ARTICLE) {
             this.upgradeArticle();
@@ -44,12 +46,14 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           } else if (msg.action === MessageAction.FORMATED_IN_HTML_ARTICLE) {
             this.checkMeteo();
           } else if (msg.action === MessageAction.METEO) {
+            this.savePost();
+          } else if (msg.action === MessageAction.METEO) {
             // this.addImagesInArticle();
           }
           break;
         }
         case 'fail': {
-          if (msg.action === MessageAction.ARTICLE) {this.searchIdea();}
+          if (msg.action === MessageAction.ARTICLE || msg.action === MessageAction.ARTICLE_VALID) { this.searchIdea(); }
           break;
         }
       }
@@ -68,6 +72,10 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
 
   async searchArticle() {
     this.application.searchArticle();
+  }
+
+  async selectArticle() {
+    this.application.selectArticle();
   }
 
   async searchIdea() {
@@ -93,7 +101,6 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
   async savePost() {
     this.application.savePost();
   }
-
 
   async addImagesInArticle() {
     this.application.addImagesInArticle();

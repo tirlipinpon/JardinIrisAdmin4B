@@ -10,7 +10,8 @@ import {map} from "rxjs/operators";
 
 export interface SearchState {
   articles: { url: string; image_url: string }[] | null;
-  ideaByMonth: string | null;
+  articleValid: { valid: boolean | null, url: string | null, image_url: string | null, explication:{ raisonArticle1: string | null} }
+  ideaByMonth:  { id: number | null, "description": string | null } | null ;
   urlPost: string | null;
   isLoading: boolean;
   generatedArticle: string | null;
@@ -18,6 +19,7 @@ export interface SearchState {
   formatedInHtmlArticle: string | null;
   meteo: string | null;
   post: Post | null;
+  postId: number | null;
 }
 
 export enum CathegoriesBlog {
@@ -34,14 +36,28 @@ export enum CathegoriesBlog {
 // valeur initiale
 const initialValue: SearchState = {
   articles: null,
+  articleValid: { valid: null, url: null, image_url: null, explication:{raisonArticle1: null}},
   isLoading: false,
   ideaByMonth: null,
   generatedArticle: null,
   upgradedArticle: null,
   formatedInHtmlArticle: null,
   meteo: null,
-  post: null,
-  urlPost: null
+  post: {
+    titre: "Le retour du soleil après une semaine pluvieuse",
+    description_meteo: "Un ciel dégagé et des températures en hausse marquent cette belle journée de printemps.",
+    phrase_accroche: "Enfin du soleil ! Découvrez les prévisions détaillées.",
+    article: "Après une semaine de pluie, le soleil fait son grand retour sur l'ensemble du pays. Les températures atteindront les 20°C dans certaines régions. Découvrez comment ce changement de temps impacte votre quotidien et les activités à privilégier.",
+    citation: "Le soleil brille pour tout le monde. - Sénèque",
+    lien_url_article: null,
+    image_url: null,
+    categorie: "Météo",
+    visite: 0,
+    valid: false,
+    deleted: false
+  },
+  urlPost: null,
+  postId: null
 
 }
 export const SearchStore= signalStore(
@@ -54,26 +70,32 @@ export const SearchStore= signalStore(
       return articles !== null && articles.length > 0 && articles[0].url.length > 1;
     }),
     isIdeaByMonth: computed(() =>  {  const ideaByMonth = store.ideaByMonth();
-      return ideaByMonth!==null &&  ideaByMonth.length > 0
+      return ideaByMonth!==null && ideaByMonth.id
     }),
     getArticles: computed(() =>  store.articles()),
+
+    getArticleValid: computed(() =>  store.articleValid()),
+    isArticleValid: computed(() =>  {  const articleValid = store.articleValid();
+      return articleValid!==null && articleValid.valid
+    }),
     getIdeaByMonth: computed(() =>  store.ideaByMonth()),
     getGeneratedArticle: computed(() =>  store.generatedArticle()),
     isGeneratedArticle: computed(() =>  {  const generatedArticle = store.generatedArticle();
-      return generatedArticle!==null &&  generatedArticle.length > 0
+      return generatedArticle!==null && generatedArticle.length > 0
     }),
     getUpgradedArticle: computed(() =>  store.upgradedArticle()),
     isUpgradedArticle: computed(() =>  {  const upgradedArticle = store.upgradedArticle();
-      return upgradedArticle!==null &&  upgradedArticle.length > 0
+      return upgradedArticle!==null && upgradedArticle.length > 0
     }),
     getFormatedInHtmlArticle: computed(() =>  store.formatedInHtmlArticle()),
     isFormatedInHtmlArticle: computed(() =>  {  const formatedInHtmlArticle = store.formatedInHtmlArticle();
-      return formatedInHtmlArticle!==null &&  formatedInHtmlArticle.length > 0
+      return formatedInHtmlArticle!==null && formatedInHtmlArticle.length > 0
     }),
     getMeteo: computed(() =>  store.meteo()),
     isMeteo: computed(() =>  {  const meteo = store.meteo();
       return meteo!==null &&  meteo.length > 0
     }),
+    getPost: computed(() =>  store.post()),
   })),
   withMethods((store, infra = inject(SearchInfrastructure))=> (
     {
@@ -90,10 +112,28 @@ export const SearchStore= signalStore(
           })
         )
       ),
+      selectArticle: rxMethod<void>(
+        pipe(
+          tap(()=> updateState(store, '[searchArticle] update loading', {isLoading: true})    ),
+          switchMap(() => {
+            const getArticles = store.getArticles();
+            if (!getArticles) {
+              patchState(store, { isLoading: false });
+              return EMPTY;
+            }
+            return infra.selectArticle(getArticles).pipe(
+              tapResponse({
+                next: articleValid => patchState(store, { articleValid: articleValid, isLoading: false }),
+                error: error => patchState(store, {isLoading: false})
+              })
+            )
+          })
+        )
+      ),
       searchIdea: rxMethod<void>(
         pipe(
           tap(()=> updateState(store, '[searchIdea] update loading', {isLoading: true})    ),
-          concatMap(() => {
+          switchMap(() => {
             return infra.searchIdea().pipe(
               tapResponse({
                 next: idea => patchState(store, { ideaByMonth: idea, isLoading: false }),
@@ -106,8 +146,18 @@ export const SearchStore= signalStore(
       generateArticle: rxMethod<string | undefined>(
         pipe(
           tap(() => updateState(store, '[generateArticle] update loading', {isLoading: true})    ),
-          concatMap((input?: string) => {
-            return infra.generateArticle(input).pipe(
+          switchMap((input?: string) => {
+            let getArticleValid;
+            if(input?.length) {
+              getArticleValid = input
+            } else {
+              getArticleValid = store.getArticleValid().url;
+              if (!getArticleValid) {
+                patchState(store, { isLoading: false });
+                return EMPTY;
+              }
+            }
+            return infra.generateArticle(getArticleValid).pipe(
               tapResponse({
                 next: generatedArticle => patchState(store, { generatedArticle: generatedArticle, isLoading: false }),
                 error: error => patchState(store, {isLoading: false})
@@ -174,24 +224,24 @@ export const SearchStore= signalStore(
           })
         )
       ),
-      // savePost: rxMethod<void>(
-      //   pipe(
-      //     tap(()=> updateState(store, '[savePost] update loading', {isLoading: true})    ),
-      //     switchMap(() => {
-      //       const getFormatedInHtmlArticle = store.getFormatedInHtmlArticle();
-      //       if (!getFormatedInHtmlArticle) {
-      //         patchState(store, { isLoading: false });
-      //         return EMPTY;
-      //       }
-      //       return infra.savePost(getFormatedInHtmlArticle).pipe(
-      //         tapResponse({
-      //           next: formatedInHtmlArticle => patchState(store, { formatedInHtmlArticle: formatedInHtmlArticle, isLoading: false }),
-      //           error: error => patchState(store, {isLoading: false})
-      //         })
-      //       )
-      //     })
-      //   )
-      // ),
+      savePost: rxMethod<void>(
+        pipe(
+          tap(()=> updateState(store, '[savePost] update loading', {isLoading: true})    ),
+          switchMap(() => {
+            const getPost = store.getPost();
+            if (!getPost) {
+              patchState(store, { isLoading: false });
+              return EMPTY;
+            }
+            return infra.savePost(getPost).pipe(
+              tapResponse({
+                next: postId => patchState(store, { postId: postId, isLoading: false }),
+                error: error => patchState(store, {isLoading: false})
+              })
+            )
+          })
+        )
+      ),
       addImagesInArticle: rxMethod<void>(
         pipe(
           tap(()=> updateState(store, '[addImagesInArticle] update loading', {isLoading: true})    ),

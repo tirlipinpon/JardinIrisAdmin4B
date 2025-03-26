@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {createClient, SupabaseClient} from "@supabase/supabase-js";
+import {createClient, PostgrestError, SupabaseClient} from "@supabase/supabase-js";
 import {environment} from "../../../../../../../../environment";
 
 @Injectable({
@@ -165,7 +165,7 @@ export class SupabaseService {
     }
   }
 
-  async getFirstIdeaPostByMonth(month: number, year: number) {
+  async getFirstIdeaPostByMonth(month: number, year: number): Promise<{ id: number | null, "description": string | null } | PostgrestError>  {
     const { data, error } = await this.supabase
       .from('ideaPost')
       .select('id, description')
@@ -180,7 +180,7 @@ export class SupabaseService {
       return error
     } else {
       console.log("getFirstIdeaPostByMonth = " + JSON.stringify(data, null, 2))
-      return data;
+      return data.length > 0 ? data[0] : { id: null, description: null };
     }
   }
 

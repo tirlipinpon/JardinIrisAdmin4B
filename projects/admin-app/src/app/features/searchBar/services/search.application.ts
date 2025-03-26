@@ -18,11 +18,12 @@ export class SearchApplication {
 
   private initializeEffects(): void {
     this.isSearchingEffect();
+    this.isArticleValidEffect();
     this.isIdeaEffect();
     this.isGeneratedArticleEffect();
     this.isFormatedInHtmlArticleEffect();
     this.isUpgradedArticleEffect();
-    this.isMeteo();
+    this.isMeteoEffect();
   }
 
   get isSearching(): Signal<boolean> {
@@ -30,12 +31,17 @@ export class SearchApplication {
   }
 
   searchArticle(): void {
-      this.messageService.sendMessage('Articles recherche en cour pour la Belgique.');
+      this.messageService.sendMessage('Articles recherche en cours pour la Belgique.');
       this.store.searchArticle(this.cptSearchArticle++);
   }
 
+  selectArticle(): void {
+    this.messageService.sendMessage('Selecte un Articles en cours.');
+    this.store.selectArticle();
+  }
+
   searchIdea(): void {
-      this.messageService.sendMessage('Idée recherche en cour.');
+      this.messageService.sendMessage('Idée recherche en cours.');
       this.store.searchIdea();
   }
 
@@ -49,23 +55,24 @@ export class SearchApplication {
   }
 
   upgradeArticle(): void {
-    this.messageService.sendMessage('Upgrade article en cour.');
+    this.messageService.sendMessage('Upgrade article en cours.');
     this.store.upgradeArticle();
   }
 
   formatInHtmlArticle(): void {
-    this.messageService.sendMessage('Formatage en Html d article en cour.');
+    this.messageService.sendMessage('Formatage en Html d article en cours.');
     this.store.formatInHtmlArticle();
   }
 
   checkMeteo(): void {
-    this.messageService.sendMessage('Météo en cour.');
+    this.messageService.sendMessage('Météo en cours.');
     this.store.checkMeteo();
   }
 
   savePost(): void {
     this.messageService.sendMessage('Enregistrement du post en cour.');
-    // this.store.savePost(this.store.formatInHtmlArticle);
+    // recuperer et traiter les données = post formated
+    this.store.savePost();
   }
 
   addImagesInArticle(): void {
@@ -83,6 +90,18 @@ export class SearchApplication {
           this.store.searchArticle(this.cptSearchArticle++);
         } else if (this.cptSearchArticle === 2) {
           this.messageService.sendFail('Articles non trouvés en Europe.', MessageAction.ARTICLE);
+        }
+      }
+    });
+  }
+
+  private isArticleValidEffect(): void {
+    effect(() => {
+      if(this.store.getArticleValid().valid !== null) {
+        if (this.store.isArticleValid()) {
+          this.messageService.sendSuccess('Article validé trouvé.', MessageAction.ARTICLE_VALID);
+        } else {
+          this.messageService.sendFail('Article non validé trouvé.', MessageAction.ARTICLE_VALID);
         }
       }
     });
@@ -136,7 +155,7 @@ export class SearchApplication {
     });
   }
 
-  private isMeteo(): void {
+  private isMeteoEffect(): void {
     effect(() => {
       if(this.store.getMeteo()!==null) {
         if(this.store.isMeteo()) {
