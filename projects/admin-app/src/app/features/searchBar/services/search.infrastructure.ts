@@ -55,7 +55,34 @@ export class SearchInfrastructure {
 
   generateArticle(url_post?: string): Observable<string> {
     return new Observable<string>(subscriber => {
-      const mockArticles = url_post ? `dummy article a ete genere avec le post url ${url_post} voici l article` : `dummy article a ete genere  voici l article`;
+      const mockArticles = url_post ?
+        `
+        ${url_post} => Introduction à la Gestion Durable de l'Eau chez AB InBev 🌊
+À Jupille, dans la région de Liège, la brasserie AB InBev a mis en place une initiative innovante pour purifier les eaux usées et les rendre potables.
+Le Processus de Purification des Eaux Usées ⚗️
+Depuis 2019, la brasserie de Jupille, en collaboration avec De Watergroep, purifie environ 400 000 m³ d'eau usée chaque année, soit l'équivalent de 160 piscines olympiques.
+Réduction de l'Empreinte Hydrique des Brasseries 📉
+La réduction de l'empreinte hydrique est un élément clé des objectifs de développement durable d'AB InBev. L'entreprise utilise l'approche des 5R (Reduce, Reuse, Recycle, Restore, Recover)
+Surveillance et Protection des Ressources en Eau 🛡️
+La brasserie de Jupille se concentre également sur la surveillance et la protection des ressources en eau. Une zone de protection des puits est mise en place pour éviter toute pollution des eaux de puits.
+Impact Environnemental et Économique 🌍
+Les initiatives de AB InBev pour réduire l'empreinte hydrique ont des implications environnementales et économiques significatives. L'utilisation rationnelle de l'eau est cruciale, et l'entreprise vise à protéger cette ressource naturelle.
+Initiatives Globales et Partenariats pour la Durabilité 🌟
+AB InBev engage des initiatives globales pour adresser les défis liés à l'eau. Entre 2017 et 2022, l'entreprise a réduit sa consommation d'eau de 14% et a atteint un ratio d'efficacité hydrique de 2,64 hectolitres/hectolitre.` :
+        `
+Introduction à la Gestion Durable de l'Eau chez AB InBev 🌊
+À Jupille, dans la région de Liège, la brasserie AB InBev a mis en place une initiative innovante pour purifier les eaux usées et les rendre potables.
+Le Processus de Purification des Eaux Usées ⚗️
+Depuis 2019, la brasserie de Jupille, en collaboration avec De Watergroep, purifie environ 400 000 m³ d'eau usée chaque année, soit l'équivalent de 160 piscines olympiques.
+Réduction de l'Empreinte Hydrique des Brasseries 📉
+La réduction de l'empreinte hydrique est un élément clé des objectifs de développement durable d'AB InBev. L'entreprise utilise l'approche des 5R (Reduce, Reuse, Recycle, Restore, Recover)
+Surveillance et Protection des Ressources en Eau 🛡️
+La brasserie de Jupille se concentre également sur la surveillance et la protection des ressources en eau. Une zone de protection des puits est mise en place pour éviter toute pollution des eaux de puits.
+Impact Environnemental et Économique 🌍
+Les initiatives de AB InBev pour réduire l'empreinte hydrique ont des implications environnementales et économiques significatives. L'utilisation rationnelle de l'eau est cruciale, et l'entreprise vise à protéger cette ressource naturelle.
+Initiatives Globales et Partenariats pour la Durabilité 🌟
+AB InBev engage des initiatives globales pour adresser les défis liés à l'eau. Entre 2017 et 2022, l'entreprise a réduit sa consommation d'eau de 14% et a atteint un ratio d'efficacité hydrique de 2,64 hectolitres/hectolitre.
+        `;
       setTimeout(() => {
         subscriber.next(mockArticles);
         subscriber.complete();

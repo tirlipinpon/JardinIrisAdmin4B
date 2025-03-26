@@ -1,20 +1,20 @@
 import {Comment} from "./comment";
 
 export interface Post {
-  id: number;
-  created_at: string;
+  id?: number;
+  created_at?: string;
   titre: string;
   description_meteo: string;
   phrase_accroche: string;
   article: string;
   comments?: Comment[];
   citation: string;
-  lien_url_article: string;
-  image_url: string;
-  categorie: string;
-  visite: number;
-  valid: boolean;
-  deleted: boolean;
+  lien_url_article?: string;
+  image_url?: string;
+  categorie?: string;
+  visite?: number;
+  valid?: boolean;
+  deleted?: boolean;
   video?: string;
 }
 

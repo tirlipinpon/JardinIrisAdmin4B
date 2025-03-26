@@ -6,10 +6,12 @@ import {concatMap, from, pipe, tap} from "rxjs";
 import {tapResponse} from "@ngrx/operators";
 import {SearchInfrastructure} from "../services/search.infrastructure";
 import {Post} from "../../../types/post";
+import {map} from "rxjs/operators";
 
 export interface SearchState {
   articles: { url: string; image_url: string }[] | null;
   ideaByMonth: string | null;
+  urlPost: string | null;
   isLoading: boolean;
   generatedArticle: string | null;
   formatedInHtmlArticle: string | null;
@@ -34,7 +36,8 @@ const initialValue: SearchState = {
   ideaByMonth: null,
   generatedArticle: null,
   formatedInHtmlArticle: null,
-  post: null
+  post: null,
+  urlPost: null
 
 }
 export const SearchStore= signalStore(
@@ -98,6 +101,15 @@ export const SearchStore= signalStore(
                 error: error => patchState(store, {isLoading: false})
               })
             )
+          })
+        )
+      ),
+      saveUrlPost: rxMethod<string>(
+        pipe(
+          tap(() => updateState(store, '[saveUrlPost] update loading', {isLoading: true})),
+          map((url: string) => {
+            patchState(store, { urlPost: url, isLoading: false });
+            return url;
           })
         )
       ),

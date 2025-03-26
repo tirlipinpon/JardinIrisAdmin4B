@@ -40,6 +40,7 @@ export class SearchApplication {
   generateArticle(url_post?: string): void {
     this.messageService.sendMessage('Géneration d article en cour.');
     this.store.generateArticle(url_post);
+    url_post?this.store.saveUrlPost(url_post):null;
   }
 
   formatInHtmlArticle(): void {
@@ -49,7 +50,7 @@ export class SearchApplication {
 
   private isSearchingEffect(): void {
     effect(() => {
-      if (this.store.getArticles()) {
+      if (this.store.getArticles()!==null) {
         if (this.store.isArticlesFound() ) {
           this.messageService.sendSuccess('Articles trouvés.', MessageAction.ARTICLE);
         } else if (this.cptSearchArticle < 2) {
