@@ -21,6 +21,7 @@ export class SearchApplication {
     this.isIdeaEffect();
     this.isGeneratedArticleEffect();
     this.isFormatedInHtmlArticleEffect();
+    this.isUpgradedArticleEffect();
   }
 
   get isSearching(): Signal<boolean> {
@@ -40,12 +41,21 @@ export class SearchApplication {
   generateArticle(url_post?: string): void {
     this.messageService.sendMessage('Géneration d article en cour.');
     this.store.generateArticle(url_post);
-    url_post?this.store.saveUrlPost(url_post):null;
+    if (url_post) {
+      this.messageService.sendMessage('Sauvegarde de l url de post a generer.');
+      this.store.saveUrlPost(url_post);
+    }
+
   }
 
   formatInHtmlArticle(): void {
     this.messageService.sendMessage('Formatage en Html d article en cour.');
     this.store.formatInHtmlArticle();
+  }
+
+  upgradeArticle(): void {
+    this.messageService.sendMessage('Upgrade article en cour.');
+    this.store.upgradeArticle();
   }
 
   private isSearchingEffect(): void {
@@ -82,6 +92,18 @@ export class SearchApplication {
           this.messageService.sendSuccess('Géneration terminé.', MessageAction.GENERATED_ARTICLE);
         } else {
           this.messageService.sendError('Géneration a une erreur.');
+        }
+      }
+    });
+  }
+
+  private isUpgradedArticleEffect(): void {
+    effect(() => {
+      if(this.store.getUpgradedArticle()!==null) {
+        if(this.store.isUpgradedArticle()) {
+          this.messageService.sendSuccess('Upgrade terminé.', MessageAction.UPGRADED_ARTICLE);
+        } else {
+          this.messageService.sendError('Upgrade a une erreur.');
         }
       }
     });

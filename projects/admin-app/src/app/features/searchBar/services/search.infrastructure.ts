@@ -90,6 +90,19 @@ AB InBev engage des initiatives globales pour adresser les défis liés à l'eau
     });
   }
 
+
+  upgradeArticle(article: string): Observable<string> {
+    return new Observable<string>(subscriber => {
+      const mockArticles =
+        `Super Article => ${article}`;
+      setTimeout(() => {
+        subscriber.next(mockArticles);
+        subscriber.complete();
+      }, 1000);
+    });
+  }
+
+
   formatInHtmlArticle(): Observable<string> {
     return new Observable<string>(subscriber => {
       const mockArticles = `

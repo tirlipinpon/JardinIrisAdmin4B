@@ -38,7 +38,9 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           if (msg.action === MessageAction.ARTICLE || msg.action === MessageAction.IDEA) {
             this.generateArticle();
           }
-          else if (msg.action === MessageAction.GENERATED_ARTICLE){
+          else if (msg.action === MessageAction.GENERATED_ARTICLE) {
+            this.upgradeArticle();
+          } else if (msg.action === MessageAction.UPGRADED_ARTICLE) {
             this.formatInHtmlArticle();
           }
           break;
@@ -58,20 +60,27 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
   }
 
   async process() {
-    !this.url_post?this.application.searchArticle():this.application.generateArticle(this.url_post);
+    !this.url_post?this.searchArticle():this.generateArticle(this.url_post);
+  }
+
+  async searchArticle() {
+    this.application.searchArticle();
   }
 
   async searchIdea() {
     this.application.searchIdea();
   }
 
-  async generateArticle() {
-    this.application.generateArticle();
+  async generateArticle(url_post? : string) {
+    this.application.generateArticle(url_post);
   }
 
   async formatInHtmlArticle() {
     this.application.formatInHtmlArticle();
   }
 
+  async upgradeArticle() {
+    this.application.upgradeArticle();
+  }
 
 }

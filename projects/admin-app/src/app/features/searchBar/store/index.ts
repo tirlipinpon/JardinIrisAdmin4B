@@ -2,7 +2,7 @@ import {patchState, signalStore, withComputed, withMethods, withState} from "@ng
 import {updateState, withDevtools} from "@angular-architects/ngrx-toolkit";
 import {computed, inject} from "@angular/core";
 import {rxMethod} from "@ngrx/signals/rxjs-interop";
-import {concatMap, from, pipe, tap} from "rxjs";
+import {concatMap, EMPTY, from, pipe, switchMap, tap} from "rxjs";
 import {tapResponse} from "@ngrx/operators";
 import {SearchInfrastructure} from "../services/search.infrastructure";
 import {Post} from "../../../types/post";
@@ -14,6 +14,7 @@ export interface SearchState {
   urlPost: string | null;
   isLoading: boolean;
   generatedArticle: string | null;
+  upgradedArticle: string | null;
   formatedInHtmlArticle: string | null;
   post: Post | null;
 }
@@ -35,6 +36,7 @@ const initialValue: SearchState = {
   isLoading: false,
   ideaByMonth: null,
   generatedArticle: null,
+  upgradedArticle: null,
   formatedInHtmlArticle: null,
   post: null,
   urlPost: null
@@ -57,6 +59,10 @@ export const SearchStore= signalStore(
     getGeneratedArticle: computed(() =>  store.generatedArticle()),
     isGeneratedArticle: computed(() =>  {  const generatedArticle = store.generatedArticle();
       return generatedArticle!==null &&  generatedArticle.length > 0
+    }),
+    getUpgradedArticle: computed(() =>  store.upgradedArticle()),
+    isUpgradedArticle: computed(() =>  {  const upgradedArticle = store.upgradedArticle();
+      return upgradedArticle!==null &&  upgradedArticle.length > 0
     }),
     getFormatedInHtmlArticle: computed(() =>  store.formatedInHtmlArticle()),
     isFormatedInHtmlArticle: computed(() =>  {  const formatedInHtmlArticle = store.formatedInHtmlArticle();
@@ -110,6 +116,24 @@ export const SearchStore= signalStore(
           map((url: string) => {
             patchState(store, { urlPost: url, isLoading: false });
             return url;
+          })
+        )
+      ),
+      upgradeArticle: rxMethod<void>(
+        pipe(
+          tap(() => updateState(store, '[upgradeArticle] update loading', { isLoading: true })),
+          switchMap(() => {
+            const generatedArticle = store.generatedArticle();
+            if (!generatedArticle) {
+              patchState(store, { isLoading: false });
+              return EMPTY;
+            }
+            return infra.upgradeArticle(generatedArticle).pipe(
+              tapResponse({
+                next: (upgradedArticle) => patchState(store, { upgradedArticle: upgradedArticle, isLoading: false }),
+                error: () => patchState(store, { isLoading: false }),
+              })
+            );
           })
         )
       ),

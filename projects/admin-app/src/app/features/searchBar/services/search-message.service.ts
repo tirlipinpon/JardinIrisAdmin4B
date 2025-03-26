@@ -10,6 +10,7 @@ export const MessageAction = {
   ARTICLE: 'article',
   IDEA: 'idea',
   GENERATED_ARTICLE: 'generatedArticle',
+  UPGRADED_ARTICLE: 'upgradedArticle',
   FORMATED_IN_HTML_ARTICLE: 'FormatedInHtmlArticle',
 } as const;
 
