@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {createClient, PostgrestError, SupabaseClient} from "@supabase/supabase-js";
 import {environment} from "../../../../../../../../environment";
+import {Post} from "../../../../types/post";
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ export class SupabaseService {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey)
   }
 
-  async setNewPostForm(value: any): Promise<any> {
+  async setNewPostForm(value: Post): Promise<Post[]> {
     try {
       const { data, error } = await this.supabase
         .from('post')

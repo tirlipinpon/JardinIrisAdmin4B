@@ -44,14 +44,14 @@ const initialValue: SearchState = {
   formatedInHtmlArticle: null,
   meteo: null,
   post: {
-    titre: "Le retour du soleil après une semaine pluvieuse",
-    description_meteo: "Un ciel dégagé et des températures en hausse marquent cette belle journée de printemps.",
-    phrase_accroche: "Enfin du soleil ! Découvrez les prévisions détaillées.",
-    article: "Après une semaine de pluie, le soleil fait son grand retour sur l'ensemble du pays. Les températures atteindront les 20°C dans certaines régions. Découvrez comment ce changement de temps impacte votre quotidien et les activités à privilégier.",
-    citation: "Le soleil brille pour tout le monde. - Sénèque",
-    lien_url_article: null,
-    image_url: null,
-    categorie: "Météo",
+    titre: "",
+    description_meteo: "",
+    phrase_accroche: "",
+    article: "",
+    citation: "",
+    lien_url_article: "",
+    image_url: "",
+    categorie: "",
     visite: 0,
     valid: false,
     deleted: false
@@ -96,6 +96,10 @@ export const SearchStore= signalStore(
       return meteo!==null &&  meteo.length > 0
     }),
     getPost: computed(() =>  store.post()),
+    getPostId: computed(() =>  store.postId()),
+    isPostId: computed(() =>  { const postId = store.postId();
+      return postId!==null &&  postId > 0
+    }),
   })),
   withMethods((store, infra = inject(SearchInfrastructure))=> (
     {
@@ -235,7 +239,7 @@ export const SearchStore= signalStore(
             }
             return infra.savePost(getPost).pipe(
               tapResponse({
-                next: postId => patchState(store, { postId: postId, isLoading: false }),
+                next: post => patchState(store, { postId: post.id, isLoading: false }),
                 error: error => patchState(store, {isLoading: false})
               })
             )

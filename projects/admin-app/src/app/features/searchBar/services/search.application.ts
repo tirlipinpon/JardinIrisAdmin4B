@@ -24,6 +24,7 @@ export class SearchApplication {
     this.isFormatedInHtmlArticleEffect();
     this.isUpgradedArticleEffect();
     this.isMeteoEffect();
+    this.isPostId();
   }
 
   get isSearching(): Signal<boolean> {
@@ -162,6 +163,18 @@ export class SearchApplication {
           this.messageService.sendSuccess('Météo terminé.', MessageAction.METEO);
         } else {
           this.messageService.sendError('Météo a une erreur.');
+        }
+      }
+    });
+  }
+
+  private isPostId(): void {
+    effect(() => {
+      if(this.store.getPostId()!==null) {
+        if(this.store.isPostId()) {
+          this.messageService.sendSuccess('Post sauvé en db et id dans le store.', MessageAction.SAVED_POST);
+        } else {
+          this.messageService.sendError('Post pas sauvé y a une erreur.');
         }
       }
     });

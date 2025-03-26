@@ -15,8 +15,9 @@
   </div>
 </section>
 
-<div *ngFor="let msg of messages" [ngClass]="'message-' + msg.type" style="margin: 5px 0;">
+<div *ngFor="let msg of messages()" [ngClass]="'message-' + msg.type" style="margin: 5px 0;">
   {{ msg.type }} - {{ msg.content }}
 </div>
+
 
 

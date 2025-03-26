@@ -14,6 +14,8 @@ export const MessageAction = {
   UPGRADED_ARTICLE: 'upgradedArticle',
   FORMATED_IN_HTML_ARTICLE: 'formatedInHtmlArticle',
   METEO: 'meteo',
+  SAVED_POST: 'savedPost',
+  IDEA_UPDATED: 'ideaUpdated',
 } as const;
 
 // Type pour les actions (utilisant typeof pour inférer automatiquement les valeurs)

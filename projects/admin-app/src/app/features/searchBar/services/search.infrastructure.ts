@@ -47,8 +47,7 @@ export class SearchInfrastructure {
 
   selectArticle(articleValid: { url: string; image_url: string }[]): Observable<{ valid: boolean | null, explication:{raisonArticle1: string | null}, url: string | null, image_url: string | null }> {
     return new Observable<{ valid: boolean | null, explication:{raisonArticle1: string | null}, url: string | null, image_url: string | null }>(subscriber => {
-      const mock =
-        {
+      const mock = {
         valid: Math.random() > 0.5,
         explication: { raisonArticle1: "Pourquoi cet article est pertinent ou non pertinent pour le blog de jardinier en Belgique." },
         url: articleValid[0].url,
@@ -60,7 +59,6 @@ export class SearchInfrastructure {
       }, 1000);
     });
   }
-
 
   searchIdea(): Observable<{ id: number | null, description: string | null }> {
     return from(this.supabaseService.getFirstIdeaPostByMonth(new Date().getMonth()+1, new Date().getFullYear()))
@@ -89,10 +87,10 @@ export class SearchInfrastructure {
       const mock = url_post ?
         `
         ${url_post} => Introduction à la Gestion Durable de l'Eau chez AB InBev 🌊
-int un ratio d'efficacité hydrique de 2,64 hectolitres/hectolitre` :
-        `
-Introduction à la Gestion Durable de l'Eau chez AB InBev 🌊
-int un ratio d'efficacité hydrique de 2,64 hectolitres/hectolitre.
+        int un ratio d'efficacité hydrique de 2,64 hectolitres/hectolitre` :
+                `
+        Introduction à la Gestion Durable de l'Eau chez AB InBev 🌊
+        int un ratio d'efficacité hydrique de 2,64 hectolitres/hectolitre.
         `;
       setTimeout(() => {
         subscriber.next(mock);
@@ -100,7 +98,6 @@ int un ratio d'efficacité hydrique de 2,64 hectolitres/hectolitre.
       }, 1000);
     });
   }
-
 
   upgradeArticle(article: string): Observable<string> {
     return new Observable<string>(subscriber => {
@@ -112,7 +109,6 @@ int un ratio d'efficacité hydrique de 2,64 hectolitres/hectolitre.
       }, 1000);
     });
   }
-
 
   formatInHtmlArticle(generatedArticle: string): Observable<string> {
     return new Observable<string>(subscriber => {
@@ -138,14 +134,18 @@ int un ratio d'efficacité hydrique de 2,64 hectolitres/hectolitre.
     });
   }
 
-  savePost(post: Post): Observable<number> {
-    return new Observable<number>(subscriber => {
-      const mock = 1;
-      setTimeout(() => {
-        subscriber.next(mock);
+  savePost(post: Post): Observable<Post> {
+    return from(this.supabaseService.setNewPostForm(post)).pipe(
+      map(data => {
+        if (data && data.length > 0) {
+          return data[0]; // Retourne le premier élément du tableau
+        }
+        throw new Error('Aucune donnée retournée après l insertion');
       })
-    })
+    );
   }
+
+
 
   addImagesInArticle(getFormatedInHtmlArticle: string): Observable<string> {
     return new Observable<string>(subscriber => {

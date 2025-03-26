@@ -1,4 +1,4 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit, signal} from '@angular/core';
 import {FormsModule} from "@angular/forms";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {MessageAction, SearchMessage, SearchMessageService} from "../../services/search-message.service";
@@ -16,15 +16,14 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
   private readonly application = inject(SearchApplication);
   private readonly messageService = inject(SearchMessageService);
   private messageSubscription!: Subscription;
-
+  messages = signal<{type: string, content: string}[]>([]);
   url_post = "";
   isLoading =  this.application.isSearching;
-  messages: SearchMessage[] = [];
-
 
   ngOnInit() {
     this.messageSubscription = this.messageService.message$.subscribe(msg => {
-      if (msg) { this.messages.push(msg); }
+      if (msg) {this.messages.update(currentMessages => [...currentMessages, msg]);
+      }
       switch (msg?.type) {
         case 'message': {
           //statements;
@@ -47,7 +46,8 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
             this.checkMeteo();
           } else if (msg.action === MessageAction.METEO) {
             this.savePost();
-          } else if (msg.action === MessageAction.METEO) {
+          } else if (msg.action === MessageAction.SAVED_POST) {
+            // this.updateIdeaPost();
             // this.addImagesInArticle();
           }
           break;
