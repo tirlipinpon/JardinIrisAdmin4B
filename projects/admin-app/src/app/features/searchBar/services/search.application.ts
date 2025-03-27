@@ -76,10 +76,16 @@ export class SearchApplication {
     this.store.savePost();
   }
 
+  updateIdeaPost(): void {
+    this.messageService.sendMessage('Update de post idea en cour.');
+    this.store.updateIdeaPost();
+  }
+
   addImagesInArticle(): void {
     this.messageService.sendMessage('Ajout images d article en cour.');
     this.store.addImagesInArticle();
   }
+
 
   private isSearchingEffect(): void {
     effect(() => {
@@ -110,10 +116,10 @@ export class SearchApplication {
 
   private isIdeaEffect(): void {
     effect(() => {
-      if(this.store.getIdeaByMonth()!==null) {
-        if (!this.store.isIdeaByMonth()) {
+      if(this.store.getIdeaPost()!==null) {
+        if (!this.store.isIdeaPost()) {
           this.messageService.sendError('Idée non trouvé dans la liste.');
-        } else if (this.store.isIdeaByMonth()) {
+        } else {
           this.messageService.sendSuccess('Idée trouvés dans la liste.', MessageAction.IDEA);
         }
       }

@@ -47,7 +47,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           } else if (msg.action === MessageAction.METEO) {
             this.savePost();
           } else if (msg.action === MessageAction.SAVED_POST) {
-            // this.updateIdeaPost();
+            this.updateIdeaPost();
             // this.addImagesInArticle();
           }
           break;
@@ -104,6 +104,10 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
 
   async addImagesInArticle() {
     this.application.addImagesInArticle();
+  }
+
+  async updateIdeaPost() {
+    this.application.updateIdeaPost();
   }
 
 }

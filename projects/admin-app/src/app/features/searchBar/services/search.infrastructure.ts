@@ -34,15 +34,15 @@ export class SearchInfrastructure {
   ) {}
 
   searchArticle(cptSearchArticle: number): Observable<{ url: string; image_url: string  }[]> {
-    return this.theNewsApiService.getNewsApi(cptSearchArticle);
-    // return new Observable<{ url: string; image_url: string }[]>(subscriber => {
-    //   const mock = cptSearchArticle === 0 ? [] : [];
-    //   //{ url: 'https://example.com/article1', image_url: 'https://example.com/image1.jpg' }
-    //   setTimeout(() => {
-    //     subscriber.next(mock);
-    //     subscriber.complete();
-    //   }, 1000);
-    // });
+    // return this.theNewsApiService.getNewsApi(cptSearchArticle);
+    return new Observable<{ url: string; image_url: string }[]>(subscriber => {
+      const mock = cptSearchArticle === 0 ? [] : [];
+      //{ url: 'https://example.com/article1', image_url: 'https://example.com/image1.jpg' }
+      setTimeout(() => {
+        subscriber.next(mock);
+        subscriber.complete();
+      }, 1000);
+    });
   }
 
   selectArticle(articleValid: { url: string; image_url: string }[]): Observable<{ valid: boolean | null, explication:{raisonArticle1: string | null}, url: string | null, image_url: string | null }> {
@@ -145,7 +145,17 @@ export class SearchInfrastructure {
     );
   }
 
-
+  updateIdeaPost(ideaPostId: number, postId: number): Observable<any> {
+    return from(this.supabaseService.updateIdeaPostById(ideaPostId, postId));
+    // return new Observable<string>(subscriber => {
+    //   console.log(`Recherche d'idée dans le mois courrent`);
+    //   const mock = `dummy idee recue`;
+    //   setTimeout(() => {
+    //     subscriber.next(mock);
+    //     subscriber.complete();
+    //   }, 1000);
+    // });
+  }
 
   addImagesInArticle(getFormatedInHtmlArticle: string): Observable<string> {
     return new Observable<string>(subscriber => {

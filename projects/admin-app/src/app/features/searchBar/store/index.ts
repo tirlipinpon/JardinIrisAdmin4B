@@ -11,7 +11,7 @@ import {map} from "rxjs/operators";
 export interface SearchState {
   articles: { url: string; image_url: string }[] | null;
   articleValid: { valid: boolean | null, url: string | null, image_url: string | null, explication:{ raisonArticle1: string | null} }
-  ideaByMonth:  { id: number | null, "description": string | null } | null ;
+  ideaPost:  { id: number | null, "description": string | null } | null ;
   urlPost: string | null;
   isLoading: boolean;
   generatedArticle: string | null;
@@ -38,7 +38,7 @@ const initialValue: SearchState = {
   articles: null,
   articleValid: { valid: null, url: null, image_url: null, explication:{raisonArticle1: null}},
   isLoading: false,
-  ideaByMonth: null,
+  ideaPost: null,
   generatedArticle: null,
   upgradedArticle: null,
   formatedInHtmlArticle: null,
@@ -69,16 +69,16 @@ export const SearchStore= signalStore(
     isArticlesFound: computed(() => {  const articles = store.articles();
       return articles !== null && articles.length > 0 && articles[0].url.length > 1;
     }),
-    isIdeaByMonth: computed(() =>  {  const ideaByMonth = store.ideaByMonth();
-      return ideaByMonth!==null && ideaByMonth.id
+    isIdeaPost: computed(() =>  {  const ideaPost = store.ideaPost();
+      return ideaPost!==null && ideaPost.id
     }),
+    getIdeaPost: computed(() =>  store.ideaPost()),
     getArticles: computed(() =>  store.articles()),
 
     getArticleValid: computed(() =>  store.articleValid()),
     isArticleValid: computed(() =>  {  const articleValid = store.articleValid();
       return articleValid!==null && articleValid.valid
     }),
-    getIdeaByMonth: computed(() =>  store.ideaByMonth()),
     getGeneratedArticle: computed(() =>  store.generatedArticle()),
     isGeneratedArticle: computed(() =>  {  const generatedArticle = store.generatedArticle();
       return generatedArticle!==null && generatedArticle.length > 0
@@ -140,7 +140,7 @@ export const SearchStore= signalStore(
           switchMap(() => {
             return infra.searchIdea().pipe(
               tapResponse({
-                next: idea => patchState(store, { ideaByMonth: idea, isLoading: false }),
+                next: idea => patchState(store, { ideaPost: idea, isLoading: false }),
                 error: error => patchState(store, {isLoading: false})
               })
             )
@@ -149,24 +149,24 @@ export const SearchStore= signalStore(
       ),
       generateArticle: rxMethod<string | undefined>(
         pipe(
-          tap(() => updateState(store, '[generateArticle] update loading', {isLoading: true})    ),
+          tap(() => updateState(store, '[generateArticle] update loading', {isLoading: true})),
           switchMap((input?: string) => {
-            let getArticleValid;
-            if(input?.length) {
-              getArticleValid = input
-            } else {
-              getArticleValid = store.getArticleValid().url;
-              if (!getArticleValid) {
-                patchState(store, { isLoading: false });
-                return EMPTY;
-              }
-            }
-            return infra.generateArticle(getArticleValid).pipe(
-              tapResponse({
-                next: generatedArticle => patchState(store, { generatedArticle: generatedArticle, isLoading: false }),
-                error: error => patchState(store, {isLoading: false})
-              })
-            )
+            // Fonction pour traiter la génération d'article avec n'importe quelle source
+            const processGeneration = (source: string) => {
+              return infra.generateArticle(source).pipe(
+                tapResponse({
+                  next: generatedArticle => patchState(store, { generatedArticle, isLoading: false }),
+                  error: error => patchState(store, {isLoading: false})
+                })
+              );
+            };
+            if (input?.length) { return processGeneration(input); }
+            const articleValid = store.getArticleValid();
+            if (articleValid.valid && articleValid.url) { return processGeneration(articleValid.url); }
+            const ideaPost = store.getIdeaPost();
+            if (ideaPost?.id !== null && ideaPost?.description) { return processGeneration(ideaPost.description); }
+            patchState(store, { isLoading: false });
+            return EMPTY;
           })
         )
       ),
@@ -240,6 +240,23 @@ export const SearchStore= signalStore(
             return infra.savePost(getPost).pipe(
               tapResponse({
                 next: post => patchState(store, { postId: post.id, isLoading: false }),
+                error: error => patchState(store, {isLoading: false})
+              })
+            )
+          })
+        )
+      ),
+      updateIdeaPost: rxMethod<void>(
+        pipe(
+          tap(()=> updateState(store, '[updateIdeaPost] update loading', {isLoading: true})    ),
+          switchMap(() => {
+            const ideaPost = store.getIdeaPost();
+            const postId = store.getPostId();
+            const isValid = ideaPost && ideaPost.id !== null && postId !== null;
+            if (!isValid) { patchState(store, { isLoading: false }); return EMPTY; }
+            return infra.updateIdeaPost(ideaPost.id as number, postId as number).pipe(
+              tapResponse({
+                next: ideaPost => patchState(store, {isLoading: false }),
                 error: error => patchState(store, {isLoading: false})
               })
             )
