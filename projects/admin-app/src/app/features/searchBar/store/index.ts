@@ -268,10 +268,7 @@ export const SearchStore= signalStore(
           tap(()=> updateState(store, '[addImagesInArticle] update loading', {isLoading: true})    ),
           switchMap(() => {
             const getFormatedInHtmlArticle = store.getFormatedInHtmlArticle();
-            if (!getFormatedInHtmlArticle) {
-              patchState(store, { isLoading: false });
-              return EMPTY;
-            }
+            if (!getFormatedInHtmlArticle) { patchState(store, { isLoading: false }); return EMPTY; }
             return infra.addImagesInArticle(getFormatedInHtmlArticle).pipe(
               tapResponse({
                 next: formatedInHtmlArticle => patchState(store, { formatedInHtmlArticle: formatedInHtmlArticle, isLoading: false }),

@@ -72,7 +72,6 @@ export class SearchApplication {
 
   savePost(): void {
     this.messageService.sendMessage('Enregistrement du post en cour.');
-    // recuperer et traiter les données = post formated
     this.store.savePost();
   }
 
@@ -82,7 +81,7 @@ export class SearchApplication {
   }
 
   addImagesInArticle(): void {
-    this.messageService.sendMessage('Ajout images d article en cour.');
+    this.messageService.sendMessage('Ajout d images d article en cour.');
     this.store.addImagesInArticle();
   }
 

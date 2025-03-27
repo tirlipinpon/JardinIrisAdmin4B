@@ -160,7 +160,7 @@ export class SearchInfrastructure {
   addImagesInArticle(getFormatedInHtmlArticle: string): Observable<string> {
     return new Observable<string>(subscriber => {
       const mock = `
-      <span> ${getFormatedInHtmlArticle} </span>
+      <span> images  = ${getFormatedInHtmlArticle} </span>
       `;
       setTimeout(() => {
         subscriber.next(mock);

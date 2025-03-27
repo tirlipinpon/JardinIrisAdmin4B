@@ -48,7 +48,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
             this.savePost();
           } else if (msg.action === MessageAction.SAVED_POST) {
             this.updateIdeaPost();
-            // this.addImagesInArticle();
+            this.addImagesInArticle();
           }
           break;
         }
@@ -66,47 +66,47 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
     }
   }
 
-  async process() {
+   process() {
     !this.url_post?this.searchArticle():this.generateArticle(this.url_post);
   }
 
-  async searchArticle() {
+   searchArticle() {
     this.application.searchArticle();
   }
 
-  async selectArticle() {
+   selectArticle() {
     this.application.selectArticle();
   }
 
-  async searchIdea() {
+   searchIdea() {
     this.application.searchIdea();
   }
 
-  async generateArticle(url_post? : string) {
+   generateArticle(url_post? : string) {
     this.application.generateArticle(url_post);
   }
 
-  async upgradeArticle() {
+   upgradeArticle() {
     this.application.upgradeArticle();
   }
 
-  async formatInHtmlArticle() {
+   formatInHtmlArticle() {
     this.application.formatInHtmlArticle();
   }
 
-  async checkMeteo() {
+   checkMeteo() {
     this.application.checkMeteo();
   }
 
-  async savePost() {
+   savePost() {
     this.application.savePost();
   }
 
-  async addImagesInArticle() {
+   addImagesInArticle() {
     this.application.addImagesInArticle();
   }
 
-  async updateIdeaPost() {
+   updateIdeaPost() {
     this.application.updateIdeaPost();
   }
 
