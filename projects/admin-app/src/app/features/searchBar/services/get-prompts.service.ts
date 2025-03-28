@@ -170,41 +170,27 @@ Présente le résultat sous la forme d'un JSON valide structuré comme suit :
 
   getPerplexityPromptSystemSelectKeyWordsFromChapitresInArticle(){
     const prompt = `Identifie le mot-clé unique le plus pertinent à partir du titre d'un blog pour effectuer une recherche d'image sur le site Unsplash.com.
-
 Extrait un seul mot-clé du titre du blog. Assure-toi que ce mot résume efficacement l'essence du titre ou capte l'atmosphère centrale pour maximiser la pertinence des images recherchées.
-
 # Steps
-
-1. **Analyse du Titre**: Lis attentivement le titre du blog et identifie les concepts clés et le thème principal.
+1. **Analyse du Titre**: Lis attentivement le titre du blog et les concepts clés et le thème principal.
 2. **Sélection du Mot-clé**: Choisis un mot unique qui encapsule le sujet principal ou l'atmosphère globale du titre et traduis le en anglais.
+2. **Explication du Mot-clé**: Explique pourquoi ce mot clefs.
 3. **Vérification**: Assure-toi que le mot-clé choisi est général et suffisamment représentatif pour être utilisé efficacement dans une recherche d'image.
-
 # Output Format
-
-- Fournis un seul mot en résultat, représentant le mot-clé choisi.
-
+- Fournis un seul mot en résultat, représentant le mot-clé choisi sous cette forme json {"keyWord":"Mots choisis", "explanation":""}.
 # Examples
-
 **Input**: "Exploration des merveilles de l'océan: secrets des abysses"
-
 **Reasoning**:
 - Le titre parle de l'océan et des secrets cachés sous l'eau.
 - Le mot "océan" capture bien le sujet principal.
-
-**Output**: "{"keyWord":"{ocean}"}"
-
+**Output**: "{"keyWord":"ocean", "explanation":"Le mot océan capture bien le sujet principal"} et rien d 'autre, ne rajoute pas de texte ou d explication dans la réponse !
 ---
-
 **Input**: "Les charmes hivernaux des montagnes enneigées"
-
 **Reasoning**:
 - Ce titre met l'accent sur un paysage spécifique et une ambiance saisonnière.
 - Le mot "montagnes" est central pour la recherche visuelle.
-
-**Output**: "{"keyWord":"{mountains}"}"
-
+**Output**: "{"keyWord":"mountains", "explanation":"Le mot montagnes est central pour la recherche visuelle"}"
 # Notes
-
 - Si le titre contient plusieurs thèmes, choisis le mot-clé qui représente le mieux le message principal ou l'élément le plus visuel.
 - Le mot-clé choisi doit être suffisamment large pour couvrir un éventail d'images mais précis pour rester pertinent.`
     return prompt;
@@ -234,8 +220,7 @@ Extrait un seul mot-clé du titre du blog. Assure-toi que ce mot résume efficac
             Ta tâche consiste à lire un texte.
             En analysant le contenu du texte, identifie les thèmes, le ton, et les éléments visuels ou concepts clés qui pourraient être illustrés.
             À partir d'une liste d'URL d'images, trouve celle qui représente le mieux le contenu de ce texte,
-            en considérant l'aspect narratif et la cohérence avec le style du texte.
-            Si tu ne trouve pas d'image adaptée ne donne pas de réponse`
+            en considérant l'aspect narratif et la cohérence avec le style du texte.`
     return prompt;
   }
 
@@ -243,8 +228,7 @@ Extrait un seul mot-clé du titre du blog. Assure-toi que ce mot résume efficac
     const prompt = `Voici le texte  : ${article}, ainsi qu'une liste d'URL d'images ${JSON.stringify(images)}.
             Analyse le contenu du texte pour en extraire les thèmes et concepts principaux, et choisis l'image la plus représentative de cette partie du texte destinée sur un blog de jardinier.
             Assure-toi que l'image sélectionnée illustre bien l'ambiance et les éléments visuels pertinents.
-            Si il n y a pas d'image adapté renvoie une url vide.
-            Donne l'url de l'image choisie en suivant ce format JSON: {"imageUrl":"{url}"}`
+            Donne l'url de l'image choisie en suivant ce format JSON: {"imageUrl":"url"}`
     return prompt;
   }
 

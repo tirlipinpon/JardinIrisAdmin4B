@@ -267,11 +267,13 @@ export const SearchStore= signalStore(
         pipe(
           tap(()=> updateState(store, '[addImagesInArticle] update loading', {isLoading: true})    ),
           switchMap(() => {
-            const getFormatedInHtmlArticle = store.getFormatedInHtmlArticle();
-            if (!getFormatedInHtmlArticle) { patchState(store, { isLoading: false }); return EMPTY; }
-            return infra.addImagesInArticle(getFormatedInHtmlArticle).pipe(
+            const getPost = store.getFormatedInHtmlArticle();
+            if (!getPost || !getPost.length) { patchState(store, { isLoading: false }); return EMPTY; }
+            const getPostId = store.getPostId();
+            if (!getPostId) { patchState(store, { isLoading: false }); return EMPTY; }
+            return infra.addImagesInArticle(getPost, getPostId).pipe(
               tapResponse({
-                next: formatedInHtmlArticle => patchState(store, { formatedInHtmlArticle: formatedInHtmlArticle, isLoading: false }),
+                next: data => patchState(store, { isLoading: false }),
                 error: error => patchState(store, {isLoading: false})
               })
             )

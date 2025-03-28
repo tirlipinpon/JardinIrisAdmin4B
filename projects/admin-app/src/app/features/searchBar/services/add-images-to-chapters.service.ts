@@ -1,30 +1,37 @@
-import {inject, Injectable} from '@angular/core';
-import {Post} from "../../../types/post";
-import {TheNewsApiService} from "./the-news-api.service";
-import {OpenaiApiService} from "./openai-api.service";
-import {PerplexityApiService} from "./perplexity-api.service";
-import {GetPromptsService} from "./get-prompts.service";
-import {UnsplashImageService} from "./unsplash-image.service";
-import {SupabaseService} from "./supabase/supabase.service";
+import { inject, Injectable } from '@angular/core';
+import { Post } from "../../../types/post";
+import { TheNewsApiService } from "./the-news-api.service";
+import { OpenaiApiService } from "./openai-api.service";
+import { PerplexityApiService } from "./perplexity-api.service";
+import { GetPromptsService } from "./get-prompts.service";
+import { UnsplashImageService } from "./unsplash-image.service";
+import { SupabaseService } from "./supabase/supabase.service";
 
+/**
+ * Service responsable d'ajouter des images aux chapitres d'un article
+ * basé sur l'analyse du contenu de chaque chapitre
+ */
 @Injectable({
-  providedIn: 'root',
-  useFactory: () => {
-    const theNewsApiService = inject(TheNewsApiService);
-    const openaiApiService = inject(OpenaiApiService);
-    const perplexityApiService = inject(PerplexityApiService);
-    const getPromptsService = inject(GetPromptsService);
-    const unsplashImageService = inject(UnsplashImageService);
-    const supabaseService = inject(SupabaseService);
-  }
+  providedIn: 'root'
 })
 export class AddImagesToChaptersService {
 
-  constructor(private openaiApiService: OpenaiApiService
-    , private perplexityApiService: PerplexityApiService
-    , private getPromptsService: GetPromptsService
-    , private unsplashImageService: UnsplashImageService
-    , private supabaseService: SupabaseService) { }
+  constructor(
+    private perplexityApiService: PerplexityApiService,
+    private openaiApiService: OpenaiApiService,
+    private getPromptsService: GetPromptsService,
+    private unsplashImageService: UnsplashImageService,
+    private supabaseService: SupabaseService
+  ) {
+    console.log("AddImagesToChaptersService initialisé avec services:", {
+      perplexityApiService: !!perplexityApiService,
+      getPromptsService: !!getPromptsService,
+      unsplashImageService: !!unsplashImageService,
+      supabaseService: !!supabaseService,
+      openaiApiService: !!openaiApiService
+    });
+  }
+
 
   extractJSONBlock(input: string): string {
     const regex = /```json\s([\s\S]*?)\s```/;
@@ -45,32 +52,51 @@ export class AddImagesToChaptersService {
     }
   }
   extractByPositionH4Title(texte: string, x: number): string {
+    console.log(`Tentative d'extraction du titre H4 position ${x} dans un article de ${texte?.length || 0} caractères`);
+    try {
     const regex = new RegExp(`<span[^>]*id=["']paragraphe-${x}["'][^>]*>\\s*<h4>(.*?)</h4>`, 'i');
     const match = texte.match(regex);
     return match ? match[1] : '';
+    } catch (e) {
+      console.error(`Erreur lors de l'extraction du titre H4 (${x}):`, e);
+      return ""; // Retourne une chaîne vide en cas d'erreur
+    }
+
   }
-  async getKeyWordsFromChapitreInArticleAndSetImageUrl(article: Post) {
+
+  async getKeyWordsFromChapitreInArticleAndSetImageUrl(article: string, articleId: number) {
+    console.log("Début getKeyWordsFromChapitreInArticleAndSetImageUrl", { articleId });
+
     let chapitreKeyWordList: string[] = []
     for (let i=1; i<=6; i++) {
+      console.log(`Traitement du chapitre ${i}`);
       const chapitreId = i;
       let chapitreKeyWord = "";
-      const extractedTitle = this.extractByPositionH4Title(article.article, chapitreId)
-      console.log("extractedTitle-" +  chapitreId  +" : "+ extractedTitle)
-      const extractedParagraphe = this.extractSecondSpanContent(article.article, chapitreId)
-      console.log("extractedParagraphe-" +  chapitreId  +" : "+ extractedTitle)
-      if(extractedTitle.length) {
+      const extractedTitle = this.extractByPositionH4Title(article, chapitreId)
+      console.log(`Chapitre ${chapitreId} - Titre extrait:`, extractedTitle);
+      const extractedParagraphe = this.extractSecondSpanContent(article, chapitreId)
+      console.log(`Chapitre ${chapitreId} - Paragraphe extrait:`, extractedParagraphe?.substring(0, 50) + "...");
+      if(!extractedTitle || extractedTitle.length) {
         try {
           // Selection des images par le titre et des mots-clés
           const prompt = this.getPromptsService.getPromptGenericSelectKeyWordsFromChapitresInArticle(extractedTitle, chapitreKeyWordList);
-          const response = await this.perplexityApiService.fetchData(prompt);
+          const response = await this.openaiApiService.fetchData(prompt, true);
           // Vérification et parsing de la réponse
           let resp;
           try {
-            resp = JSON.parse(this.extractJSONBlock(response.choices[0].message.content));
-            chapitreKeyWord = resp.keyWord;
-          } catch (parseError) {
+            if (response && response.length > 0) {
+              let test = response.match(/\{"keyWord":"\{?[^}]+\}?"\}/g);
+              if (test && test.length > 0) {
+                let test2 = this.extractJSONBlock(test[0])
+                resp = JSON.parse(test2);
+                chapitreKeyWord = resp.keyWord;
+                console.log(`Chapitre ${chapitreId} - Préparation de la requête pour les mots-clés`);
+              }
+              }
+            } catch (parseError) {
             console.error("Erreur lors de l'analyse du JSON pour les mots-clés du chapitre :", parseError);
-            return;
+            continue
+              ;
           }
           // Récupération des images depuis Unsplash
           const unsplashResponse = await this.unsplashImageService.getUnsplashApi(chapitreKeyWord);
@@ -79,22 +105,31 @@ export class AddImagesToChaptersService {
           // Vérification si l'URL d'image existe
           if (!respImagesUrl || !respImagesUrl.regularUrls) {
             console.error("Erreur: Aucune URL d'image trouvée pour les mots-clés:", chapitreKeyWord);
-            return;
+            continue
+              ;
           }
           // Sélection de la meilleure image pour le chapitre
           const bestImagePrompt = this.getPromptsService.getPromptGenericSelectBestImageForChapitresInArticle(extractedParagraphe, respImagesUrl.regularUrls);
-          const bestImageResponse = await this.perplexityApiService.fetchData(bestImagePrompt);
+          const bestImageResponse = await this.openaiApiService.fetchData(bestImagePrompt, true);
           // Vérification et parsing de la réponse pour la meilleure image
           let dataUrl;
           try {
-            dataUrl = JSON.parse(this.extractJSONBlock(bestImageResponse.choices[0].message.content));
+            const jsonBlock = this.extractJSONBlock(bestImageResponse!);
+            if (jsonBlock) {
+              dataUrl = JSON.parse(jsonBlock);
+            } else {
+              // Gérer le cas où aucun bloc JSON n'a été trouvé
+              console.error("Aucun bloc JSON trouvé dans la réponse");
+            }
+
           } catch (parseError) {
             console.error("Erreur lors de l'analyse du JSON pour la meilleure image :", parseError);
-            return;
+            continue
+              ;
           }
           // Sauvegarde de l'URL de l'image pour le chapitre dans Supabase
           try {
-            await this.supabaseService.setNewUrlImagesChapitres(dataUrl.imageUrl, chapitreId, article.id, chapitreKeyWord);
+            await this.supabaseService.setNewUrlImagesChapitres(dataUrl.imageUrl, chapitreId, articleId, chapitreKeyWord);
             console.log("URL d'image enregistrée avec succès:", dataUrl);
           } catch (saveError) {
             console.error("Erreur lors de la sauvegarde de l'URL de l'image dans Supabase :", saveError);
@@ -106,5 +141,6 @@ export class AddImagesToChaptersService {
         console.error("Erreur lors de la recuperation du chapitre dans l article :");
       }
     }
+    return { success: true };
   }
 }
