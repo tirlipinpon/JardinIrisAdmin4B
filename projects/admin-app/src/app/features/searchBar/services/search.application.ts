@@ -53,11 +53,11 @@ export class SearchApplication {
     }
   }
 
-  // upgradeArticle(): void {
-  //   this.messageService.sendMessage('Upgrade article en cours.');
-  //   this.store.upgradeArticle();
-  // }
-  //
+  upgradeArticle(): void {
+    this.messageService.sendMessage('Upgrade article en cours.');
+    this.store.upgradeArticle();
+  }
+
   // checkMeteo(): void {
   //   this.messageService.sendMessage('Météo en cours.');
   //   this.store.checkMeteo();

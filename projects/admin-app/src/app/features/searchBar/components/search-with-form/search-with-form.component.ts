@@ -39,7 +39,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           } else if (msg.action === MessageAction.ARTICLE_VALID || msg.action === MessageAction.IDEA) {
             this.generateArticle();
           } else if (msg.action === MessageAction.GENERATED_ARTICLE) {
-            // this.upgradeArticle();
+            this.upgradeArticle();
           } else if (msg.action === MessageAction.UPGRADED_ARTICLE) {
             // this.formatInHtmlArticle();
           }else if (msg.action === MessageAction.METEO) {
@@ -85,7 +85,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
   }
 
    upgradeArticle() {
-    // this.application.upgradeArticle();
+    this.application.upgradeArticle();
   }
 
    checkMeteo() {

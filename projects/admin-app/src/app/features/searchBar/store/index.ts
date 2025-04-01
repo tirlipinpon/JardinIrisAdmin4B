@@ -95,12 +95,12 @@ export const SearchStore= signalStore(
     }),
     getPostArticle: computed(() => {
       const post = store.post();
-      return post?.article;
+      return post && post.article;
     }),
 
     getPostCitation: computed(() => {
       const post = store.post();
-      return post?.citation;
+      return post && post.citation;
     }),
     isPostCitation: computed(() => {
       const post = store.post();
@@ -109,7 +109,7 @@ export const SearchStore= signalStore(
 
     getPostMeteo: computed(() => {
       const post = store.post();
-      return post?.meteo;
+      return post && post.meteo;
     }),
     isPostMeteo: computed(() => {
       const post = store.post();
@@ -118,13 +118,13 @@ export const SearchStore= signalStore(
 
     isPostLienUrlArticle: computed(() => {
       const post = store.post();
-      return post !== null && post.lien_url_article !== undefined && post.lien_url_article !== null && post.lien_url_article !== '';
+      return post !== null && post.lien_url_article !== undefined && post.lien_url_article !== null && post.lien_url_article.lien1 !== '';
     }),
 
 
     getPostImageUrl: computed(() => {
       const post = store.post();
-      return post?.image_url;
+      return post && post.image_url;
     }),
     isPostImageUrl: computed(() => {
       const post = store.post();
@@ -134,7 +134,7 @@ export const SearchStore= signalStore(
 
     getPostCategorie: computed(() => {
       const post = store.post();
-      return post?.categorie;
+      return post && post.categorie;
     }),
     isPostCategorie: computed(() => {
       const post = store.post();
@@ -222,7 +222,7 @@ export const SearchStore= signalStore(
           tap(() => updateState(store, '[saveUrlPost] update loading', {isLoading: true})),
           map((url: string) => {
             const currentPost = store.post();
-            const updatedPost = currentPost ? { ...currentPost, lien_url_article: url } : { lien_url_article: url };
+            const updatedPost = currentPost ? { ...currentPost, lien_url_article:  { lien1: url } } : { lien_url_article:  { lien1: url } };
             patchState(store, {
               post: updatedPost,
               isLoading: false
@@ -231,26 +231,26 @@ export const SearchStore= signalStore(
           })
         )
       ),
-
-
-      // upgradeArticle: rxMethod<void>(
-      //   pipe(
-      //     tap(() => updateState(store, '[upgradeArticle] update loading', { isLoading: true })),
-      //     switchMap(() => {
-      //       const generatedArticle = store.getGeneratedArticle();
-      //       if (!generatedArticle) {
-      //         patchState(store, { isLoading: false });
-      //         return EMPTY;
-      //       }
-      //       return infra.upgradeArticle(generatedArticle).pipe(
-      //         tapResponse({
-      //           next: (upgradedArticle) => patchState(store, { upgradedArticle: upgradedArticle, isLoading: false }),
-      //           error: () => patchState(store, { isLoading: false }),
-      //         })
-      //       );
-      //     })
-      //   )
-      // ),
+      upgradeArticle: rxMethod<void>(
+        pipe(
+          tap(() => updateState(store, '[upgradeArticle] update loading', { isLoading: true })),
+          switchMap(() => {
+            const generatedArticle = store.getPostArticle();
+            if (!generatedArticle) {
+              patchState(store, { isLoading: false });
+              return EMPTY;
+            }
+            return infra.upgradeArticle(generatedArticle).pipe(
+              tapResponse({
+                next: (upgradedArticle) => patchState(store, {
+                  post: { ...store.post(), article: upgradedArticle },
+                  isLoading: false }),
+                error: () => patchState(store, { isLoading: false }),
+              })
+            );
+          })
+        )
+      ),
       // checkMeteo: rxMethod<void>(
       //   pipe(
       //     tap(() => updateState(store, '[checkMeteo] update loading', { isLoading: true })),

@@ -10,7 +10,7 @@ export interface Post {
   comments?: Comment[];
   citation?: string;
   meteo?: string;
-  lien_url_article?: string;
+  lien_url_article?: { lien1: string };
   image_url?: string;
   categorie?: string;
   visite?: number;
