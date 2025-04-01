@@ -1,6 +1,5 @@
 import { effect, inject, Injectable, Signal } from '@angular/core';
 import { SearchStore } from '../store';
-import {parseJsonSafe} from "../../../utils/cleanJsonObject";
 import {
   MessageAction,
   SearchMessageService
@@ -21,10 +20,9 @@ export class SearchApplication {
     this.isArticleValidEffect();
     this.isIdeaEffect();
     this.isGeneratedArticleEffect();
-    this.isFormatedInHtmlArticleEffect();
-    this.isUpgradedArticleEffect();
-    this.isMeteoEffect();
-    this.isPostId();
+    // this.isUpgradedArticleEffect();
+    // this.isMeteoEffect();
+    // this.isPostId();
   }
 
   get isSearching(): Signal<boolean> {
@@ -55,35 +53,30 @@ export class SearchApplication {
     }
   }
 
-  upgradeArticle(): void {
-    this.messageService.sendMessage('Upgrade article en cours.');
-    this.store.upgradeArticle();
-  }
-
-  formatInHtmlArticle(): void {
-    this.messageService.sendMessage('Formatage en Html d article en cours.');
-    this.store.formatInHtmlArticle();
-  }
-
-  checkMeteo(): void {
-    this.messageService.sendMessage('Météo en cours.');
-    this.store.checkMeteo();
-  }
-
-  savePost(): void {
-    this.messageService.sendMessage('Enregistrement du post en cour.');
-    this.store.savePost();
-  }
-
-  updateIdeaPost(): void {
-    this.messageService.sendMessage('Update de post idea en cour.');
-    this.store.updateIdeaPost();
-  }
-
-  addImagesInArticle(): void {
-    this.messageService.sendMessage('Ajout d images d article en cour.');
-    this.store.addImagesInArticle();
-  }
+  // upgradeArticle(): void {
+  //   this.messageService.sendMessage('Upgrade article en cours.');
+  //   this.store.upgradeArticle();
+  // }
+  //
+  // checkMeteo(): void {
+  //   this.messageService.sendMessage('Météo en cours.');
+  //   this.store.checkMeteo();
+  // }
+  //
+  // savePost(): void {
+  //   this.messageService.sendMessage('Enregistrement du post en cour.');
+  //   this.store.savePost();
+  // }
+  //
+  // updateIdeaPost(): void {
+  //   this.messageService.sendMessage('Update de post idea en cour.');
+  //   this.store.updateIdeaPost();
+  // }
+  //
+  // addImagesInArticle(): void {
+  //   this.messageService.sendMessage('Ajout d images d article en cour.');
+  //   this.store.addImagesInArticle();
+  // }
 
 
   private isSearchingEffect(): void {
@@ -127,8 +120,8 @@ export class SearchApplication {
 
   private isGeneratedArticleEffect(): void {
     effect(() => {
-      if(this.store.getGeneratedArticle()!==null) {
-        if(this.store.isGeneratedArticle()) {
+      if(this.store.getPostArticle()!==null) {
+        if(this.store.isPostArticle()) {
           this.messageService.sendSuccess('Géneration terminé.', MessageAction.GENERATED_ARTICLE);
         } else {
           this.messageService.sendError('Géneration a une erreur.');
@@ -137,52 +130,40 @@ export class SearchApplication {
     });
   }
 
-  private isUpgradedArticleEffect(): void {
-    effect(() => {
-      if(this.store.getUpgradedArticle()!==null) {
-        if(this.store.isUpgradedArticle()) {
-          this.messageService.sendSuccess('Upgrade terminé.', MessageAction.UPGRADED_ARTICLE);
-        } else {
-          this.messageService.sendError('Upgrade a une erreur.');
-        }
-      }
-    });
-  }
+  // private isUpgradedArticleEffect(): void {
+  //   effect(() => {
+  //     if(this.store.getUpgradedArticle()!==null) {
+  //       if(this.store.isUpgradedArticle()) {
+  //         this.messageService.sendSuccess('Upgrade terminé.', MessageAction.UPGRADED_ARTICLE);
+  //       } else {
+  //         this.messageService.sendError('Upgrade a une erreur.');
+  //       }
+  //     }
+  //   });
+  // }
+  //
+  // private isMeteoEffect(): void {
+  //   effect(() => {
+  //     if(this.store.getMeteo()!==null) {
+  //       if(this.store.isMeteo()) {
+  //         this.messageService.sendSuccess('Météo terminé.', MessageAction.METEO);
+  //       } else {
+  //         this.messageService.sendError('Météo a une erreur.');
+  //       }
+  //     }
+  //   });
+  // }
 
-  private isFormatedInHtmlArticleEffect(): void {
-    effect(() => {
-      if(this.store.getFormatedInHtmlArticle()!==null) {
-        if(this.store.isFormatedInHtmlArticle()) {
-          this.messageService.sendSuccess('Formatage en html terminé.', MessageAction.FORMATED_IN_HTML_ARTICLE);
-        } else {
-          this.messageService.sendError('Formatage en html a une erreur.');
-        }
-      }
-    });
-  }
-
-  private isMeteoEffect(): void {
-    effect(() => {
-      if(this.store.getMeteo()!==null) {
-        if(this.store.isMeteo()) {
-          this.messageService.sendSuccess('Météo terminé.', MessageAction.METEO);
-        } else {
-          this.messageService.sendError('Météo a une erreur.');
-        }
-      }
-    });
-  }
-
-  private isPostId(): void {
-    effect(() => {
-      if(this.store.getPostId()!==null) {
-        if(this.store.isPostId()) {
-          this.messageService.sendSuccess('Post sauvé en db et id dans le store.', MessageAction.SAVED_POST);
-        } else {
-          this.messageService.sendError('Post pas sauvé y a une erreur.');
-        }
-      }
-    });
-  }
+  // private isPostId(): void {
+  //   effect(() => {
+  //     if(this.store.getPostId()!==null) {
+  //       if(this.store.isPostId()) {
+  //         this.messageService.sendSuccess('Post sauvé en db et id dans le store.', MessageAction.SAVED_POST);
+  //       } else {
+  //         this.messageService.sendError('Post pas sauvé y a une erreur.');
+  //       }
+  //     }
+  //   });
+  // }
 
 }

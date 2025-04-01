@@ -12,14 +12,8 @@ export interface SearchState {
   articles: { url: string; image_url: string }[] | null;
   articleValid: { valid: boolean | null, url: string | null, image_url: string | null, explication:{ raisonArticle1: string | null} }
   ideaPost:  { id: number | null, "description": string | null } | null ;
-  urlPost: string | null;
   isLoading: boolean;
-  generatedArticle: string | null;
-  upgradedArticle: string | null;
-  formatedInHtmlArticle: string | null;
-  meteo: string | null;
   post: Post | null;
-  postId: number | null;
 }
 
 export enum CathegoriesBlog {
@@ -39,25 +33,7 @@ const initialValue: SearchState = {
   articleValid: { valid: null, url: null, image_url: null, explication:{raisonArticle1: null}},
   isLoading: false,
   ideaPost: null,
-  generatedArticle: null,
-  upgradedArticle: null,
-  formatedInHtmlArticle: null,
-  meteo: null,
-  post: {
-    titre: "",
-    description_meteo: "",
-    phrase_accroche: "",
-    article: "",
-    citation: "",
-    lien_url_article: "",
-    image_url: "",
-    categorie: "",
-    visite: 0,
-    valid: false,
-    deleted: false
-  },
-  urlPost: null,
-  postId: null
+  post: null,
 
 }
 export const SearchStore= signalStore(
@@ -69,37 +45,108 @@ export const SearchStore= signalStore(
     isArticlesFound: computed(() => {  const articles = store.articles();
       return articles !== null && articles.length > 0 && articles[0].url.length > 1;
     }),
+
+    getIdeaPost: computed(() =>  store.ideaPost()),
     isIdeaPost: computed(() =>  {  const ideaPost = store.ideaPost();
       return ideaPost!==null && ideaPost.id
     }),
-    getIdeaPost: computed(() =>  store.ideaPost()),
-    getArticles: computed(() =>  store.articles()),
 
+    getArticles: computed(() =>  store.articles()),
     getArticleValid: computed(() =>  store.articleValid()),
     isArticleValid: computed(() =>  {  const articleValid = store.articleValid();
       return articleValid!==null && articleValid.valid
     }),
-    getGeneratedArticle: computed(() =>  store.generatedArticle()),
-    isGeneratedArticle: computed(() =>  {  const generatedArticle = store.generatedArticle();
-      return generatedArticle!==null && generatedArticle.length > 0
+
+    getPost: computed(() => store.post()),
+    isPostId: computed(() => {
+      const post = store.post();
+      return post !== null && post.id;
     }),
-    getUpgradedArticle: computed(() =>  store.upgradedArticle()),
-    isUpgradedArticle: computed(() =>  {  const upgradedArticle = store.upgradedArticle();
-      return upgradedArticle!==null && upgradedArticle.length > 0
+    getPostTitle: computed(() => {
+      const post = store.post();
+      return post?.titre;
     }),
-    getFormatedInHtmlArticle: computed(() =>  store.formatedInHtmlArticle()),
-    isFormatedInHtmlArticle: computed(() =>  {  const formatedInHtmlArticle = store.formatedInHtmlArticle();
-      return formatedInHtmlArticle!==null && formatedInHtmlArticle.length > 0
+    isPostTitre: computed(() => {
+      const post = store.post();
+      return post !== null && post.titre !== undefined && post.titre !== null && post.titre !== '';
     }),
-    getMeteo: computed(() =>  store.meteo()),
-    isMeteo: computed(() =>  {  const meteo = store.meteo();
-      return meteo!==null &&  meteo.length > 0
+
+    getPostDescriptionMeteo: computed(() => {
+      const post = store.post();
+      return post?.description_meteo;
     }),
-    getPost: computed(() =>  store.post()),
-    getPostId: computed(() =>  store.postId()),
-    isPostId: computed(() =>  { const postId = store.postId();
-      return postId!==null &&  postId > 0
+    isPostDescriptionMeteo: computed(() => {
+      const post = store.post();
+      return post !== null && post.description_meteo !== undefined && post.description_meteo !== null && post.description_meteo !== '';
     }),
+
+    getPostPhraseAccroche: computed(() => {
+      const post = store.post();
+      return post?.phrase_accroche;
+    }),
+    isPostPhraseAccroche: computed(() => {
+      const post = store.post();
+      return post !== null && post.phrase_accroche !== undefined && post.phrase_accroche !== null && post.phrase_accroche !== '';
+    }),
+
+    isPostArticle: computed(() => {
+      const post = store.post();
+      return post !== null && post.article !== undefined && post.article !== null && post.article !== '';
+    }),
+    getPostArticle: computed(() => {
+      const post = store.post();
+      return post?.article;
+    }),
+
+    getPostCitation: computed(() => {
+      const post = store.post();
+      return post?.citation;
+    }),
+    isPostCitation: computed(() => {
+      const post = store.post();
+      return post !== null && post.citation !== undefined && post.citation !== null && post.citation !== '';
+    }),
+
+    getPostMeteo: computed(() => {
+      const post = store.post();
+      return post?.meteo;
+    }),
+    isPostMeteo: computed(() => {
+      const post = store.post();
+      return post !== null && post.meteo !== undefined && post.meteo !== null && post.meteo !== '';
+    }),
+
+    isPostLienUrlArticle: computed(() => {
+      const post = store.post();
+      return post !== null && post.lien_url_article !== undefined && post.lien_url_article !== null && post.lien_url_article !== '';
+    }),
+
+
+    getPostImageUrl: computed(() => {
+      const post = store.post();
+      return post?.image_url;
+    }),
+    isPostImageUrl: computed(() => {
+      const post = store.post();
+      return post !== null && post.image_url !== undefined && post.image_url !== null && post.image_url !== '';
+    }),
+
+
+    getPostCategorie: computed(() => {
+      const post = store.post();
+      return post?.categorie;
+    }),
+    isPostCategorie: computed(() => {
+      const post = store.post();
+      return post !== null && post.categorie !== undefined && post.categorie !== null && post.categorie !== '';
+    }),
+
+
+    isPostValid: computed(() => {
+      const post = store.post();
+      return post !== null && post.valid === true;
+    }),
+
   })),
   withMethods((store, infra = inject(SearchInfrastructure))=> (
     {
@@ -155,7 +202,7 @@ export const SearchStore= signalStore(
             const processGeneration = (source: string) => {
               return infra.generateArticle(source).pipe(
                 tapResponse({
-                  next: generatedArticle => patchState(store, { generatedArticle, isLoading: false }),
+                  next: post => patchState(store, { post, isLoading: false }),
                   error: error => patchState(store, {isLoading: false})
                 })
               );
@@ -174,112 +221,101 @@ export const SearchStore= signalStore(
         pipe(
           tap(() => updateState(store, '[saveUrlPost] update loading', {isLoading: true})),
           map((url: string) => {
-            patchState(store, { urlPost: url, isLoading: false });
+            const currentPost = store.post();
+            const updatedPost = currentPost ? { ...currentPost, lien_url_article: url } : { lien_url_article: url };
+            patchState(store, {
+              post: updatedPost,
+              isLoading: false
+            });
             return url;
           })
         )
       ),
-      upgradeArticle: rxMethod<void>(
-        pipe(
-          tap(() => updateState(store, '[upgradeArticle] update loading', { isLoading: true })),
-          switchMap(() => {
-            const generatedArticle = store.getGeneratedArticle();
-            if (!generatedArticle) {
-              patchState(store, { isLoading: false });
-              return EMPTY;
-            }
-            return infra.upgradeArticle(generatedArticle).pipe(
-              tapResponse({
-                next: (upgradedArticle) => patchState(store, { upgradedArticle: upgradedArticle, isLoading: false }),
-                error: () => patchState(store, { isLoading: false }),
-              })
-            );
-          })
-        )
-      ),
-      formatInHtmlArticle: rxMethod<void>(
-        pipe(
-          tap(()=> updateState(store, '[formatInHtmlArticle] update loading', {isLoading: true})    ),
-          switchMap(() => {
-            const getUpgradedArticle = store.getUpgradedArticle();
-            if (!getUpgradedArticle) {
-              patchState(store, { isLoading: false });
-              return EMPTY;
-            }
-            return infra.formatInHtmlArticle(getUpgradedArticle).pipe(
-              tapResponse({
-                next: formatedInHtmlArticle => patchState(store, { formatedInHtmlArticle: formatedInHtmlArticle, isLoading: false }),
-                error: error => patchState(store, {isLoading: false})
-              })
-            )
-          })
-        )
-      ),
-      checkMeteo: rxMethod<void>(
-        pipe(
-          tap(() => updateState(store, '[checkMeteo] update loading', { isLoading: true })),
-          switchMap(() => {
-            return infra.checkMeteo().pipe(
-              tapResponse({
-                next: (meteo) => patchState(store, { meteo: meteo, isLoading: false }),
-                error: () => patchState(store, { isLoading: false }),
-              })
-            );
-          })
-        )
-      ),
-      savePost: rxMethod<void>(
-        pipe(
-          tap(()=> updateState(store, '[savePost] update loading', {isLoading: true})    ),
-          switchMap(() => {
-            const getPost = store.getPost();
-            if (!getPost) {
-              patchState(store, { isLoading: false });
-              return EMPTY;
-            }
-            return infra.savePost(getPost).pipe(
-              tapResponse({
-                next: post => patchState(store, { postId: post.id, isLoading: false }),
-                error: error => patchState(store, {isLoading: false})
-              })
-            )
-          })
-        )
-      ),
-      updateIdeaPost: rxMethod<void>(
-        pipe(
-          tap(()=> updateState(store, '[updateIdeaPost] update loading', {isLoading: true})    ),
-          switchMap(() => {
-            const ideaPost = store.getIdeaPost();
-            const postId = store.getPostId();
-            const isValid = ideaPost && ideaPost.id !== null && postId !== null;
-            if (!isValid) { patchState(store, { isLoading: false }); return EMPTY; }
-            return infra.updateIdeaPost(ideaPost.id as number, postId as number).pipe(
-              tapResponse({
-                next: ideaPost => patchState(store, {isLoading: false }),
-                error: error => patchState(store, {isLoading: false})
-              })
-            )
-          })
-        )
-      ),
-      addImagesInArticle: rxMethod<void>(
-        pipe(
-          tap(()=> updateState(store, '[addImagesInArticle] update loading', {isLoading: true})    ),
-          switchMap(() => {
-            const getPost = store.getFormatedInHtmlArticle();
-            if (!getPost || !getPost.length) { patchState(store, { isLoading: false }); return EMPTY; }
-            const getPostId = store.getPostId();
-            if (!getPostId) { patchState(store, { isLoading: false }); return EMPTY; }
-            return infra.addImagesInArticle(getPost, getPostId).pipe(
-              tapResponse({
-                next: data => patchState(store, { isLoading: false }),
-                error: error => patchState(store, {isLoading: false})
-              })
-            )
-          })
-        )
-      ),
+
+
+      // upgradeArticle: rxMethod<void>(
+      //   pipe(
+      //     tap(() => updateState(store, '[upgradeArticle] update loading', { isLoading: true })),
+      //     switchMap(() => {
+      //       const generatedArticle = store.getGeneratedArticle();
+      //       if (!generatedArticle) {
+      //         patchState(store, { isLoading: false });
+      //         return EMPTY;
+      //       }
+      //       return infra.upgradeArticle(generatedArticle).pipe(
+      //         tapResponse({
+      //           next: (upgradedArticle) => patchState(store, { upgradedArticle: upgradedArticle, isLoading: false }),
+      //           error: () => patchState(store, { isLoading: false }),
+      //         })
+      //       );
+      //     })
+      //   )
+      // ),
+      // checkMeteo: rxMethod<void>(
+      //   pipe(
+      //     tap(() => updateState(store, '[checkMeteo] update loading', { isLoading: true })),
+      //     switchMap(() => {
+      //       return infra.checkMeteo().pipe(
+      //         tapResponse({
+      //           next: (meteo) => patchState(store, { post: meteo, isLoading: false }),
+      //           error: () => patchState(store, { isLoading: false }),
+      //         })
+      //       );
+      //     })
+      //   )
+      // ),
+      // savePost: rxMethod<void>(
+      //   pipe(
+      //     tap(()=> updateState(store, '[savePost] update loading', {isLoading: true})    ),
+      //     switchMap(() => {
+      //       const getPost = store.getPost();
+      //       if (!getPost) {
+      //         patchState(store, { isLoading: false });
+      //         return EMPTY;
+      //       }
+      //       return infra.savePost(getPost).pipe(
+      //         tapResponse({
+      //           next: post => patchState(store, { postId: post.id, isLoading: false }),
+      //           error: error => patchState(store, {isLoading: false})
+      //         })
+      //       )
+      //     })
+      //   )
+      // ),
+      // updateIdeaPost: rxMethod<void>(
+      //   pipe(
+      //     tap(()=> updateState(store, '[updateIdeaPost] update loading', {isLoading: true})    ),
+      //     switchMap(() => {
+      //       const ideaPost = store.getIdeaPost();
+      //       const postId = store.getPostId();
+      //       const isValid = ideaPost && ideaPost.id !== null && postId !== null;
+      //       if (!isValid) { patchState(store, { isLoading: false }); return EMPTY; }
+      //       return infra.updateIdeaPost(ideaPost.id as number, postId as number).pipe(
+      //         tapResponse({
+      //           next: ideaPost => patchState(store, {isLoading: false }),
+      //           error: error => patchState(store, {isLoading: false})
+      //         })
+      //       )
+      //     })
+      //   )
+      // ),
+      // addImagesInArticle: rxMethod<void>(
+      //   pipe(
+      //     tap(()=> updateState(store, '[addImagesInArticle] update loading', {isLoading: true})    ),
+      //     switchMap(() => {
+      //       const getPost = store.getPostArticle();
+      //       if (!getPost || !getPost.length) { patchState(store, { isLoading: false }); return EMPTY; }
+      //       const getPostId = store.getPostId();
+      //       if (!getPostId) { patchState(store, { isLoading: false }); return EMPTY; }
+      //       return infra.addImagesInArticle(getPost, getPostId).pipe(
+      //         tapResponse({
+      //           next: data => patchState(store, { isLoading: false }),
+      //           error: error => patchState(store, {isLoading: false})
+      //         })
+      //       )
+      //     })
+      //   )
+      // ),
     }
   ))
 )

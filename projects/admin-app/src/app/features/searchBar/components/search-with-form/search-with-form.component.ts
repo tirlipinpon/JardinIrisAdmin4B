@@ -39,16 +39,14 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           } else if (msg.action === MessageAction.ARTICLE_VALID || msg.action === MessageAction.IDEA) {
             this.generateArticle();
           } else if (msg.action === MessageAction.GENERATED_ARTICLE) {
-            this.upgradeArticle();
+            // this.upgradeArticle();
           } else if (msg.action === MessageAction.UPGRADED_ARTICLE) {
-            this.formatInHtmlArticle();
-          } else if (msg.action === MessageAction.FORMATED_IN_HTML_ARTICLE) {
-            this.checkMeteo();
-          } else if (msg.action === MessageAction.METEO) {
-            this.savePost();
+            // this.formatInHtmlArticle();
+          }else if (msg.action === MessageAction.METEO) {
+            // this.savePost();
           } else if (msg.action === MessageAction.SAVED_POST) {
-            this.updateIdeaPost();
-            this.addImagesInArticle();
+            //  this.updateIdeaPost();
+            // this.addImagesInArticle();
           }
           break;
         }
@@ -87,27 +85,23 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
   }
 
    upgradeArticle() {
-    this.application.upgradeArticle();
-  }
-
-   formatInHtmlArticle() {
-    this.application.formatInHtmlArticle();
+    // this.application.upgradeArticle();
   }
 
    checkMeteo() {
-    this.application.checkMeteo();
+    // this.application.checkMeteo();
   }
 
    savePost() {
-    this.application.savePost();
+    // this.application.savePost();
   }
 
    addImagesInArticle() {
-    this.application.addImagesInArticle();
+    // this.application.addImagesInArticle();
   }
 
    updateIdeaPost() {
-    this.application.updateIdeaPost();
+    // this.application.updateIdeaPost();
   }
 
 }

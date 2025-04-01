@@ -102,7 +102,7 @@ Le résultat doit être un JSON strictement valide comme ceci:
       userRole: { "role": "user", "content": `utilise les informations contenu sur la page dont l 'url est la suivante:  ${article} pour remplir les infos.` }
     }
   }
-  designArticle(article: any): any {
+designArticle(article: any): any {
     return {
       systemRole: {"role": "system","content":`
      Ajoute au contenu des textes des paragraphes en insérant des balises HTML pour structurer le contenu et en améliorer la lisibilité, sans modifier le texte original.
