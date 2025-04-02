@@ -280,19 +280,49 @@ export const SearchStore= signalStore(
           })
         )
       ),
-      // checkMeteo: rxMethod<void>(
-      //   pipe(
-      //     tap(() => updateState(store, '[checkMeteo] update loading', { isLoading: true })),
-      //     switchMap(() => {
-      //       return infra.checkMeteo().pipe(
-      //         tapResponse({
-      //           next: (meteo) => patchState(store, { post: meteo, isLoading: false }),
-      //           error: () => patchState(store, { isLoading: false }),
-      //         })
-      //       );
-      //     })
-      //   )
-      // ),
+      formatInHtmlArticle: rxMethod<void>(
+        pipe(
+          tap(() => updateState(store, '[formatInHtmlArticle] update loading', { isLoading: true })),
+          switchMap(() => {
+            const getArticleUpgraded = store.getArticleUpgraded();
+            if (!getArticleUpgraded) {
+              patchState(store, { isLoading: false });
+              return EMPTY;
+            }
+            const getPost = store.getPost();
+            if (!getPost) {
+              patchState(store, { isLoading: false });
+              return EMPTY;
+            }
+            return infra.formatInHtmlArticle(getArticleUpgraded).pipe(
+              tapResponse({
+                next: (formatInHtmlArticle) => {
+                  patchState(store, { post: { ...getPost, article: formatInHtmlArticle }, isLoading: false });
+                },
+                error: () => patchState(store, { isLoading: false }),
+              })
+            );
+          })
+        )
+      ),
+      checkMeteo: rxMethod<void>(
+        pipe(
+          tap(() => updateState(store, '[checkMeteo] update loading', { isLoading: true })),
+          switchMap(() => {
+            const getPost = store.getPost();
+            if (!getPost) {
+              patchState(store, { isLoading: false });
+              return EMPTY;
+            }
+            return infra.checkMeteo().pipe(
+              tapResponse({
+                next: (meteo) => patchState(store, { post: { ...getPost, meteo: meteo }, isLoading: false }),
+                error: () => patchState(store, { isLoading: false }),
+              })
+            );
+          })
+        )
+      ),
       // savePost: rxMethod<void>(
       //   pipe(
       //     tap(()=> updateState(store, '[savePost] update loading', {isLoading: true})    ),

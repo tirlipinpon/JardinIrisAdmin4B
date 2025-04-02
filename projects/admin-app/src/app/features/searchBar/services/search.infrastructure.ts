@@ -1,5 +1,19 @@
 import {inject, Injectable} from "@angular/core";
-import {catchError, delay, EMPTY, from, mergeMap, Observable, of, retry, tap, throwError, timer, toArray} from "rxjs";
+import {
+  catchError,
+  delay,
+  EMPTY,
+  from,
+  mergeMap,
+  Observable,
+  of,
+  retry,
+  takeLast,
+  tap,
+  throwError,
+  timer,
+  toArray
+} from "rxjs";
 import {TheNewsApiService} from "./the-news-api.service";
 import {OpenaiApiService} from "./openai-api.service";
 import {GetPromptsService} from "./get-prompts.service";
@@ -56,12 +70,8 @@ export class SearchInfrastructure {
         if (result === null) {
           throw new Error('Aucun résultat retourné par l\'API OpenAI');
         }
-
-        // Extraction et parsing du JSON depuis la chaîne retournée
         try {
-          const jsonData = extractJSONBlock(result);
-          const parsedData = JSON.parse(jsonData);
-
+          const parsedData = JSON.parse(extractJSONBlock(result));
           return {
             valid: parsedData.valid,
             explication: parsedData.explication,
@@ -100,14 +110,6 @@ export class SearchInfrastructure {
           }
         })
       );
-    // return new Observable<string>(subscriber => {
-    //   console.log(`Recherche d'idée dans le mois courrent`);
-    //   const mock = `dummy idee recue`;
-    //   setTimeout(() => {
-    //     subscriber.next(mock);
-    //     subscriber.complete();
-    //   }, 1000);
-    // });
   }
 
   generateArticle(url_post?: string): Observable<Post> {
@@ -120,12 +122,17 @@ export class SearchInfrastructure {
     //     return parseJsonSafe(extractJSONBlock(result)) ;
     //   })
     // );
-
     return new Observable<Post>(subscriber => {
       const mock = {
         "titre": "Transformer votre toit en oasis urbaine",
           "phrase_accroche": "Découvrez comment aménager un jardin sur votre toit en plein cœur de la ville, un projet écologique et esthétique pour reverdir Bruxelles tout en profitant d'un espace vert unique.",
-          "article": "<h4>Pourquoi un jardin sur le toit ?</h4><ul><li>Quels sont les avantages d'un toit végétalisé ?</li></ul><div id=\"paragraphe-1\"><p>Aménager un jardin sur le toit en milieu urbain offre de nombreux avantages, tant écologiques que pratiques. En plus de créer un espace vert supplémentaire, ces jardins contribuent à la biodiversité en offrant un refuge pour les insectes pollinisateurs et les oiseaux. Ils améliorent également la qualité de l'air en absorbant les polluants et en produisant de l'oxygène. Sur le plan thermique, ils isolent les bâtiments, réduisant ainsi les besoins en chauffage l'hiver et en climatisation l'été. Pour les habitants, c'est l'occasion de disposer d'un espace de détente ou même de cultiver ses propres légumes en plein cœur de la ville. À Bruxelles, où l'espace est limité, ces jardins représentent une solution innovante pour reverdir la ville tout en répondant aux enjeux climatiques actuels. Et qui n'a jamais rêvé d'un coin de verdure personnel avec vue sur les toits ?</p></div><h4>Les étapes clés pour votre projet</h4><ul><li>Comment débuter son jardin de toit ?</li></ul><div id=\"paragraphe-2\"><p>Avant de vous lancer dans l'aménagement d'un jardin sur votre toit, plusieurs étapes sont indispensables. Tout d'abord, vérifiez la capacité portante de votre toiture avec un professionnel, car les substrats et plantes ajoutent un poids considérable. Ensuite, pensez à l'étanchéité : une membrane spéciale protègera votre bâtiment des infiltrations. Le choix des plantes est crucial : privilégiez des espèces résistantes au vent et nécessitant peu d'entretien, comme les sedums ou certaines aromatiques. Pour le substrat, optez pour un mélange léger spécial toitures végétalisées. N'oubliez pas l'accès à l'eau pour l'arrosage, surtout les premières années. À Bruxelles, certaines communes proposent même des subsides pour ce type de projet écologique. Et si vous manquez d'inspiration, pourquoi ne pas visiter les toits végétalisés déjà existants dans la capitale ?</p></div><h4>Les défis techniques à anticiper</h4><ul><li>Quels obstacles peut-on rencontrer ?</li></ul><div id=\"paragraphe-3\"><p>Créer un jardin sur son toit n'est pas sans défis techniques. Le vent peut être beaucoup plus fort en hauteur, nécessitant parfois des brise-vents ou le choix de plantes résistantes. L'exposition au soleil est souvent plus intense qu'au sol, demandant un arrosage adapté. L'accès à l'eau peut poser problème, surtout en été : pensez à des systèmes de récupération d'eau de pluie. Le poids est une contrainte majeure : une toiture extensive (peu épaisse) conviendra mieux aux structures légères qu'un jardin intensif (plus épais). En ville, les règlements d'urbanisme peuvent imposer des restrictions, mieux vaut se renseigner auprès de sa commune. Et n'oubliez pas que même en hauteur, les nuisibles comme les pucerons ou les limaces peuvent trouver le chemin de vos plantations !</p></div><h4>Des idées d'aménagement créatives</h4><ul><li>Comment personnaliser son jardin de toit ?</li></ul><div id=\"paragraphe-4\"><p>Votre jardin sur le toit peut devenir bien plus qu'une simple étendue verte. Pour les petits espaces, les jardins en bac ou les murs végétaux optimisent la surface. Un coin potager permet de cultiver tomates, fraises ou aromates avec une vue imprenable. Ajoutez des sièges et une table pour créer un espace détente original. Les bruxellois apprécieront peut-être un coin « bière artisanale » avec houblon et plantes à infusion. Pour la biodiversité, installez un hôtel à insectes ou une petite mare (si la structure le permet). L'éclairage solaire prolongera les soirées estivales. Et pourquoi ne pas imaginer un petit verger avec des arbres nains ? Après tout, qui a dit qu'on ne pouvait pas avoir de pommiers sur son toit à Bruxelles ?</p></div><h4>L'entretien : plus simple qu'il n'y paraît</h4><ul><li>Comment maintenir son jardin de toit facilement ?</li></ul><div id=\"paragraphe-5\"><p>Contrairement aux idées reçues, un jardin sur le toit demande souvent moins d'entretien qu'un jardin traditionnel. Les plantes choisies sont généralement résistantes et adaptées aux conditions difficiles. Un désherbage occasionnel et un arrosage modéré suffisent la plupart du temps. Au printemps, un apport d'engrais organique peut être bénéfique. Pour les toitures extensives, une visite annuelle de contrôle de l'étanchéité est recommandée. En hiver, laissez faire la nature : les plantes entreront en dormance. Pensez à prévoir un accès facile pour l'entretien, surtout si vous devez monter du matériel. Et si vous partez en vacances, pas de panique : ces jardins sont conçus pour résister à quelques jours sans soins. Après tout, même les plantes ont droit à un peu d'indépendance !</p></div><h4>L'impact écologique à Bruxelles</h4><ul><li>Comment ces jardins profitent-ils à la ville ?</li></ul><div id=\"paragraphe-6\"><p>À l'échelle de Bruxelles, les jardins sur les toits représentent une solution concrète pour lutter contre les îlots de chaleur urbains. Ils absorbent jusqu'à 50% des eaux pluviales, réduisant la pression sur les égouts lors des fortes pluies. Leur capacité à filtrer les particules fines améliore la qualité de l'air dans les rues environnantes. Ils créent des corridors écologiques pour la faune en milieu très urbanisé. Sur le plan social, ils offrent des espaces de convivialité et de détente précieux en ville. Certains projets bruxellois combinent même production maraîchère et insertion sociale. Avec la densification urbaine, ces jardins aériens pourraient bien devenir la norme plutôt que l'exception. Et si demain, les toits de Bruxelles rivalisaient de verdure avec ses nombreux parcs ?</p></div>",
+          "article": "<h4>Pourquoi un jardin sur le toit ?</h4><ul><li>Quels sont les avantages d'un toit végétalisé ?</li></ul>" +
+            "<div id=\"paragraphe-1\"><p>Aménager un jardin sur le toit en milieu urbain offre de nombreux avantages, tant écologiques que pratiques. En plus de créer un espace vert supplémentaire, ces jardins contribuent à la biodiversité en offrant un refuge pour les insectes pollinisateurs et les oiseaux. Ils améliorent également la qualité de l'air en absorbant les polluants et en produisant de l'oxygène. Sur le plan thermique, ils isolent les bâtiments, réduisant ainsi les besoins en chauffage l'hiver et en climatisation l'été. Pour les habitants, c'est l'occasion de disposer d'un espace de détente ou même de cultiver ses propres légumes en plein cœur de la ville. À Bruxelles, où l'espace est limité, ces jardins représentent une solution innovante pour reverdir la ville tout en répondant aux enjeux climatiques actuels. Et qui n'a jamais rêvé d'un coin de verdure personnel avec vue sur les toits ?</p></div><h4>Les étapes clés pour votre projet</h4><ul><li>Comment débuter son jardin de toit ?</li></ul>" +
+            "<div id=\"paragraphe-2\"><p>Avant de vous lancer dans l'aménagement d'un jardin sur votre toit, plusieurs étapes sont indispensables. Tout d'abord, vérifiez la capacité portante de votre toiture avec un professionnel, car les substrats et plantes ajoutent un poids considérable. Ensuite, pensez à l'étanchéité : une membrane spéciale protègera votre bâtiment des infiltrations. Le choix des plantes est crucial : privilégiez des espèces résistantes au vent et nécessitant peu d'entretien, comme les sedums ou certaines aromatiques. Pour le substrat, optez pour un mélange léger spécial toitures végétalisées. N'oubliez pas l'accès à l'eau pour l'arrosage, surtout les premières années. À Bruxelles, certaines communes proposent même des subsides pour ce type de projet écologique. Et si vous manquez d'inspiration, pourquoi ne pas visiter les toits végétalisés déjà existants dans la capitale ?</p></div><h4>Les défis techniques à anticiper</h4><ul><li>Quels obstacles peut-on rencontrer ?</li></ul>" +
+            "<div id=\"paragraphe-3\"><p>Créer un jardin sur son toit n'est pas sans défis techniques. Le vent peut être beaucoup plus fort en hauteur, nécessitant parfois des brise-vents ou le choix de plantes résistantes. L'exposition au soleil est souvent plus intense qu'au sol, demandant un arrosage adapté. L'accès à l'eau peut poser problème, surtout en été : pensez à des systèmes de récupération d'eau de pluie. Le poids est une contrainte majeure : une toiture extensive (peu épaisse) conviendra mieux aux structures légères qu'un jardin intensif (plus épais). En ville, les règlements d'urbanisme peuvent imposer des restrictions, mieux vaut se renseigner auprès de sa commune. Et n'oubliez pas que même en hauteur, les nuisibles comme les pucerons ou les limaces peuvent trouver le chemin de vos plantations !</p></div><h4>Des idées d'aménagement créatives</h4><ul><li>Comment personnaliser son jardin de toit ?</li></ul>" +
+            "<div id=\"paragraphe-4\"><p>Votre jardin sur le toit peut devenir bien plus qu'une simple étendue verte. Pour les petits espaces, les jardins en bac ou les murs végétaux optimisent la surface. Un coin potager permet de cultiver tomates, fraises ou aromates avec une vue imprenable. Ajoutez des sièges et une table pour créer un espace détente original. Les bruxellois apprécieront peut-être un coin « bière artisanale » avec houblon et plantes à infusion. Pour la biodiversité, installez un hôtel à insectes ou une petite mare (si la structure le permet). L'éclairage solaire prolongera les soirées estivales. Et pourquoi ne pas imaginer un petit verger avec des arbres nains ? Après tout, qui a dit qu'on ne pouvait pas avoir de pommiers sur son toit à Bruxelles ?</p></div><h4>L'entretien : plus simple qu'il n'y paraît</h4><ul><li>Comment maintenir son jardin de toit facilement ?</li></ul>" +
+            "<div id=\"paragraphe-5\"><p>Contrairement aux idées reçues, un jardin sur le toit demande souvent moins d'entretien qu'un jardin traditionnel. Les plantes choisies sont généralement résistantes et adaptées aux conditions difficiles. Un désherbage occasionnel et un arrosage modéré suffisent la plupart du temps. Au printemps, un apport d'engrais organique peut être bénéfique. Pour les toitures extensives, une visite annuelle de contrôle de l'étanchéité est recommandée. En hiver, laissez faire la nature : les plantes entreront en dormance. Pensez à prévoir un accès facile pour l'entretien, surtout si vous devez monter du matériel. Et si vous partez en vacances, pas de panique : ces jardins sont conçus pour résister à quelques jours sans soins. Après tout, même les plantes ont droit à un peu d'indépendance !</p></div><h4>L'impact écologique à Bruxelles</h4><ul><li>Comment ces jardins profitent-ils à la ville ?</li></ul>" +
+            "<div id=\"paragraphe-6\"><p>À l'échelle de Bruxelles, les jardins sur les toits représentent une solution concrète pour lutter contre les îlots de chaleur urbains. Ils absorbent jusqu'à 50% des eaux pluviales, réduisant la pression sur les égouts lors des fortes pluies. Leur capacité à filtrer les particules fines améliore la qualité de l'air dans les rues environnantes. Ils créent des corridors écologiques pour la faune en milieu très urbanisé. Sur le plan social, ils offrent des espaces de convivialité et de détente précieux en ville. Certains projets bruxellois combinent même production maraîchère et insertion sociale. Avec la densification urbaine, ces jardins aériens pourraient bien devenir la norme plutôt que l'exception. Et si demain, les toits de Bruxelles rivalisaient de verdure avec ses nombreux parcs ?</p></div>",
           "citation": "\"Le jardinage est l'art qui utilise les fleurs et les plantes comme peinture et la terre comme toile.\" - Elizabeth Murray",
           "lien_url_article": {
             "lien1": "https://www.eco-jardinage.com/amenager-un-jardin-sur-le-toit-en-milieu-urbain/"
@@ -138,164 +145,89 @@ export class SearchInfrastructure {
         subscriber.complete();
       }, 1000);
     });
-
   }
 
   upgradeArticle(article: string): Observable<string> {
-    // Configuration
-    const MAX_CONCURRENT_REQUESTS = 2; // Contrôle du nombre de requêtes simultanées
-    const chapitreIds = [1, 2, 3, 4, 5, 6];
-    return from(chapitreIds).pipe(
-      // mergeMap avec paramètre de concurrence limite les requêtes simultanées
-      mergeMap(chapitreId => {
-        // Extraction du chapitre
-        const chapitreText = extractChapitreById(article, chapitreId);
-        // Optimisation: ne pas traiter les chapitres vides
-        if (!chapitreText.trim()) {
-          return of({ chapitreId, upgradedText: chapitreText });
-        }
-        const prompt = this.getPromptsService.upgradeArticle(chapitreText);
-        // Envoi de la requête et traitement de la réponse
-        return from(this.openaiApiService.fetchData(prompt, true)).pipe(
-          map(result => ({ chapitreId, upgradedText: result || chapitreText })),
-          // Stratégie de réessai plus intelligente
-          retry({
-            count: 3,
-            // Backoff exponentiel en cas d'erreur
-            delay: (error, retryCount) => {
-              // Calcul d'un délai exponentiel avec jitter pour les réessais uniquement
-              const baseDelay = Math.pow(2, retryCount) * 500;
-              const jitter = baseDelay * 0.2 * Math.random();
-              const retryDelay = baseDelay + jitter;
-              console.log(`Réessai ${retryCount} pour le chapitre ${chapitreId} après ${retryDelay}ms`);
-              return timer(retryDelay);
-            }
-          }),
-          catchError(error => {
-            console.error(`Erreur lors de la mise à jour du chapitre ${chapitreId}:`, error);
-            return of({ chapitreId, upgradedText: chapitreText });
-          })
-        );
-      }, MAX_CONCURRENT_REQUESTS), // Cette limite est la clé pour contrôler la charge
-      // Collecter tous les résultats
-      toArray(),
-      // Reconstruire l'article avec tous les chapitres mis à jour
-      map(results => {
-        let updatedArticle = article;
-        // Tri par ID pour garantir l'ordre correct
-        results.sort((a, b) => a.chapitreId - b.chapitreId);
-        for (const { chapitreId, upgradedText } of results) {
-          console.log(`updatedArticle ${updatedArticle} pour le chapitre ${chapitreId} après upgradedText ${upgradedText}`);
-          updatedArticle = replaceChapitreById(updatedArticle, chapitreId, upgradedText);
-        }
-        return updatedArticle;
-      })
-    );
-  }
-
-
-  formatInHtmlArticle(generatedArticle: string): Observable<string> {
-    const prompt = this.getPromptsService.generateArticle(generatedArticle);
-    return from(this.openaiApiService.fetchData(prompt, true)).pipe(
-      map(result => {
-        if (result === null) {
-          throw new Error('Aucun résultat retourné par l\'API OpenAI');
-        }
-        return result;
-      })
-    );
-   /* return new Observable<string>(subscriber => {
-      const mock = `
-
-
-    <span id="paragraphe-1">
-        <h4>Chapitre 1 : Le réveil du sol – Techniques de régénération en MSV (Maraîchage sur Sol Vivant)</h4>
-        <p>En Belgique, le mois de mars marque la fin des gelées et le réchauffement progressif du sol. C'est le moment idéal pour préparer la terre avant les semis. Le <strong>Maraîchage sur Sol Vivant (MSV)</strong> privilégie une approche naturelle :</p>
-        <ul>
-            <li><strong>Pas de labour</strong> pour préserver la vie microbienne.</li>
-            <li><strong>Apport de matière organique</strong> (compost, BRF, engrais verts).</li>
-            <li><strong>Couverts végétaux</strong> pour éviter l'érosion.</li>
-        </ul>
-
-        <h3>Comment appliquer le MSV chez soi ?</h3>
-        <ol>
-            <li><strong>Analyse du sol</strong> : Testez son pH et sa texture (argileuse, sableuse...).</li>
-            <li><strong>Paillage</strong> : Utilisez des feuilles mortes ou de la paille pour nourrir les micro-organismes.</li>
-            <li><strong>Semis d'engrais verts</strong> (phacélie, moutarde) pour enrichir naturellement la terre.</li>
-        </ol>
-        <p><em>Astuce belge</em> : Certaines fermes wallonnes proposent des ateliers sur le MSV – une bonne idée de sortie printanière !</p>
-    </span>
-
-    <span id="paragraphe-2">
-    <div class="chapter">
-        <h4>Chapitre 2 : L'hydrologie régénérative – Gérer l'eau intelligemment</h4>
-        <p>Avec des étés de plus en plus secs et des pluies irrégulières, optimiser l'eau est crucial.</p>
-        <h3>Solutions concrètes</h3>
-        <ul>
-            <li><strong>Les baissières</strong> (fossés d'infiltration) pour retenir l'eau.</li>
-            <li><strong>Les Ollas</strong> (pots en terre cuite enterrés) pour un arrosage goutte-à-goutte naturel.</li>
-            <li><strong>Récupération d'eau de pluie</strong> avec des cuves connectées à des systèmes d'irrigation.</li>
-        </ul>
-        <p><em>Exemple local</em> : Des maraîchers flamands utilisent des <strong>mares temporaires</strong> pour créer des microclimats humides.</p>
-    </span>
-
-    <span id="paragraphe-3">
-        <h4>Chapitre 3 : La permaculture – Des écosystèmes autonomes</h4>
-        <ul>
-            <li><strong>Buttes de culture</strong> pour un meilleur drainage.</li>
-            <li><strong>Associations de plantes</strong> (tomates + basilic, carottes + poireaux).</li>
-            <li><strong>Zones de biodiversité</strong> (hôtels à insectes, haies comestibles).</li>
-        </ul>
-        <p><em>Inspiration belge</em> : Le projet <strong>"Le Début des Haricots"</strong> à Bruxelles montre comment intégrer la permaculture en ville.</p>
-    </span>
-
-    <span id="paragraphe-4"></span>
-        <h4>Chapitre 4 : Les semis de mars – Quoi planter en Belgique ?</h4>
-        <ul>
-            <li><strong>Épinards, radis, petits pois</strong> (résistants au froid).</li>
-            <li><strong>Pommes de terre</strong> (variétés précoces comme 'Charlotte').</li>
-            <li><strong>Fleurs comestibles</strong> (capucines, bourrache) pour attirer les pollinisateurs.</li>
-        </ul>
-        <p><em>Erreurs à éviter</em> : Semer trop tôt les tomates (attendre mi-avril sous abri).</p>
-    </span>
-
-    <span id="paragraphe-5">
-    <div class="chapter">
-        <h4>Chapitre 5 : Le jardin paysager – Esthétique et fonctionnel</h4>
-        <ul>
-            <li><strong>Spirales d'aromatiques</strong> (économie d'espace + esthétique).</li>
-            <li><strong>Jardins verticaux</strong> pour les petits espaces urbains.</li>
-            <li><strong>Allées en bois ramial fragmenté (BRF)</strong> pour un aspect naturel.</li>
-        </ul>
-        <p><em>Tendance 2025</em> : Les <strong>jardins secs</strong> (xéropaysagisme) gagnent du terrain en Wallonie.</p>
-    </span>
-
-    <span id="paragraphe-6">
-        <h2>Conclusion : Un jardin résilient et productif</h2>
-        <h3>Récapitulatif des actions clés</h3>
-        <ol>
-            <li>Régénérer le sol avec du paillage et des engrais verts.</li>
-            <li>Optimiser l'eau avec des Ollas et baissières.</li>
-            <li>Adopter la permaculture pour moins d'entretien et plus de biodiversité.</li>
-        </ol>
-        <p><em>Prochaine étape</em> : Participer à des ateliers locaux (comme ceux proposés par <strong>Nature & Progrès Belgique</strong>) pour échanger avec d'autres passionnés.</p>
-        <p><strong>Et vous, quelles techniques allez-vous essayer ce printemps ?</strong></p>
-
-        <h3>Bonus</h3>
-        <ul>
-            <li><strong>Fiche pratique</strong> : Calendrier des semis pour la Belgique.</li>
-            <li><strong>Interview</strong> d'un maraîcher en MSV en Flandre.</li>
-        </ul>
-    </span>
-      `;
+    return new Observable<string>(subscriber => {
+      const mock = `<h4>Pourquoi un jardin sur le toit ?</h4><ul><li>Quels sont les avantages d'un toit végétalisé ?</li></ul><div id="paragraphe-1"><p>Aménager un jardin sur le toit en milieu urbain offre de nombreux avantages, tant écologiques que pratiques. En plus de créer un espace vert supplémentaire, ces jardins contribuent à la biodiversité en offrant un refuge pour les insectes pollinisateurs et les oiseaux. Selon une étude de l'Université de Toronto, un toit végétalisé de 100 m² peut accueillir jusqu'à 10 espèces d'abeilles sauvages et augmenter la présence d'oiseaux de 40% dans un rayon de 500 mètres. Ils améliorent également la qualité de l'air en absorbant les polluants (jusqu'à 0,2 kg de particules fines par m²/an) et en produisant de l'oxygène (un jardin de toit moyen produit autant d'oxygène que 5 arbres adultes). Sur le plan thermique, ils isolent les bâtiments, réduisant ainsi les besoins en chauffage l'hiver (jusqu'à 25% d'économie) et en climatisation l'été (diminution de 5°C de la température intérieure). Pour les habitants, c'est l'occasion de disposer d'un espace de détente ou même de cultiver ses propres légumes en plein cœur de la ville (un potager sur toit de 10m² peut produire jusqu'à 50kg de légumes par saison). À Bruxelles, où l'espace est limité, ces jardins représentent une solution innovante pour reverdir la ville tout en répondant aux enjeux climatiques actuels. La capitale belge compte déjà plus de 30 hectares de toits végétalisés, avec un objectif d'atteindre 50 hectares d'ici 2025. Et qui n'a jamais rêvé d'un coin de verdure personnel avec vue sur les toits ?</p></div><h4>Les étapes clés pour votre projet</h4><ul><li>Comment débuter son jardin de toit ?</li></ul><div id="paragraphe-2"><p>Avant de vous lancer dans l'aménagement d'un jardin sur votre toit, plusieurs étapes sont indispensables. Tout d'abord, vérifiez la capacité portante de votre toiture avec un professionnel, car les substrats et plantes ajoutent un poids considérable – en moyenne, un jardin sur toit pèse entre 150 et 500 kg/m² une fois saturé d'eau. Ensuite, pensez à l'étanchéité : une membrane EPDM ou PVC (épaisseur minimale de 1,2 mm) protègera durablement votre bâtiment des infiltrations. Le choix des plantes est crucial : privilégiez des espèces résistantes au vent (vitesses pouvant atteindre 100 km/h en ville) et nécessitant peu d'entretien, comme les sedums (couvrant 80% des toits végétalisés extensifs) ou certaines aromatiques (thym, romarin). Pour le substrat, optez pour un mélange léger (max. 900 kg/m³) spécial toitures végétalisées, composé à 70% de matériaux minéraux. N'oubliez pas l'accès à l'eau pour l'arrosage (comptez 10-20 litres/m²/semaine en été), surtout les 2-3 premières années. À Bruxelles, 7 communes sur 19 proposent des subsides jusqu'à 50€/m² pour ce type de projet écologique, avec +35% de surfaces végétalisées enregistrées depuis 2020. Et si vous manquez d'inspiration, pourquoi ne pas visiter les 18 ha de toits végétalisés recensés dans la capitale, comme ceux du Musée des Sciences Naturelles ou de la Bibliothèque Solvay ?</p></div><h4>Les défis techniques à anticiper</h4><ul><li>Quels obstacles peut-on rencontrer ?</li></ul><div id="paragraphe-3"><p>Créer un jardin sur son toit n'est pas sans défis techniques. Le vent peut être jusqu'à 30% plus fort en hauteur qu'au niveau du sol, nécessitant parfois des brise-vents efficaces (comme des treillis ou des arbustes bas résistants) ou le choix de plantes adaptées comme les sedums ou les graminées. L'exposition au soleil est souvent plus intense qu'au sol, avec des UV jusqu'à 15% plus élevés, ce qui demande un arrosage adapté : un système goutte-à-goutte automatisé peut réduire la consommation d'eau de 50% par rapport à un arrosage manuel. L'accès à l'eau peut poser problème, surtout en été où les besoins hydriques augmentent de 40% : pensez à des systèmes de récupération d'eau de pluie (un toit de 50m² peut collecter jusqu'à 30 000 litres d'eau par an). Le poids est une contrainte majeure : une toiture extensive (15-20 cm d'épaisseur, charge de 60-150 kg/m²) conviendra mieux aux structures légères qu'un jardin intensif (plus de 30 cm, charge supérieure à 300 kg/m²). En ville, 75% des communes imposent des restrictions spécifiques pour les toits végétalisés, mieux vaut se renseigner auprès de sa mairie avant tout projet. Et n'oubliez pas que même en hauteur, les nuisibles comme les pucerons (qui peuvent infester un toit en 48h) ou les limaces (capables de grimper 3 étages) peuvent trouver le chemin de vos plantations !</p></div><h4>Des idées d'aménagement créatives</h4><ul><li>Comment personnaliser son jardin de toit ?</li></ul><div id="paragraphe-4"><p>Votre jardin sur le toit peut devenir bien plus qu'une simple étendue verte. Pour les petits espaces (moins de 10 m²), les jardins en bac ou les murs végétaux optimisent la surface tout en réduisant l'effet d'îlot de chaleur urbain de 2 à 5°C selon une étude de la KU Leuven. Un coin potager permet de cultiver tomates (variétés naines comme 'Tumbling Tom' idéales en pots), fraises (1 plant produit en moyenne 500g/an) ou aromates (basilic, thym, romarin) avec une vue imprenable. Ajoutez des sièges et une table en teck imputrescible pour créer un espace détente original. Les Bruxellois apprécieront peut-être un coin « bière artisanale » avec houblon (rendement : 500g à 1kg par plant) et plantes à infusion (menthe, mélisse). Pour la biodiversité, installez un hôtel à insectes (attirant jusqu'à 30 espèces différentes) ou une petite mare préformée de 60L max (si la structure le permet, avec une charge de 60kg/m²). L'éclairage solaire (LED 5W couvrant 2m²) prolongera les soirées estivales. Et pourquoi ne pas imaginer un petit verger avec des arbres nains (pommiers colonnaires produisant 3-5kg/fruit/an) ? Après tout, Bruxelles compte déjà 15% de toits végétalisés selon Bruxelles Environnement.</p></div><h4>L'entretien : plus simple qu'il n'y paraît</h4><ul><li>Comment maintenir son jardin de toit facilement ?</li></ul><div id="paragraphe-5"><p>Contrairement aux idées reçues, un jardin sur le toit demande souvent moins d'entretien qu'un jardin traditionnel. Les plantes choisies, comme les sedums, les graminées ou les thyms, sont généralement résistantes et adaptées aux conditions difficiles (ensoleillement intense, vent, variations thermiques). Selon une étude de la Fédération Française du Paysage (2023), ces espèces nécessitent jusqu'à 70% moins d'eau qu'une pelouse classique. Un désherbage occasionnel (environ 2 à 3 fois par an) et un arrosage modéré (10 à 15 litres/m² par semaine en été) suffisent la plupart du temps. Au printemps, un apport d'engrais organique à libération lente (compost ou fumier déshydraté) peut être bénéfique pour stimuler la croissance. Pour les toitures extensives, une visite annuelle de contrôle de l'étanchéité est recommandée, avec un coût moyen de 150 à 300€ selon la surface. En hiver, laissez faire la nature : les plantes entreront en dormance et supporteront des températures jusqu'à -15°C pour les variétés les plus robustes. Pensez à prévoir un accès facile (échelle sécurisée ou trappe d'accès de 60x80cm minimum) pour l'entretien, surtout si vous devez monter du matériel. Et si vous partez en vacances, pas de panique : ces jardins sont conçus pour résister à 2-3 semaines sans soins en période estivale. Après tout, même les plantes ont droit à un peu d'indépendance !</p></div><h4>L'impact écologique à Bruxelles</h4><ul><li>Comment ces jardins profitent-ils à la ville ?</li></ul><div id="paragraphe-6"><p>À l'échelle de Bruxelles, les jardins sur les toits représentent une solution concrète pour lutter contre les îlots de chaleur urbains. Selon une étude de Bruxelles Environnement (2023), ces espaces verts peuvent réduire la température ambiante de 3 à 5°C en été. Ils absorbent jusqu'à 50% des eaux pluviales, réduisant la pression sur les égouts lors des fortes pluies, comme lors des intempéries de juillet 2021 où certains quartiers équipés ont évité des inondations. Leur capacité à filtrer les particules fines (jusqu'à 0,7 kg/m²/an selon l'ULB) améliore significativement la qualité de l'air dans les rues environnantes. Ils créent des corridors écologiques pour la faune en milieu très urbanisé, avec déjà 38 espèces d'abeilles sauvages recensées sur les toits végétalisés bruxellois. Sur le plan social, ils offrent des espaces de convivialité et de détente précieux en ville, comme le prouve le succès du toit-terrasse de la Cité Administrative (500 visiteurs/jour en moyenne). Certains projets bruxellois combinent même production maraîchère (comme le potager du toit de Tour & Taxis qui produit 2 tonnes de légumes bio annuellement) et insertion sociale (12 emplois créés en 2022). Avec la densification urbaine et le nouveau plan 'Bruxelles 2040' prévoyant 10ha supplémentaires de toits verts, ces jardins aériens pourraient bien devenir la norme plutôt que l'exception. Et si demain, les toits de Bruxelles rivalisaient de verdure avec ses nombreux parcs ? Le potentiel est immense : sur les 12km² de toitures plates bruxelloises, seulement 15% sont actuellement végétalisées.</p></div>`
       setTimeout(() => {
         subscriber.next(mock);
         subscriber.complete();
       }, 1000);
-    });*/
+    });
+    // return of(article).pipe(
+    //   mergeMap(fullArticle => {
+    //     // Création d'un tableau contenant les identifiants des 6 chapitres
+    //     const chapitreIds = [1, 2, 3, 4, 5, 6];
+    //
+    //     // Traitement séquentiel de chaque chapitre
+    //     return from(chapitreIds).pipe(
+    //       mergeMap(chapitreId => {
+    //         // Extraction du texte du chapitre
+    //         const chapitreText = extractChapitreById(fullArticle, chapitreId);
+    //
+    //         // Création du prompt pour l'amélioration
+    //         const prompt = this.getPromptsService.upgradeArticle(chapitreText);
+    //
+    //         // Conversion de la Promise en Observable et traitement de l'amélioration
+    //         return from(this.openaiApiService.fetchData(prompt, true)).pipe(
+    //           map(upgradedText => {
+    //             // Vérification que le texte amélioré est bien une chaîne
+    //             if (upgradedText === null || typeof upgradedText !== 'string') {
+    //               console.warn(`Le chapitre ${chapitreId} n'a pas pu être amélioré, texte reçu:`, upgradedText);
+    //               return fullArticle; // Retourne l'article sans modifier ce chapitre
+    //             }
+    //             const upgradedTextJson: {upgradedChapitre: string} = JSON.parse(extractJSONBlock(upgradedText))
+    //             const upgradedTextJsonObject  = upgradedTextJson.upgradedChapitre
+    //
+    //             // Remplacement du chapitre dans l'article complet
+    //             fullArticle = replaceChapitreById(fullArticle, chapitreId, upgradedTextJsonObject);
+    //             return fullArticle;
+    //           }),
+    //           catchError(error => {
+    //             console.error(`Erreur lors de l'amélioration du chapitre ${chapitreId}:`, error);
+    //             return of(fullArticle); // En cas d'erreur, on retourne l'article sans modification
+    //           })
+    //         );
+    //       }, 1), // Traitement d'un chapitre à la fois
+    //       // On ne s'intéresse qu'au dernier résultat qui contient l'article complet avec tous les chapitres améliorés
+    //       takeLast(1)
+    //     );
+    //   })
+    // );
+  }
+
+  formatInHtmlArticle(articleUpgraded: string): Observable<string> {
+    // const prompt = this.getPromptsService.formatInHtmlArticle(articleUpgraded);
+    // return from(this.openaiApiService.fetchData(prompt, true)).pipe(
+    //   map(result => {
+    //     if (result === null) {
+    //       throw new Error('Aucun résultat retourné par l\'API OpenAI');
+    //     }
+    //     const data: {article: string} = JSON.parse(extractJSONBlock(result))
+    //     return data.article;
+    //   })
+    // );
+    return new Observable<string>(subscriber => {
+      const mock = `formatInHtmlArticle => ${articleUpgraded}`;
+      setTimeout(() => {
+        subscriber.next(mock);
+        subscriber.complete();
+      }, 1000);
+    });
   }
 
   checkMeteo(): Observable<string> {
+    // const prompt = this.getPromptsService.meteoArticle();
+    // return from(this.openaiApiService.fetchData(prompt, true)).pipe(
+    //   map(result => {
+    //     if (result === null) {
+    //       throw new Error('Aucun résultat retourné par l\'API OpenAI');
+    //     }
+    //     const data: {meteo: string} = JSON.parse(extractJSONBlock(result))
+    //     return data.meteo;
+    //   })
+    // );
     return new Observable<string>(subscriber => {
       const mock = `
       Ma météo est bonne 12 degrés.

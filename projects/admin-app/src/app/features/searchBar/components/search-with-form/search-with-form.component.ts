@@ -41,8 +41,10 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           } else if (msg.action === MessageAction.GENERATED_ARTICLE) {
             this.upgradeArticle();
           } else if (msg.action === MessageAction.UPGRADED_ARTICLE) {
-            // this.formatInHtmlArticle();
-          }else if (msg.action === MessageAction.METEO) {
+            this.formatInHtmlArticle();
+          } else if (msg.action === MessageAction.FORMATED_IN_HTML_ARTICLE) {
+            this.checkMeteo()
+          } else if (msg.action === MessageAction.METEO) {
             // this.savePost();
           } else if (msg.action === MessageAction.SAVED_POST) {
             //  this.updateIdeaPost();
@@ -88,8 +90,12 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
     this.application.upgradeArticle();
   }
 
+  formatInHtmlArticle() {
+    this.application.formatInHtmlArticle();
+  }
+
    checkMeteo() {
-    // this.application.checkMeteo();
+      this.application.checkMeteo();
   }
 
    savePost() {

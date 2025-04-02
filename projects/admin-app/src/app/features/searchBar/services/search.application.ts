@@ -21,7 +21,8 @@ export class SearchApplication {
     this.isIdeaEffect();
     this.isGeneratedArticleEffect();
     this.isUpgradedArticleEffect();
-    // this.isMeteoEffect();
+    this.isFormatInHtmlArticleEffect()
+    this.isMeteoEffect();
     // this.isPostId();
   }
 
@@ -58,10 +59,15 @@ export class SearchApplication {
     this.store.upgradeArticle();
   }
 
-  // checkMeteo(): void {
-  //   this.messageService.sendMessage('Météo en cours.');
-  //   this.store.checkMeteo();
-  // }
+  formatInHtmlArticle(): void {
+    this.messageService.sendMessage('Format en HTML upgradeArticle en cours.');
+    this.store.formatInHtmlArticle();
+  }
+
+  checkMeteo(): void {
+    this.messageService.sendMessage('Météo en cours.');
+    this.store.checkMeteo();
+  }
   //
   // savePost(): void {
   //   this.messageService.sendMessage('Enregistrement du post en cour.');
@@ -132,8 +138,8 @@ export class SearchApplication {
 
   private isUpgradedArticleEffect(): void {
     effect(() => {
-      if(this.store.getPostArticle()!==null) {
-        if(this.store.isPostArticle()) {
+      if(this.store.getArticleUpgraded()!==null) {
+        if(this.store.isArticleUpgraded()) {
           this.messageService.sendSuccess('Upgrade terminé.', MessageAction.UPGRADED_ARTICLE);
         } else {
           this.messageService.sendError('Upgrade a une erreur.');
@@ -141,18 +147,32 @@ export class SearchApplication {
       }
     });
   }
-  //
-  // private isMeteoEffect(): void {
-  //   effect(() => {
-  //     if(this.store.getMeteo()!==null) {
-  //       if(this.store.isMeteo()) {
-  //         this.messageService.sendSuccess('Météo terminé.', MessageAction.METEO);
-  //       } else {
-  //         this.messageService.sendError('Météo a une erreur.');
-  //       }
-  //     }
-  //   });
-  // }
+
+  private isFormatInHtmlArticleEffect(): void {
+    effect(() => {
+      if(this.store.getPostArticle() && this.store.getPostArticle()!==null) {
+        if(this.store.isPostArticle()) {
+          this.messageService.sendSuccess('Format en HTML terminé.', MessageAction.FORMATED_IN_HTML_ARTICLE);
+        } else {
+          this.messageService.sendError('Format en HTML a une erreur.');
+        }
+      }
+    });
+  }
+
+  private isMeteoEffect(): void {
+    effect(() => {
+      const test = this.store.getPostMeteo()
+      if(this.store.getPostMeteo() && this.store.getPostMeteo()!==null) {
+        const test = this.store.isPostMeteo()
+        if(this.store.isPostMeteo()) {
+          this.messageService.sendSuccess('Météo terminé.', MessageAction.METEO);
+        } else {
+          this.messageService.sendError('Météo a une erreur.');
+        }
+      }
+    });
+  }
 
   // private isPostId(): void {
   //   effect(() => {
