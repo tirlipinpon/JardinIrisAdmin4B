@@ -20,7 +20,7 @@ export class SearchApplication {
     this.isArticleValidEffect();
     this.isIdeaEffect();
     this.isGeneratedArticleEffect();
-    // this.isUpgradedArticleEffect();
+    this.isUpgradedArticleEffect();
     // this.isMeteoEffect();
     // this.isPostId();
   }
@@ -120,8 +120,8 @@ export class SearchApplication {
 
   private isGeneratedArticleEffect(): void {
     effect(() => {
-      if(this.store.getPostArticle()!==null) {
-        if(this.store.isPostArticle()) {
+      if(this.store.getArticleGenerated()!==null) {
+        if(this.store.isArticleGenerated()) {
           this.messageService.sendSuccess('Géneration terminé.', MessageAction.GENERATED_ARTICLE);
         } else {
           this.messageService.sendError('Géneration a une erreur.');
@@ -130,17 +130,17 @@ export class SearchApplication {
     });
   }
 
-  // private isUpgradedArticleEffect(): void {
-  //   effect(() => {
-  //     if(this.store.getUpgradedArticle()!==null) {
-  //       if(this.store.isUpgradedArticle()) {
-  //         this.messageService.sendSuccess('Upgrade terminé.', MessageAction.UPGRADED_ARTICLE);
-  //       } else {
-  //         this.messageService.sendError('Upgrade a une erreur.');
-  //       }
-  //     }
-  //   });
-  // }
+  private isUpgradedArticleEffect(): void {
+    effect(() => {
+      if(this.store.getPostArticle()!==null) {
+        if(this.store.isPostArticle()) {
+          this.messageService.sendSuccess('Upgrade terminé.', MessageAction.UPGRADED_ARTICLE);
+        } else {
+          this.messageService.sendError('Upgrade a une erreur.');
+        }
+      }
+    });
+  }
   //
   // private isMeteoEffect(): void {
   //   effect(() => {

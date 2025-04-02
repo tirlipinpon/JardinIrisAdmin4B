@@ -14,6 +14,8 @@ export interface SearchState {
   ideaPost:  { id: number | null, "description": string | null } | null ;
   isLoading: boolean;
   post: Post | null;
+  articleGenerated: string | null;
+  articleUpgraded: string | null;
 }
 
 export enum CathegoriesBlog {
@@ -34,6 +36,8 @@ const initialValue: SearchState = {
   isLoading: false,
   ideaPost: null,
   post: null,
+  articleGenerated: null,
+  articleUpgraded: null
 
 }
 export const SearchStore= signalStore(
@@ -55,6 +59,16 @@ export const SearchStore= signalStore(
     getArticleValid: computed(() =>  store.articleValid()),
     isArticleValid: computed(() =>  {  const articleValid = store.articleValid();
       return articleValid!==null && articleValid.valid
+    }),
+
+    getArticleGenerated: computed(() =>  store.articleGenerated()),
+    isArticleGenerated: computed(() =>  {  const articleGenerated = store.articleGenerated();
+      return articleGenerated!==null && articleGenerated.length > 1
+    }),
+
+    getArticleUpgraded: computed(() =>  store.articleUpgraded()),
+    isArticleUpgraded: computed(() =>  {  const articleUpgraded = store.articleUpgraded();
+      return articleUpgraded!==null && articleUpgraded.length > 1
     }),
 
     getPost: computed(() => store.post()),
@@ -201,8 +215,24 @@ export const SearchStore= signalStore(
             // Fonction pour traiter la génération d'article avec n'importe quelle source
             const processGeneration = (source: string) => {
               return infra.generateArticle(source).pipe(
+                map(post => {
+                  // Extraire l'article du post
+                  const articleGenerated = post.article;
+                  // Créer une copie du post sans l'article
+                  const { article, ...postWithoutArticle } = post;
+                  // Renvoyer les deux éléments séparés
+                  return {
+                    postWithoutArticle,
+                    articleGenerated
+                  };
+                }),
                 tapResponse({
-                  next: post => patchState(store, { post, isLoading: false }),
+                  next: ({ postWithoutArticle, articleGenerated }) =>
+                    patchState(store, {
+                      post: postWithoutArticle,
+                      articleGenerated,
+                      isLoading: false
+                    }),
                   error: error => patchState(store, {isLoading: false})
                 })
               );
@@ -217,6 +247,7 @@ export const SearchStore= signalStore(
           })
         )
       ),
+
       saveUrlPost: rxMethod<string>(
         pipe(
           tap(() => updateState(store, '[saveUrlPost] update loading', {isLoading: true})),
@@ -235,16 +266,14 @@ export const SearchStore= signalStore(
         pipe(
           tap(() => updateState(store, '[upgradeArticle] update loading', { isLoading: true })),
           switchMap(() => {
-            const generatedArticle = store.getPostArticle();
+            const generatedArticle = store.getArticleGenerated();
             if (!generatedArticle) {
               patchState(store, { isLoading: false });
               return EMPTY;
             }
             return infra.upgradeArticle(generatedArticle).pipe(
               tapResponse({
-                next: (upgradedArticle) => patchState(store, {
-                  post: { ...store.post(), article: upgradedArticle },
-                  isLoading: false }),
+                next: (upgradedArticle) => patchState(store, { articleUpgraded: upgradedArticle, isLoading: false }),
                 error: () => patchState(store, { isLoading: false }),
               })
             );

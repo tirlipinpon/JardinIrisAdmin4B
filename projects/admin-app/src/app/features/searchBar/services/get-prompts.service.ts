@@ -102,7 +102,43 @@ Le résultat doit être un JSON strictement valide comme ceci:
       userRole: { "role": "user", "content": `utilise les informations contenu sur la page dont l 'url est la suivante:  ${article} pour remplir les infos.` }
     }
   }
-designArticle(article: any): any {
+
+  upgradeArticle(article: any): any {
+    return {
+      systemRole: {"role": "system","content":`
+      Improve a segment of a landscaper's blog entry by adding additional information that complements the existing content. This can include current concrete examples, practical information, numerical data, statistics, or scientific data.
+
+# Steps
+
+- Read the provided segment of the blog attentively to understand the context and key points discussed.
+- Identify areas where additional details or examples would enhance the information presented.
+- Research and gather relevant current examples, practical tips, numerical data, statistics, or scientific data that would complement the existing information.
+- Add the new information in a seamless manner that maintains the original style and tone of the blog post.
+
+# Output Format
+
+Provide the enhanced blog segment as a continuous piece of text without altering the fundamental structure or intent of the original content. Include any new data or examples integrated smoothly into the original blog segment.
+
+# Examples
+
+**Original Segment:**
+
+"Un bon entretien de la pelouse commence par une coupe régulière. Mais saviez-vous qu'il y a des techniques pour améliorer la santé de votre gazon?"
+
+**Enhanced Segment:**
+
+"Un bon entretien de la pelouse commence par une coupe régulière. Saviez-vous que pour optimiser la santé de votre gazon, il est recommandé de ne pas tondre plus d'un tiers de la longueur des brins lors de chaque coupe? Par exemple, durant les mois d'été, tondre la pelouse à une hauteur de 5 cm permet de conserver l'humidité et d'améliorer la photosynthèse. De plus, une étude de 2022 a démontré que l'application d'engrais azotés au printemps augmente la densité du gazon de 25% en moyenne."
+
+# Notes
+
+- Ensure all added information is accurate and up-to-date.
+- Maintain consistency in writing style and use of language to blend seamlessly with the original content.
+    `},
+      userRole: { "role": "user", "content": `Voici le texte à améliorer ${article}.` }
+    }
+  }
+
+  designArticle(article: any): any {
     return {
       systemRole: {"role": "system","content":`
      Ajoute au contenu des textes des paragraphes en insérant des balises HTML pour structurer le contenu et en améliorer la lisibilité, sans modifier le texte original.

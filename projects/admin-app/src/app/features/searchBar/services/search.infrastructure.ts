@@ -1,5 +1,5 @@
 import {inject, Injectable} from "@angular/core";
-import {catchError, EMPTY, from, Observable, of, tap, throwError} from "rxjs";
+import {catchError, delay, EMPTY, from, mergeMap, Observable, of, retry, tap, throwError, timer, toArray} from "rxjs";
 import {TheNewsApiService} from "./the-news-api.service";
 import {OpenaiApiService} from "./openai-api.service";
 import {GetPromptsService} from "./get-prompts.service";
@@ -11,6 +11,7 @@ import {PostgrestError} from "@supabase/supabase-js";
 import {map} from "rxjs/operators";
 import {Post} from "../../../types/post";
 import {AddImagesToChaptersService} from "./add-images-to-chapters.service";
+import {extractChapitreById, replaceChapitreById} from "../../../utils/exctractChapitreById";
 
 @Injectable({
   providedIn: 'root',
@@ -141,15 +142,57 @@ export class SearchInfrastructure {
   }
 
   upgradeArticle(article: string): Observable<string> {
-    return new Observable<string>(subscriber => {
-      const mock =
-        `${article}`;
-      setTimeout(() => {
-        subscriber.next(mock);
-        subscriber.complete();
-      }, 1000);
-    });
+    // Configuration
+    const MAX_CONCURRENT_REQUESTS = 2; // Contrôle du nombre de requêtes simultanées
+    const chapitreIds = [1, 2, 3, 4, 5, 6];
+    return from(chapitreIds).pipe(
+      // mergeMap avec paramètre de concurrence limite les requêtes simultanées
+      mergeMap(chapitreId => {
+        // Extraction du chapitre
+        const chapitreText = extractChapitreById(article, chapitreId);
+        // Optimisation: ne pas traiter les chapitres vides
+        if (!chapitreText.trim()) {
+          return of({ chapitreId, upgradedText: chapitreText });
+        }
+        const prompt = this.getPromptsService.upgradeArticle(chapitreText);
+        // Envoi de la requête et traitement de la réponse
+        return from(this.openaiApiService.fetchData(prompt, true)).pipe(
+          map(result => ({ chapitreId, upgradedText: result || chapitreText })),
+          // Stratégie de réessai plus intelligente
+          retry({
+            count: 3,
+            // Backoff exponentiel en cas d'erreur
+            delay: (error, retryCount) => {
+              // Calcul d'un délai exponentiel avec jitter pour les réessais uniquement
+              const baseDelay = Math.pow(2, retryCount) * 500;
+              const jitter = baseDelay * 0.2 * Math.random();
+              const retryDelay = baseDelay + jitter;
+              console.log(`Réessai ${retryCount} pour le chapitre ${chapitreId} après ${retryDelay}ms`);
+              return timer(retryDelay);
+            }
+          }),
+          catchError(error => {
+            console.error(`Erreur lors de la mise à jour du chapitre ${chapitreId}:`, error);
+            return of({ chapitreId, upgradedText: chapitreText });
+          })
+        );
+      }, MAX_CONCURRENT_REQUESTS), // Cette limite est la clé pour contrôler la charge
+      // Collecter tous les résultats
+      toArray(),
+      // Reconstruire l'article avec tous les chapitres mis à jour
+      map(results => {
+        let updatedArticle = article;
+        // Tri par ID pour garantir l'ordre correct
+        results.sort((a, b) => a.chapitreId - b.chapitreId);
+        for (const { chapitreId, upgradedText } of results) {
+          console.log(`updatedArticle ${updatedArticle} pour le chapitre ${chapitreId} après upgradedText ${upgradedText}`);
+          updatedArticle = replaceChapitreById(updatedArticle, chapitreId, upgradedText);
+        }
+        return updatedArticle;
+      })
+    );
   }
+
 
   formatInHtmlArticle(generatedArticle: string): Observable<string> {
     const prompt = this.getPromptsService.generateArticle(generatedArticle);
