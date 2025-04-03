@@ -9,7 +9,6 @@ export interface Post {
   article?: string;
   comments?: Comment[];
   citation?: string;
-  meteo?: string;
   lien_url_article?: { lien1: string };
   image_url?: string;
   categorie?: string;

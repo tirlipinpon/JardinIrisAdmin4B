@@ -52,16 +52,9 @@ export class AddImagesToChaptersService {
     }
   }
   extractByPositionH4Title(texte: string, x: number): string {
-    console.log(`Tentative d'extraction du titre H4 position ${x} dans un article de ${texte?.length || 0} caractères`);
-    try {
-    const regex = new RegExp(`<span[^>]*id=["']paragraphe-${x}["'][^>]*>\\s*<h4>(.*?)</h4>`, 'i');
-    const match = texte.match(regex);
-    return match ? match[1] : '';
-    } catch (e) {
-      console.error(`Erreur lors de l'extraction du titre H4 (${x}):`, e);
-      return ""; // Retourne une chaîne vide en cas d'erreur
-    }
-
+    console.log(`Extraction du titre H4 du paragraphe ${x} (longueur de l'article : ${texte?.length || 0} caractères)`);
+    const regex = new RegExp(`<span[^>]*id=["']paragraphe-${x}["'][^>]*>\\s*<h4>(.*?)</h4>`, 'si');
+    return texte.match(regex)?.[1] ?? '';
   }
 
   async getKeyWordsFromChapitreInArticleAndSetImageUrl(article: string, articleId: number) {

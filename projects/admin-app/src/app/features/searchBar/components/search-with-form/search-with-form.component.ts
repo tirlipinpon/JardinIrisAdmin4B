@@ -43,12 +43,12 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           } else if (msg.action === MessageAction.UPGRADED_ARTICLE) {
             this.formatInHtmlArticle();
           } else if (msg.action === MessageAction.FORMATED_IN_HTML_ARTICLE) {
-            this.checkMeteo()
+            this.checkMeteo();
           } else if (msg.action === MessageAction.METEO) {
-            // this.savePost();
+            this.savePost();
           } else if (msg.action === MessageAction.SAVED_POST) {
-            //  this.updateIdeaPost();
-            // this.addImagesInArticle();
+            this.updateIdeaPost();
+            this.addImagesInArticle();
           }
           break;
         }
@@ -99,15 +99,15 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
   }
 
    savePost() {
-    // this.application.savePost();
+    this.application.savePost();
   }
 
    addImagesInArticle() {
-    // this.application.addImagesInArticle();
+     this.application.addImagesInArticle();
   }
 
    updateIdeaPost() {
-    // this.application.updateIdeaPost();
+      this.application.updateIdeaPost();
   }
 
 }
