@@ -70,19 +70,25 @@ export class SearchApplication {
   }
 
   savePost(): void {
-    this.messageService.sendMessage('Enregistrement du post en cour.');
+    this.messageService.sendMessage('Enregistrement du post en cours.');
     this.store.savePost();
   }
 
   updateIdeaPost(): void {
-    this.messageService.sendMessage('Update de post idea en cour.');
+    this.messageService.sendMessage('Update de post idea en cours.');
     this.store.updateIdeaPost();
   }
 
   addImagesInArticle(): void {
-    this.messageService.sendMessage('Ajout d images d article en cour.');
+    this.messageService.sendMessage('Ajout d images d article en cours.');
     this.store.addImagesInArticle();
   }
+
+  generateImageIa(): void {
+    this.messageService.sendMessage('Création d une image en cours.');
+    this.store.generateImageIa();
+  }
+
 
 
   private isSearchingEffect(): void {

@@ -49,6 +49,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           } else if (msg.action === MessageAction.SAVED_POST) {
             this.updateIdeaPost();
             this.addImagesInArticle();
+            this.generateImageIa();
           }
           break;
         }
@@ -108,6 +109,10 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
 
    updateIdeaPost() {
       this.application.updateIdeaPost();
+  }
+
+  generateImageIa() {
+    this.application.generateImageIa();
   }
 
 }

@@ -315,11 +315,12 @@ export const SearchStore= signalStore(
             if (!getPost) { patchState(store, { isLoading: false }); return EMPTY; }
             const getArticleValid = store.getArticleValid();
             if (!getArticleValid) { patchState(store, { isLoading: false }); return EMPTY; }
+            const imageUrl = getArticleValid.image_url || '';
             const getMeteo = store.getMeteo();
             if (!getMeteo) { patchState(store, { isLoading: false }); return EMPTY; }
             const getArticleHtml = store.getArticleHtml();
             if (!getArticleHtml) { patchState(store, { isLoading: false }); return EMPTY; }
-            return infra.savePost(getPost, getMeteo, getArticleHtml).pipe(
+            return infra.savePost(getPost, getMeteo, getArticleHtml, imageUrl).pipe(
               tapResponse({
                 next: post => patchState(store, { postId: post.id, isLoading: false }),
                 error: error => patchState(store, {isLoading: false})
@@ -356,6 +357,21 @@ export const SearchStore= signalStore(
             const getPostId = store.getPostId();
             if (!getPostId) { patchState(store, { isLoading: false }); return EMPTY; }
             return infra.addImagesInArticle(getPost, getPostId).pipe(
+              tapResponse({
+                next: data => patchState(store, { isLoading: false }),
+                error: error => patchState(store, {isLoading: false})
+              })
+            )
+          })
+        )
+      ),
+      generateImageIa: rxMethod<void>(
+        pipe(
+          tap(()=> updateState(store, '[addImagesInArticle] update loading', {isLoading: true})    ),
+          switchMap(() => {
+            const getPostId = store.getPostId();
+            if (!getPostId) { patchState(store, { isLoading: false }); return EMPTY; }
+            return infra.generateImageIa(getPostId).pipe(
               tapResponse({
                 next: data => patchState(store, { isLoading: false }),
                 error: error => patchState(store, {isLoading: false})

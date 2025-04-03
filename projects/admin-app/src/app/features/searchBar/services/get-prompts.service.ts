@@ -154,7 +154,7 @@ Provide the enhanced blog segment in a valid JSON format as follows: {"upgradedC
 # Output Format
 Présente le résultat sous la forme d'un JSON valide structuré comme suit :
 {
-  "article": "<html_content_here>"
+  "articleHtml": "<html_content_here>"
 }
 
 

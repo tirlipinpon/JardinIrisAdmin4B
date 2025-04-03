@@ -238,7 +238,7 @@ export class SupabaseService {
     }
   }
 
-  async setNewUrlImagesChapitres(url: string, chapitreId: number, postId: number, chapitreKeyWord: string): Promise<any> {
+  async setNewUrlImagesChapitres(url: string, chapitreId: number, postId: number, chapitreKeyWord: string, chapitreExplanation: string): Promise<any> {
     try {
       const { data, error } = await this.supabase
         .from('urlImagesChapitres')
@@ -248,6 +248,7 @@ export class SupabaseService {
             url_Image: url,
             chapitre_id: chapitreId,
             chapitre_key_word: chapitreKeyWord,
+            explanation: chapitreExplanation
           }
         ]);
 

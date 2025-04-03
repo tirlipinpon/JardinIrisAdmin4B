@@ -5,6 +5,9 @@ export function extractChapitreById(article: string, chapitreId: number): string
 }
 export function replaceChapitreById(article: string, chapitreId: number, newContent: string): string {
   const regex = new RegExp(`(<span id="${'paragraphe-' + chapitreId}"><p>)(.*?)(</p></span>)`, 's');
+  // const regex = new RegExp(`(<span id="paragraphe-${chapitreId}">)(.*?)(<p>.*?</p>)(</span>)`, 's');
+  console.log("Regex construite : ", regex);
+  console.log("Test regex sur article : ", regex.test(article));
   if (!regex.test(article)) {
     return article; // Retourne l'article inchangé si le bloc n'est pas trouvé
   }
