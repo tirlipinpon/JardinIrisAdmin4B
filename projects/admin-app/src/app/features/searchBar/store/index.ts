@@ -16,6 +16,8 @@ export interface SearchState {
   post: Post | null;
   articleGenerated: string | null;
   articleUpgraded: string | null;
+  articleHtml: string | null;
+  meteo: string | null;
 }
 
 export enum CathegoriesBlog {
@@ -37,7 +39,9 @@ const initialValue: SearchState = {
   ideaPost: null,
   post: null,
   articleGenerated: null,
-  articleUpgraded: null
+  articleUpgraded: null,
+  articleHtml: null,
+  meteo: null,
 
 }
 export const SearchStore= signalStore(
@@ -161,6 +165,16 @@ export const SearchStore= signalStore(
       return post !== null && post.valid === true;
     }),
 
+    getArticleHtml: computed(() =>  store.articleHtml()),
+    isArticleHtml: computed(() =>  {  const articleHtml = store.articleHtml();
+      return articleHtml!==null && articleHtml.length > 1
+    }),
+
+    getMeteo: computed(() =>  store.meteo()),
+    isMeteo: computed(() =>  {  const meteo = store.meteo();
+      return meteo!==null && meteo.length > 1
+    }),
+
   })),
   withMethods((store, infra = inject(SearchInfrastructure))=> (
     {
@@ -267,10 +281,7 @@ export const SearchStore= signalStore(
           tap(() => updateState(store, '[upgradeArticle] update loading', { isLoading: true })),
           switchMap(() => {
             const generatedArticle = store.getArticleGenerated();
-            if (!generatedArticle) {
-              patchState(store, { isLoading: false });
-              return EMPTY;
-            }
+            if (!generatedArticle) { patchState(store, { isLoading: false }); return EMPTY; }
             return infra.upgradeArticle(generatedArticle).pipe(
               tapResponse({
                 next: (upgradedArticle) => patchState(store, { articleUpgraded: upgradedArticle, isLoading: false }),
@@ -285,19 +296,11 @@ export const SearchStore= signalStore(
           tap(() => updateState(store, '[formatInHtmlArticle] update loading', { isLoading: true })),
           switchMap(() => {
             const getArticleUpgraded = store.getArticleUpgraded();
-            if (!getArticleUpgraded) {
-              patchState(store, { isLoading: false });
-              return EMPTY;
-            }
-            const getPost = store.getPost();
-            if (!getPost) {
-              patchState(store, { isLoading: false });
-              return EMPTY;
-            }
+            if (!getArticleUpgraded) { patchState(store, { isLoading: false }); return EMPTY; }
             return infra.formatInHtmlArticle(getArticleUpgraded).pipe(
               tapResponse({
                 next: (formatInHtmlArticle) => {
-                  patchState(store, { post: { ...getPost, article: formatInHtmlArticle }, isLoading: false });
+                  patchState(store, { articleHtml: formatInHtmlArticle, isLoading: false });
                 },
                 error: () => patchState(store, { isLoading: false }),
               })
@@ -309,14 +312,9 @@ export const SearchStore= signalStore(
         pipe(
           tap(() => updateState(store, '[checkMeteo] update loading', { isLoading: true })),
           switchMap(() => {
-            const getPost = store.getPost();
-            if (!getPost) {
-              patchState(store, { isLoading: false });
-              return EMPTY;
-            }
             return infra.checkMeteo().pipe(
               tapResponse({
-                next: (meteo) => patchState(store, { post: { ...getPost, meteo: meteo }, isLoading: false }),
+                next: (meteo) => patchState(store, { meteo: meteo, isLoading: false }),
                 error: () => patchState(store, { isLoading: false }),
               })
             );

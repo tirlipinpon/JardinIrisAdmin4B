@@ -126,7 +126,9 @@ export class SearchApplication {
 
   private isGeneratedArticleEffect(): void {
     effect(() => {
+      const test = this.store.getArticleGenerated()!==null
       if(this.store.getArticleGenerated()!==null) {
+        const test = this.store.isArticleGenerated()
         if(this.store.isArticleGenerated()) {
           this.messageService.sendSuccess('Géneration terminé.', MessageAction.GENERATED_ARTICLE);
         } else {
@@ -138,7 +140,9 @@ export class SearchApplication {
 
   private isUpgradedArticleEffect(): void {
     effect(() => {
+      const test = this.store.getArticleUpgraded()!==null
       if(this.store.getArticleUpgraded()!==null) {
+        const test = this.store.isArticleUpgraded()
         if(this.store.isArticleUpgraded()) {
           this.messageService.sendSuccess('Upgrade terminé.', MessageAction.UPGRADED_ARTICLE);
         } else {
@@ -150,8 +154,10 @@ export class SearchApplication {
 
   private isFormatInHtmlArticleEffect(): void {
     effect(() => {
-      if(this.store.getPostArticle() && this.store.getPostArticle()!==null) {
-        if(this.store.isPostArticle()) {
+      const test = this.store.getArticleHtml() && this.store.getArticleHtml()!==null
+      if(this.store.getArticleHtml() && this.store.getArticleHtml()!==null) {
+        const test = this.store.isArticleHtml()
+        if(this.store.isArticleHtml()) {
           this.messageService.sendSuccess('Format en HTML terminé.', MessageAction.FORMATED_IN_HTML_ARTICLE);
         } else {
           this.messageService.sendError('Format en HTML a une erreur.');
@@ -162,10 +168,10 @@ export class SearchApplication {
 
   private isMeteoEffect(): void {
     effect(() => {
-      const test = this.store.getPostMeteo()
-      if(this.store.getPostMeteo() && this.store.getPostMeteo()!==null) {
-        const test = this.store.isPostMeteo()
-        if(this.store.isPostMeteo()) {
+      const test = this.store.getMeteo()
+      if(this.store.getMeteo() && this.store.getMeteo()!==null) {
+        const test = this.store.isMeteo()
+        if(this.store.isMeteo()) {
           this.messageService.sendSuccess('Météo terminé.', MessageAction.METEO);
         } else {
           this.messageService.sendError('Météo a une erreur.');
