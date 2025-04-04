@@ -118,14 +118,14 @@ Improve a segment of a landscaper's blog entry by adding additional information 
 - Add the new information in a seamless manner that maintains the original style and tone of the blog post.
 
 # Output Format
-Provide the enhanced blog segment in a valid JSON format as follows: {"upgradedChapitre": "Response upgraded chapitre..."} Ensure the content is integrated smoothly and maintains the fundamental structure and intent of the original content.
+Provide the enhanced blog segment in a valid JSON format as follows: {"upgraded": "Response upgraded chapitre..."} Ensure the content is integrated smoothly and maintains the fundamental structure and intent of the original content.
 
 # Examples
 **Original Segment:**
 "Un bon entretien de la pelouse commence par une coupe régulière. Mais saviez-vous qu'il y a des techniques pour améliorer la santé de votre gazon?"
 
 **Enhanced Segment:**
-{"upgradedChapitre": "Un bon entretien de la pelouse commence par une coupe régulière. Saviez-vous que pour optimiser la santé de votre gazon, il est recommandé de ne pas tondre plus d'un tiers de la longueur des brins lors de chaque coupe? Par exemple, durant les mois d'été, tondre la pelouse à une hauteur de 5 cm permet de conserver l'humidité et d'améliorer la photosynthèse. De plus, une étude de 2022 a démontré que l'application d'engrais azotés au printemps augmente la densité du gazon de 25% en moyenne."}
+{"upgraded": "Un bon entretien de la pelouse commence par une coupe régulière. Saviez-vous que pour optimiser la santé de votre gazon, il est recommandé de ne pas tondre plus d'un tiers de la longueur des brins lors de chaque coupe? Par exemple, durant les mois d'été, tondre la pelouse à une hauteur de 5 cm permet de conserver l'humidité et d'améliorer la photosynthèse. De plus, une étude de 2022 a démontré que l'application d'engrais azotés au printemps augmente la densité du gazon de 25% en moyenne."}
 
 # Notes
 - Ensure all added information is accurate and up-to-date.
@@ -138,13 +138,13 @@ Provide the enhanced blog segment in a valid JSON format as follows: {"upgradedC
   formatInHtmlArticle(article: string): any {
     return {
       systemRole: {"role": "system","content":`
-     Ajoute au contenu des textes des paragraphes en insérant des balises HTML pour structurer le contenu et en améliorer la lisibilité, sans modifier le texte original.
-
+     Au contenu des textes en insérant des balises HTML pour structurer le contenu et en améliorer la lisibilité,
+     sans modifier le texte ou les balise html deja present original.
 - Respecte les étapes suivantes pour la mise en forme :
 
 # Steps
-- Dans chaque paragraphe, encadrer une phrase clé avec la balise \`<b>\` pour la mettre en évidence et attirer l'attention du lecteur.
-- Ajoute d'un emoji illustrant le sujet du paragraphe à gauche de chaque titre.
+- Encadrer une phrase clé avec la balise \`<b>\` pour la mettre en évidence et attirer l'attention du lecteur.
+- Ajoute d'un emoji illustrant le sujet du paragraphe à gauche de chaque titre en <h4> deja present sans rajouter de <h4> supplémentaire.
 - Adapter le formatage en fonction du type de contenu :
   - Utiliser \`<ol><li></li></ol>\` pour toutes les listes.
   - Utiliser la balise \`<u>\` pour souligner des informations spécifiques.
@@ -154,16 +154,16 @@ Provide the enhanced blog segment in a valid JSON format as follows: {"upgradedC
 # Output Format
 Présente le résultat sous la forme d'un JSON valide structuré comme suit :
 {
-  "articleHtml": "<html_content_here>"
+  "upgraded": "<html_content_here>"
 }
 
 
 # Notes
-- Le JSON ne doit contenir aucun autre texte ou structuration en dehors des balises HTML requises.
+- Le JSON ne doit contenir aucun autre texte ou structuration en dehors des balises HTML requises ou deja présentes dans le texte original.
 - S'assurer de la validité du code HTML généré, en suivant les instructions spécifiées pour chaque type de contenu.
       `},
       userRole: { "role": "user",
-        "content": `Transforme le contenu des textes des paragraphes de ceci ${article}  en insérant des balises HTML pour structurer le contenu et en améliorer la lisibilité, sans modifier le texte original.` }
+        "content": `Transforme le contenu des textes des paragraphes de ceci : "${article}",  sans modifier le texte ou les balises html original.` }
     }
   }
 

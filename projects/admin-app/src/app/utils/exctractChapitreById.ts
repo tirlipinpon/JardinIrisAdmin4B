@@ -1,16 +1,13 @@
-export function extractChapitreById(article: string, chapitreId: number): string {
-  const regex = new RegExp(`<span id="paragraphe-${chapitreId}">.*?<p>(.*?)<\/p>`, 's');
-  const match = article.match(regex);
-  return match?.[1] ?? '';
+export function extractChapitreById(text: string, id: number): string {
+  const regex = new RegExp(`<span id="paragraphe-${id}">.*?<p>(.*?)<\/p>`, "s");
+  console.log("Test regex sur extract Chapitre By Id : ", regex.test(text));
+  const match = text.match(regex);
+  return match ? match[1] : text;
 }
-export function replaceChapitreById(article: string, chapitreId: number, newContent: string): string {
-  const regex = new RegExp(`(<span id="${'paragraphe-' + chapitreId}"><p>)(.*?)(</p></span>)`, 's');
-  // const regex = new RegExp(`(<span id="paragraphe-${chapitreId}">)(.*?)(<p>.*?</p>)(</span>)`, 's');
+export function replaceChapitreById(text: string, chapitreId: number, newContent: string): string {
+  const regex = new RegExp(`(<span id="paragraphe-${chapitreId}">.*?<p>)(.*?)(</p>)`, "s");
   console.log("Regex construite : ", regex);
-  console.log("Test regex sur article : ", regex.test(article));
-  if (!regex.test(article)) {
-    return article; // Retourne l'article inchangé si le bloc n'est pas trouvé
-  }
-  return article.replace(regex, `$1${newContent}$3`);
+  console.log("Test regex sur replace Chapitre By Id : ", regex.test(text));
+  return text.replace(regex, `$1${newContent}$3`);
 }
 

@@ -268,7 +268,7 @@ export const SearchStore= signalStore(
           switchMap(() => {
             const generatedArticle = store.getArticleGenerated();
             if (!generatedArticle) { patchState(store, { isLoading: false }); return EMPTY; }
-            return infra.upgradeArticle(generatedArticle).pipe(
+            return infra.formatInStructure(generatedArticle, 'UPGRADE').pipe(
               tapResponse({
                 next: (upgradedArticle) => patchState(store, { articleUpgraded: upgradedArticle, isLoading: false }),
                 error: () => patchState(store, { isLoading: false }),
@@ -283,7 +283,7 @@ export const SearchStore= signalStore(
           switchMap(() => {
             const getArticleUpgraded = store.getArticleUpgraded();
             if (!getArticleUpgraded) { patchState(store, { isLoading: false }); return EMPTY; }
-            return infra.formatInHtmlArticle(getArticleUpgraded).pipe(
+            return infra.formatInStructure(getArticleUpgraded, 'HTML').pipe(
               tapResponse({
                 next: (formatInHtmlArticle) => {
                   patchState(store, { articleHtml: formatInHtmlArticle, isLoading: false });
