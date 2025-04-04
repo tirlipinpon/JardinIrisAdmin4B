@@ -52,15 +52,15 @@ export class SearchInfrastructure {
   ) {}
 
   searchArticle(cptSearchArticle: number): Observable<{ url: string; image_url: string  }[]> {
-    // return this.theNewsApiService.getNewsApi(cptSearchArticle);
-    return new Observable<{ url: string; image_url: string }[]>(subscriber => {
-      const mock = cptSearchArticle === 0 ? [] : [];
-      //{ url: 'https://example.com/article1', image_url: 'https://example.com/image1.jpg' }
-      setTimeout(() => {
-        subscriber.next(mock);
-        subscriber.complete();
-      }, 1000);
-    });
+    return this.theNewsApiService.getNewsApi(cptSearchArticle);
+    // return new Observable<{ url: string; image_url: string }[]>(subscriber => {
+    //   const mock = cptSearchArticle === 0 ? [] : [];
+    //   //{ url: 'https://example.com/article1', image_url: 'https://example.com/image1.jpg' }
+    //   setTimeout(() => {
+    //     subscriber.next(mock);
+    //     subscriber.complete();
+    //   }, 1000);
+    // });
   }
 
   selectArticle(articles: { url: string; image_url: string }[]): Observable<{ valid: boolean | null, explication:{raisonArticle1: string | null}, url: string | null, image_url: string | null }> {
