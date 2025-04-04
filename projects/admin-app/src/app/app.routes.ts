@@ -5,21 +5,21 @@ import {userIsAuthenticateGuard} from "./features/authentication/guards/authenti
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'home/login',
     pathMatch: 'full'
   },
   {
-    path: 'home',
+    path: 'home/login',
     loadComponent: ()=> import('./pages/home/home.component').then(m => m.HomeComponent),
-    canActivate: [userIsAuthenticateGuard]
+    // canActivate: [userIsAuthenticateGuard]
   },
   {
-    path: 'authenticate',
-    children: authenticationRoutes
+    path: 'home',
+   children: authenticationRoutes
   },
   {
     path: '*',
-    redirectTo: 'authenticate/login',
+    redirectTo: 'home/login',
     pathMatch: 'full'
   }
 ];

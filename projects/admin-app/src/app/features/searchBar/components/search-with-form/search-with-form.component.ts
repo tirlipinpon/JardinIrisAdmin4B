@@ -59,6 +59,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
         }
       }
     });
+    this.process()
   }
 
   ngOnDestroy() {

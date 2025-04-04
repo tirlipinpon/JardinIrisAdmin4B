@@ -1,3 +1,7 @@
+firebase deploy --only hosting
+firebase deploy --only functions
+https://jardiniris-72ce2.web.app/home/login
+
 # JardinIrisAdmin4B
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.1.
