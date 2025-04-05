@@ -226,6 +226,9 @@ export class SupabaseService {
         .select('id, titre')
         .eq('valid', true)
         .eq('deleted', false)
+        .order('created_at', { ascending: false })
+        .limit(20)
+
 
       const { data, error } = await query;
 

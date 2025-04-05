@@ -24,6 +24,8 @@ export class SearchApplication {
     this.isFormatInHtmlArticleEffect()
     this.isMeteoEffect();
     this.isPostIdEffect();
+    this.isAddedInternalLinkByChapterEffect();
+    this.isAddedPostTitreAndIdEffect()
   }
 
   get isSearching(): Signal<boolean> {
@@ -89,6 +91,15 @@ export class SearchApplication {
     this.store.generateImageIa();
   }
 
+  addInternalLinkByChapter(): void {
+    this.messageService.sendMessage('Lien interne en cours.');
+    this.store.addInternalLinkByChapter();
+  }
+
+  getPostTitreAndId(): void {
+    this.messageService.sendMessage('get Post Titre And Id.');
+    this.store.postTitreAndId();
+  }
 
 
   private isSearchingEffect(): void {
@@ -132,9 +143,7 @@ export class SearchApplication {
 
   private isGeneratedArticleEffect(): void {
     effect(() => {
-      const test = this.store.getArticleGenerated()!==null
       if(this.store.getArticleGenerated()!==null) {
-        const test = this.store.isArticleGenerated()
         if(this.store.isArticleGenerated()) {
           this.messageService.sendSuccess('Géneration terminé.', MessageAction.GENERATED_ARTICLE);
         } else {
@@ -146,9 +155,7 @@ export class SearchApplication {
 
   private isUpgradedArticleEffect(): void {
     effect(() => {
-      const test = this.store.getArticleUpgraded()!==null
       if(this.store.getArticleUpgraded()!==null) {
-        const test = this.store.isArticleUpgraded()
         if(this.store.isArticleUpgraded()) {
           this.messageService.sendSuccess('Upgrade terminé.', MessageAction.UPGRADED_ARTICLE);
         } else {
@@ -158,11 +165,33 @@ export class SearchApplication {
     });
   }
 
+  private isAddedPostTitreAndIdEffect(): void {
+    effect(() => {
+      if(this.store.getPostTitreAndId()!==null) {
+        if(this.store.isPostTitreAndId()) {
+          this.messageService.sendMessage('get Post Titre And Id terminé.');
+        } else {
+          this.messageService.sendError('get Post Titre And Id a une erreur.');
+        }
+      }
+    });
+  }
+
+  private isAddedInternalLinkByChapterEffect(): void {
+    effect(() => {
+      if(this.store.getArticleLinkAdded()!==null) {
+        if(this.store.isArticleLinkAdded()) {
+          this.messageService.sendSuccess('Lien interne terminé.', MessageAction.INTERNAL_LINK_ADDED);
+        } else {
+          this.messageService.sendError('Lien interne a une erreur.');
+        }
+      }
+    });
+  }
+
   private isFormatInHtmlArticleEffect(): void {
     effect(() => {
-      const test = this.store.getArticleHtml() && this.store.getArticleHtml()!==null
       if(this.store.getArticleHtml() && this.store.getArticleHtml()!==null) {
-        const test = this.store.isArticleHtml()
         if(this.store.isArticleHtml()) {
           this.messageService.sendSuccess('Format en HTML terminé.', MessageAction.FORMATED_IN_HTML_ARTICLE);
         } else {
@@ -174,9 +203,7 @@ export class SearchApplication {
 
   private isMeteoEffect(): void {
     effect(() => {
-      const test = this.store.getMeteo()
       if(this.store.getMeteo() && this.store.getMeteo()!==null) {
-        const test = this.store.isMeteo()
         if(this.store.isMeteo()) {
           this.messageService.sendSuccess('Météo terminé.', MessageAction.METEO);
         } else {

@@ -34,8 +34,6 @@ export class AddImagesToChaptersService {
   }
 
   async getKeyWordsFromChapitreInArticleAndSetImageUrl(article: string, articleId: number) {
-    console.log("Début getKeyWordsFromChapitreInArticleAndSetImageUrl", { articleId });
-
     let chapitreKeyWordList: string[] = []
     for (let i=1; i<=6; i++) {
       console.log(`Traitement du chapitre ${i}`);

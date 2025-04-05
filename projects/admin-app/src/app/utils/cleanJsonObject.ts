@@ -1,5 +1,5 @@
 export function extractJSONBlock(input: any): string {
-  const regex = /```json\s([\s\S]*?)\s```/;
+  const regex = /```json\s([\s\S]*?)\s```/i
   const match = input.match(regex);
   if (match && match[1]) {
     return match[1];

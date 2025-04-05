@@ -9,16 +9,18 @@ import {Post} from "../../../types/post";
 import {map} from "rxjs/operators";
 
 export interface SearchState {
+  isLoading: boolean;
   articles: { url: string; image_url: string }[] | null;
   articleValid: { valid: boolean | null, url: string | null, image_url: string | null, explication:{ raisonArticle1: string | null} }
   ideaPost:  { id: number | null, "description": string | null } | null ;
-  isLoading: boolean;
   post: Post | null;
+  meteo: string | null;
+  postId: number | null;
+  postTitreAndId: {titre: string; id: number}[] | null;
   articleGenerated: string | null;
   articleUpgraded: string | null;
   articleHtml: string | null;
-  meteo: string | null;
-  postId: number | null;
+  articleLinkAdded: string | null;
 }
 
 export enum CathegoriesBlog {
@@ -34,17 +36,18 @@ export enum CathegoriesBlog {
 
 // valeur initiale
 const initialValue: SearchState = {
+  isLoading: false,
   articles: null,
   articleValid: { valid: null, url: null, image_url: null, explication:{raisonArticle1: null}},
-  isLoading: false,
   ideaPost: null,
   post: null,
+  meteo: null,
+  postId: null,
+  postTitreAndId: null,
   articleGenerated: null,
   articleUpgraded: null,
   articleHtml: null,
-  meteo: null,
-  postId: null,
-
+  articleLinkAdded: null
 }
 export const SearchStore= signalStore(
   { providedIn: 'root' },
@@ -164,6 +167,16 @@ export const SearchStore= signalStore(
       return postId!==null && postId > 0
     }),
 
+    getArticleLinkAdded: computed(() =>  store.articleLinkAdded()),
+    isArticleLinkAdded: computed(() =>  {  const articleLinkAdded = store.articleLinkAdded();
+      return articleLinkAdded!==null && articleLinkAdded.length > 0
+    }),
+    getPostTitreAndId: computed(() =>  store.postTitreAndId()),
+    isPostTitreAndId: computed(() =>  {  const postTitreAndId = store.postTitreAndId();
+      return postTitreAndId!==null && postTitreAndId.length > 0
+    }),
+
+
   })),
   withMethods((store, infra = inject(SearchInfrastructure))=> (
     {
@@ -279,6 +292,19 @@ export const SearchStore= signalStore(
           })
         )
       ),
+      postTitreAndId: rxMethod<void>(
+        pipe(
+          tap(() => updateState(store, '[postTitreAndId] update loading', { isLoading: true })),
+          switchMap(() => {
+            return infra.getPostTitreAndId().pipe(
+              tapResponse({
+                next: (postTitreAndId) => patchState(store, { postTitreAndId: postTitreAndId, isLoading: false }),
+                error: () => patchState(store, { isLoading: false }),
+              })
+            );
+          })
+        )
+      ),
       formatInHtmlArticle: rxMethod<void>(
         pipe(
           tap(() => updateState(store, '[formatInHtmlArticle] update loading', { isLoading: true })),
@@ -290,6 +316,23 @@ export const SearchStore= signalStore(
                 next: (formatInHtmlArticle) => {
                   patchState(store, { articleHtml: formatInHtmlArticle, isLoading: false });
                 },
+                error: () => patchState(store, { isLoading: false }),
+              })
+            );
+          })
+        )
+      ),
+      addInternalLinkByChapter: rxMethod<void>(
+        pipe(
+          tap(() => updateState(store, '[addInternalLinkByChapter] update loading', { isLoading: true })),
+          switchMap(() => {
+            const getArticleHtml = store.getArticleHtml();
+            if (!getArticleHtml) { patchState(store, { isLoading: false }); return EMPTY; }
+            const getPostTitreAndId = store.getPostTitreAndId();
+            if (!getPostTitreAndId) { patchState(store, { isLoading: false }); return EMPTY; }
+            return infra.formatInStructure(getArticleHtml, 'LINK', getPostTitreAndId).pipe(
+              tapResponse({
+                next: (articleLinkAdded) => patchState(store, { articleLinkAdded: articleLinkAdded, isLoading: false }),
                 error: () => patchState(store, { isLoading: false }),
               })
             );
@@ -320,9 +363,9 @@ export const SearchStore= signalStore(
             const imageUrl = getArticleValid.image_url || '';
             const getMeteo = store.getMeteo();
             if (!getMeteo) { patchState(store, { isLoading: false }); return EMPTY; }
-            const getArticleHtml = store.getArticleHtml();
-            if (!getArticleHtml) { patchState(store, { isLoading: false }); return EMPTY; }
-            return infra.savePost(getPost, getMeteo, getArticleHtml, imageUrl).pipe(
+            const getArticleLinkAdded = store.getArticleLinkAdded();
+            if (!getArticleLinkAdded) { patchState(store, { isLoading: false }); return EMPTY; }
+            return infra.savePost(getPost, getMeteo, getArticleLinkAdded, imageUrl).pipe(
               tapResponse({
                 next: post => patchState(store, { postId: post.id, isLoading: false }),
                 error: error => patchState(store, {isLoading: false})

@@ -36,6 +36,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
         case 'success': {
           if (msg.action === MessageAction.ARTICLE) {
             this.selectArticle();
+            this.getPostTitreAndId();
           } else if (msg.action === MessageAction.ARTICLE_VALID || msg.action === MessageAction.IDEA) {
             this.generateArticle();
           } else if (msg.action === MessageAction.GENERATED_ARTICLE) {
@@ -43,6 +44,8 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           } else if (msg.action === MessageAction.UPGRADED_ARTICLE) {
             this.formatInHtmlArticle();
           } else if (msg.action === MessageAction.FORMATED_IN_HTML_ARTICLE) {
+            this.addInternalLinkByChapter();
+          } else if (msg.action === MessageAction.INTERNAL_LINK_ADDED) {
             this.checkMeteo();
           } else if (msg.action === MessageAction.METEO) {
             this.savePost();
@@ -114,6 +117,14 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
 
   generateImageIa() {
     this.application.generateImageIa();
+  }
+
+  addInternalLinkByChapter() {
+    this.application.addInternalLinkByChapter();
+  }
+
+  getPostTitreAndId() {
+    this.application.getPostTitreAndId();
   }
 
 }

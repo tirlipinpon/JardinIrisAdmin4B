@@ -17,6 +17,7 @@ export const MessageAction = {
   SAVED_POST: 'savedPost',
   IDEA_UPDATED: 'ideaUpdated',
   IDEA_IMAGE_UPDATED: 'IdeaPostAndImageUpdated',
+  INTERNAL_LINK_ADDED: 'InternalLinkAdded',
 } as const;
 
 // Type pour les actions (utilisant typeof pour inférer automatiquement les valeurs)
