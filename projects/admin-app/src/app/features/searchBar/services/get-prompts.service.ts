@@ -138,29 +138,32 @@ Provide the enhanced blog segment in a valid JSON format as follows: {"upgraded"
   formatInHtmlArticle(article: string): any {
     return {
       systemRole: {"role": "system","content":`
-     Au contenu des textes en insérant des balises HTML pour structurer le contenu et en améliorer la lisibilité,
-     sans modifier le texte ou les balise html deja present original.
-- Respecte les étapes suivantes pour la mise en forme :
-
+     Intégrer des balises HTML aux textes afin de structurer le contenu et en améliorer la lisibilité, sans modifier le contenu texte ou les balises HTML déjà présentes.
+- Respecter les étapes suivantes pour la mise en forme.
 # Steps
-- Encadrer une phrase clé avec la balise \`<b>\` pour la mettre en évidence et attirer l'attention du lecteur.
-- Ajoute d'un emoji illustrant le sujet du paragraphe à gauche de chaque titre en <h4> deja present sans rajouter de <h4> supplémentaire.
-- Adapter le formatage en fonction du type de contenu :
-  - Utiliser \`<ol><li></li></ol>\` pour toutes les listes.
-  - Utiliser la balise \`<u>\` pour souligner des informations spécifiques.
-  - Utiliser \`<em>\` pour mettre en valeur des termes importants.
-  - Mettre le contenu tabulaire dans des balises \`<table><tr><td></td></tr></table>\`.
-
+1. Entourer les phrases clés avec la balise \`<b>\` pour les mettre en évidence et attirer l'attention du lecteur.
+2. Intégrer un emoji pertinent illustrant le sujet du paragraphe à l'intérieur de chaque titre en \`<h4>\` déjà présent sans ajouter de nouveaux \`<h4>\`.
+3. Adapter le formatage en fonction du type de contenu :
+   - Utiliser \`<ol><li></li></ol>\` pour toutes les listes.
+   - Utiliser la balise \`<u>\` pour souligner des informations spécifiques.
+   - Utiliser \`<em>\` pour mettre en valeur des termes importants.
+   - Encapsuler le contenu tabulaire dans des balises \`<table><tr><td></td></tr></table>\`.
 # Output Format
-Présente le résultat sous la forme d'un JSON valide structuré comme suit :
+Présenter le résultat sous la forme d'un JSON valide structuré comme suit :
 {
   "upgraded": "<html_content_here>"
 }
-
-
+# Examples
+**Input**:
+Un texte avec du contenu varié, incluant des phrases clés, des titres, des listes et des informations tabulaires existantes.
+**Output**:
+{
+  "upgraded": "<h4>🎨 Présentation du Projet </h4><b>Phrases clés importantes.</b><ul><li>Point 1</li><li>Point 2</li></ul><table><tr><td>Valeur</td></tr></table>"
+}
+*Note: Les phrases clés, listes, et contenus tabulaires dans la réponse réelle doivent correspondre à ce qui est fourni dans le texte original.*
 # Notes
-- Le JSON ne doit contenir aucun autre texte ou structuration en dehors des balises HTML requises ou deja présentes dans le texte original.
-- S'assurer de la validité du code HTML généré, en suivant les instructions spécifiées pour chaque type de contenu.
+- Le JSON doit strictement contenir les balises HTML requises ou déjà présentes, sans aucun texte ou formatage non essentiel au-delà de celles spécifiées.
+- Vérifier la validité du code HTML généré en conformité avec les instructions pour chaque type de contenu.
       `},
       userRole: { "role": "user",
         "content": `Transforme le contenu des textes des paragraphes de ceci : "${article}",  sans modifier le texte ou les balises html original.` }
@@ -187,7 +190,6 @@ Présente le résultat sous la forme d'un JSON valide structuré comme suit :
       userRole: { "role": "user", "content": `Donne la meteo en date du ${formatCurrentDateUs()}. Pour Bruxelles` }
     }
   }
-
 
   getPromptGenericSelectKeyWordsFromChapitresInArticle(titreArticle: string, chapitreKeyWordList: string[]) {
     return {
@@ -264,6 +266,31 @@ Extrait un seul mot-clé du titre du blog. Assure-toi que ce mot résume efficac
             Assure-toi que l'image sélectionnée illustre bien l'ambiance et les éléments visuels pertinents.
             Donne l'url de l'image choisie en suivant ce format JSON: {"imageUrl":"url"}`
     return prompt;
+  }
+
+  getOpenAiPromptImageGenerator(description: string): string {
+   return `Générez une description pour créer une image hyper réaliste sans texte ni représentations humaines, à partir d'un sujet donné que voici : ${description}.
+    Cette image servira d'illustration pour un blog.
+
+- **Focus**: Concentrez-vous sur le sujet fourni et utilisez uniquement des éléments pertinents au thème.
+- **Style**: Hyper réaliste, comme une photographie. Imaginez des détails précis et vibrants pour donner vie à l'image.
+- **Contenu**: Excluez tout texte, ainsi que toute trace de figures humaines ou partie de figures humaines.
+
+# Étapes
+
+1. Identifiez le sujet de l'image à créer.
+2. Imaginez l'image en vous concentrant sur l'élément principal.
+3. Visualisez les éléments additionnels qui renforceront le réalisme sans distraire de l'élément central.
+4. Conceptualisez l'image finale.
+
+# Format de Sortie
+
+Fournir une description détaillée en texte décrivant visuellement l'image.
+
+# Notes
+
+- Assurez-vous que l'image proposée soit suffisamment neutre pour s'adapter à divers contextes blog.
+- Vérifiez que les éléments choisis sont en accord avec le thème choisi, tout en respectant l'interdiction de tout texte ou forme humaine.`
   }
 
 }

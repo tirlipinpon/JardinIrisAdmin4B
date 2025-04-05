@@ -26,6 +26,7 @@ import {map} from "rxjs/operators";
 import {Post} from "../../../types/post";
 import {AddImagesToChaptersService} from "./add-images-to-chapters.service";
 import {extractChapitreById, replaceChapitreById} from "../../../utils/exctractChapitreById";
+import {compressImage} from "../../../utils/resizeB64JsonIMage";
 
 @Injectable({
   providedIn: 'root',
@@ -42,6 +43,8 @@ import {extractChapitreById, replaceChapitreById} from "../../../utils/exctractC
   }
 })
 export class SearchInfrastructure {
+  textPromptImage= "créé moi une image avec peu d'éléments ', concentre toi sur le sujet que je vais te donner, car cette image vas allez comme illustration d'un blog, et ne met surtout aucun de texte sur l'image ni humain ou partie humaine , voici le sujet : "
+
   constructor(private theNewsApiService: TheNewsApiService
     , private openaiApiService: OpenaiApiService
     , private perplexityApiService: PerplexityApiService
@@ -52,15 +55,15 @@ export class SearchInfrastructure {
   ) {}
 
   searchArticle(cptSearchArticle: number): Observable<{ url: string; image_url: string  }[]> {
-    // return this.theNewsApiService.getNewsApi(cptSearchArticle);
-    return new Observable<{ url: string; image_url: string }[]>(subscriber => {
-      const mock = cptSearchArticle === 0 ? [] : [];
-      //{ url: 'https://example.com/article1', image_url: 'https://example.com/image1.jpg' }
-      setTimeout(() => {
-        subscriber.next(mock);
-        subscriber.complete();
-      }, 1000);
-    });
+    return this.theNewsApiService.getNewsApi(cptSearchArticle);
+    // return new Observable<{ url: string; image_url: string }[]>(subscriber => {
+    //   const mock = cptSearchArticle === 0 ? [] : [];
+    //   //{ url: 'https://example.com/article1', image_url: 'https://example.com/image1.jpg' }
+    //   setTimeout(() => {
+    //     subscriber.next(mock);
+    //     subscriber.complete();
+    //   }, 1000);
+    // });
   }
 
   selectArticle(articles: { url: string; image_url: string }[]): Observable<{ valid: boolean | null, explication:{raisonArticle1: string | null}, url: string | null, image_url: string | null }> {
@@ -235,9 +238,10 @@ export class SearchInfrastructure {
     return from(this.addImagesToChaptersService.getKeyWordsFromChapitreInArticleAndSetImageUrl(getPost, getPostId));
   }
 
-  generateImageIa(getPostId: number): Observable<{success: boolean}> {
-    return of({success: true});
-    // return from(this.addImagesToChaptersService.getKeyWordsFromChapitreInArticleAndSetImageUrl(getPost, getPostId));
+  async generateImageIa(description: string, postId: number) {
+    let image_url = await this.openaiApiService.imageGenerartor(this.getPromptsService.getOpenAiPromptImageGenerator(description));
+    image_url = await compressImage(image_url, 500, 300)
+    await this.supabaseService.updateImageUrlPostByIdForm(postId, image_url)
   }
 
 }

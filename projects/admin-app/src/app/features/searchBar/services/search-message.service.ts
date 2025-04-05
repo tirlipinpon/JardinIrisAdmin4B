@@ -16,6 +16,7 @@ export const MessageAction = {
   METEO: 'meteo',
   SAVED_POST: 'savedPost',
   IDEA_UPDATED: 'ideaUpdated',
+  IDEA_IMAGE_UPDATED: 'IdeaPostAndImageUpdated',
 } as const;
 
 // Type pour les actions (utilisant typeof pour inférer automatiquement les valeurs)

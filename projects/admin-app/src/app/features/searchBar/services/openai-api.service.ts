@@ -27,4 +27,18 @@ export class OpenaiApiService {
     // console.log('completion.choices[0]= '+ JSON.stringify(completion.choices[0]));
     return completion.choices[0].message.content
   }
+
+  async imageGenerartor(promptText: any) {
+    const image =
+      await this.openai.images.generate({
+        model: "dall-e-3",
+        prompt: promptText,
+        n:1,
+        size:"1024x1024",
+        response_format: "b64_json"
+      });
+    return image.data[0].b64_json
+
+  }
+
 }

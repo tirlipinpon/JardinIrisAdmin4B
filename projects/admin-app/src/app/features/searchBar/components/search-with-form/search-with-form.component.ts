@@ -49,8 +49,9 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           } else if (msg.action === MessageAction.SAVED_POST) {
             this.updateIdeaPost();
             this.addImagesInArticle();
+          }  else if (msg.action === MessageAction.IDEA_IMAGE_UPDATED) {
             this.generateImageIa();
-          }
+        }
           break;
         }
         case 'fail': {

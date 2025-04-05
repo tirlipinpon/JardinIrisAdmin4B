@@ -130,7 +130,10 @@ export const SearchStore= signalStore(
       return post !== null && post.image_url !== undefined && post.image_url !== null && post.image_url !== '';
     }),
 
-
+    isArticleUrlImage: computed(() => {
+      const post = store.articleValid();
+      return post !== null && post.image_url !== undefined && post.image_url !== null && post.image_url !== '';
+    }),
     getPostCategorie: computed(() => {
       const post = store.post();
       return post && post.categorie;
@@ -216,7 +219,6 @@ export const SearchStore= signalStore(
             const processGeneration = (source: string) => {
               return infra.generateArticle(source).pipe(
                 map(post => {
-                  // Extraire l'article du post
                   const articleGenerated = post.article;
                   // Créer une copie du post sans l'article
                   const { article, ...postWithoutArticle } = post;
@@ -369,14 +371,11 @@ export const SearchStore= signalStore(
         pipe(
           tap(()=> updateState(store, '[addImagesInArticle] update loading', {isLoading: true})    ),
           switchMap(() => {
+            const getdata = store.getPostPhraseAccroche();
+            if (!getdata) { patchState(store, { isLoading: false }); return EMPTY; }
             const getPostId = store.getPostId();
             if (!getPostId) { patchState(store, { isLoading: false }); return EMPTY; }
-            return infra.generateImageIa(getPostId).pipe(
-              tapResponse({
-                next: data => patchState(store, { isLoading: false }),
-                error: error => patchState(store, {isLoading: false})
-              })
-            )
+            return infra.generateImageIa(getdata, getPostId)
           })
         )
       ),

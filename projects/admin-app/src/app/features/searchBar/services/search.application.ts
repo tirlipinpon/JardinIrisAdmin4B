@@ -194,6 +194,11 @@ export class SearchApplication {
         } else {
           this.messageService.sendError('Post pas sauvé y a une erreur.');
         }
+        if(!this.store.isArticleValid() && !this.store.isArticleUrlImage()) {
+          this.messageService.sendSuccess('Pas de article valide et donc pas d url image.', MessageAction.IDEA_IMAGE_UPDATED);
+        } else {
+          this.messageService.sendError('Article valid et url image trouvé donc pas de generation image.');
+        }
       }
     });
   }
