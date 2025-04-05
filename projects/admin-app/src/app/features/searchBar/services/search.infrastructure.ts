@@ -172,8 +172,8 @@ export class SearchInfrastructure {
                 const upgradedTextJson: {upgraded: string, idToRemove?: number} = JSON.parse(extractJSONBlock(upgradedText))
                 const upgradedTextJsonObject  = upgradedTextJson.upgraded
                 if(type === 'LINK' && postTitreAndId && upgradedTextJson.idToRemove) {
-                  const idToRemove  = upgradedTextJson.idToRemove;
-                  postTitreAndId =  postTitreAndId.filter((id: any) => id !== idToRemove);
+                  const idToRemove  = Number(upgradedTextJson.idToRemove);
+                  postTitreAndId =  postTitreAndId.filter((item) => item.id !== idToRemove);
                 }
                 // Remplacement du chapitre dans l'article complet
                 fullArticle = replaceChapitreById(fullArticle, chapitreId, upgradedTextJsonObject);
