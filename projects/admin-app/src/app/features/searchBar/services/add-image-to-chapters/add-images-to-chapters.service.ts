@@ -1,12 +1,12 @@
 import { inject, Injectable } from '@angular/core';
-import { Post } from "../../../types/post";
-import { TheNewsApiService } from "./the-news-api.service";
-import { OpenaiApiService } from "./openai-api.service";
-import { PerplexityApiService } from "./perplexity-api.service";
-import { GetPromptsService } from "./get-prompts.service";
-import { UnsplashImageService } from "./unsplash-image.service";
-import { SupabaseService } from "./supabase/supabase.service";
-import {extractByPositionH4Title, extractJSONBlock, extractSecondSpanContent} from "../../../utils/cleanJsonObject";
+import { Post } from "../../../../types/post";
+import { TheNewsApiService } from "../the-news-api.service";
+import { OpenaiApiService } from "../openai-api/openai-api.service";
+import { PerplexityApiService } from "../perplexity-api/perplexity-api.service";
+import { GetPromptsService } from "../get-prompts/get-prompts.service";
+import { UnsplashImageService } from "../unsplash-image/unsplash-image.service";
+import { SupabaseService } from "../supabase/supabase.service";
+import {extractByPositionH4Title, extractJSONBlock, extractSecondSpanContent} from "../../../../utils/cleanJsonObject";
 
 /**
  * Service responsable d'ajouter des images aux chapitres d'un article

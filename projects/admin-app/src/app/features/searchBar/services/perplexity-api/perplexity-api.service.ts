@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import {environment} from "../../../../../../../environment";
-import {extractJSONBlock} from "../../../utils/cleanJsonObject";
+import {environment} from "../../../../../../../../environment";
+import {extractJSONBlock} from "../../../../utils/cleanJsonObject";
 
 
 @Injectable({

@@ -3,7 +3,7 @@ import { SearchStore } from '../store';
 import {
   MessageAction,
   SearchMessageService
-} from "./search-message.service";
+} from "./search-message/search-message.service";
 
 @Injectable({ providedIn: 'root' })
 export class SearchApplication {

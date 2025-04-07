@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import {afficherCategories} from "../../../utils/afficherCategories";
-import {formatCurrentDateUs} from "../../../utils/getFormattedDate";
+import {afficherCategories} from "../../../../utils/afficherCategories";
+import {formatCurrentDateUs} from "../../../../utils/getFormattedDate";
 
 @Injectable({
   providedIn: 'root'

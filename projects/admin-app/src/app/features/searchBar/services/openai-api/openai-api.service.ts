@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {environment} from "../../../../../../../environment";
+import {environment} from "../../../../../../../../environment";
 import OpenAI from "openai";
 @Injectable({
   providedIn: 'root'

@@ -14,20 +14,20 @@ import {
   timer,
   toArray
 } from "rxjs";
-import {TheNewsApiService} from "./the-news-api.service";
-import {OpenaiApiService} from "./openai-api.service";
-import {GetPromptsService} from "./get-prompts.service";
-import {PerplexityApiService} from "./perplexity-api.service";
-import {extractJSONBlock, parseJsonSafe} from "../../../utils/cleanJsonObject";
-import {UnsplashImageService} from "./unsplash-image.service";
-import {SupabaseService} from "./supabase/supabase.service";
+import {TheNewsApiService} from "../the-news-api.service";
+import {OpenaiApiService} from "../openai-api/openai-api.service";
+import {GetPromptsService} from "../get-prompts/get-prompts.service";
+import {PerplexityApiService} from "../perplexity-api/perplexity-api.service";
+import {extractJSONBlock, parseJsonSafe} from "../../../../utils/cleanJsonObject";
+import {UnsplashImageService} from "../unsplash-image/unsplash-image.service";
+import {SupabaseService} from "../supabase/supabase.service";
 import {PostgrestError} from "@supabase/supabase-js";
 import {map} from "rxjs/operators";
-import {Post} from "../../../types/post";
-import {AddImagesToChaptersService} from "./add-image-to-chapters/add-images-to-chapters.service";
-import {extractChapitreById, replaceChapitreById} from "../../../utils/exctractChapitreById";
-import {compressImage} from "../../../utils/resizeB64JsonIMage";
-import {FormatInStructureService} from "./format-in-structure.service";
+import {Post} from "../../../../types/post";
+import {AddImagesToChaptersService} from "../add-image-to-chapters/add-images-to-chapters.service";
+import {extractChapitreById, replaceChapitreById} from "../../../../utils/exctractChapitreById";
+import {compressImage} from "../../../../utils/resizeB64JsonIMage";
+import {FormatInStructureService} from "../format-in-structure/format-in-structure.service";
 
 @Injectable({
   providedIn: 'root',

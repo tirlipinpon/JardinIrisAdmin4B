@@ -1,15 +1,15 @@
 import {inject, Injectable} from '@angular/core';
 import {catchError, from, mergeMap, Observable, of, toArray} from "rxjs";
-import {extractChapitreById, replaceChapitreById} from "../../../utils/exctractChapitreById";
+import {extractChapitreById, replaceChapitreById} from "../../../../utils/exctractChapitreById";
 import {map} from "rxjs/operators";
-import {extractJSONBlock, parseJsonSafe} from "../../../utils/cleanJsonObject";
-import {TheNewsApiService} from "./the-news-api.service";
-import {OpenaiApiService} from "./openai-api.service";
-import {PerplexityApiService} from "./perplexity-api.service";
-import {GetPromptsService} from "./get-prompts.service";
-import {UnsplashImageService} from "./unsplash-image.service";
-import {SupabaseService} from "./supabase/supabase.service";
-import {AddImagesToChaptersService} from "./add-image-to-chapters/add-images-to-chapters.service";
+import {extractJSONBlock, parseJsonSafe} from "../../../../utils/cleanJsonObject";
+import {TheNewsApiService} from "../the-news-api.service";
+import {OpenaiApiService} from "../openai-api/openai-api.service";
+import {PerplexityApiService} from "../perplexity-api/perplexity-api.service";
+import {GetPromptsService} from "../get-prompts/get-prompts.service";
+import {UnsplashImageService} from "../unsplash-image/unsplash-image.service";
+import {SupabaseService} from "../supabase/supabase.service";
+import {AddImagesToChaptersService} from "../add-image-to-chapters/add-images-to-chapters.service";
 
 @Injectable({
   providedIn: 'root',

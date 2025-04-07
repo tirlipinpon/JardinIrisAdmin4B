@@ -1,7 +1,7 @@
 import {Component, inject, OnDestroy, OnInit, signal} from '@angular/core';
 import {FormsModule} from "@angular/forms";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
-import {MessageAction, SearchMessage, SearchMessageService} from "../../services/search-message.service";
+import {MessageAction, SearchMessage, SearchMessageService} from "../../services/search-message/search-message.service";
 import {Subscription} from "rxjs";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {SearchApplication} from "../../services/search.application";
