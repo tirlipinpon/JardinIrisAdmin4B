@@ -9,7 +9,7 @@ import {PerplexityApiService} from "./perplexity-api.service";
 import {GetPromptsService} from "./get-prompts.service";
 import {UnsplashImageService} from "./unsplash-image.service";
 import {SupabaseService} from "./supabase/supabase.service";
-import {AddImagesToChaptersService} from "./add-images-to-chapters.service";
+import {AddImagesToChaptersService} from "./add-image-to-chapters/add-images-to-chapters.service";
 
 @Injectable({
   providedIn: 'root',

@@ -24,7 +24,7 @@ import {SupabaseService} from "./supabase/supabase.service";
 import {PostgrestError} from "@supabase/supabase-js";
 import {map} from "rxjs/operators";
 import {Post} from "../../../types/post";
-import {AddImagesToChaptersService} from "./add-images-to-chapters.service";
+import {AddImagesToChaptersService} from "./add-image-to-chapters/add-images-to-chapters.service";
 import {extractChapitreById, replaceChapitreById} from "../../../utils/exctractChapitreById";
 import {compressImage} from "../../../utils/resizeB64JsonIMage";
 import {FormatInStructureService} from "./format-in-structure.service";

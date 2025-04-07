@@ -36,10 +36,10 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
         case 'success': {
           if (msg.action === MessageAction.ARTICLE) {
             this.selectArticle();
-            this.getPostTitreAndId();
           } else if (msg.action === MessageAction.ARTICLE_VALID || msg.action === MessageAction.IDEA) {
             this.generateArticle();
           } else if (msg.action === MessageAction.GENERATED_ARTICLE) {
+            this.getPostTitreAndId();
             this.upgradeArticle();
           } else if (msg.action === MessageAction.UPGRADED_ARTICLE) {
             this.formatInHtmlArticle();

@@ -23,17 +23,6 @@ export interface SearchState {
   articleLinkAdded: string | null;
 }
 
-export enum CathegoriesBlog {
-  ARBRE = "arbre",
-  ECOLOGIE = "écologie",
-  FLEUR = "fleur",
-  JARDIN = "jardin",
-  NATURE = "nature",
-  PLANTE = "plante",
-  POTAGER = "potager",
-  FAUNE = "faune"
-}
-
 // valeur initiale
 const initialValue: SearchState = {
   isLoading: false,
