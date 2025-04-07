@@ -33,7 +33,7 @@ export class SearchApplication {
   }
 
   searchArticle(): void {
-      this.messageService.sendMessage('Articles recherche en cours pour la Belgique.');
+      this.messageService.sendMessage('Articles recherche en cours pour ' + ((this.cptSearchArticle===0)?' Belgique' : 'Europe.'));
       this.store.searchArticle(this.cptSearchArticle++);
   }
 

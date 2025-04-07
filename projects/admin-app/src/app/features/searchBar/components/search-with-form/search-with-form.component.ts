@@ -58,7 +58,11 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           break;
         }
         case 'fail': {
-          if (msg.action === MessageAction.ARTICLE || msg.action === MessageAction.ARTICLE_VALID) { this.searchIdea(); }
+          if (msg.action === MessageAction.ARTICLE_VALID) {
+            this.searchArticle();
+          } else if (msg.action === MessageAction.ARTICLE) {
+            this.searchIdea();
+          }
           break;
         }
       }
