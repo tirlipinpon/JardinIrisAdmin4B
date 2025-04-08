@@ -1,0 +1,12 @@
+.message-error {
+  color: red;
+}
+.message-success {
+  color: green;
+}
+.message-message {
+  color: blue;
+}
+.message-fail {
+  color: #ce969d;
+}
