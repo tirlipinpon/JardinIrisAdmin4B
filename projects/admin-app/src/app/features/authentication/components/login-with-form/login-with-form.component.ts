@@ -1,27 +1,33 @@
-import {Component, inject} from '@angular/core';
-import {FormBuilder, FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
-import {MatInputModule} from "@angular/material/input";
-import {MatFormField, MatFormFieldModule} from "@angular/material/form-field";
-import {MatButtonModule} from "@angular/material/button";
-import {MatIconModule} from "@angular/material/icon";
-import {AuthenticationApplication} from "../../services/authentication.application";
+import { Component, inject } from '@angular/core';
+import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { AuthenticationApplication } from '../../services/authentication.application';
 
 @Component({
   selector: 'app-login-with-form',
-  imports: [ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatIconModule, MatButtonModule],
+  imports: [
+    ReactiveFormsModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatButtonModule,
+  ],
   templateUrl: './login-with-form.component.html',
-  styleUrl: './login-with-form.component.css'
+  styleUrl: './login-with-form.component.css',
 })
 export class LoginWithFormComponent {
   private readonly application = inject(AuthenticationApplication);
 
   loginForm = inject(FormBuilder).group({
     email: new FormControl('aa@aa.com', [Validators.required, Validators.email]),
-    password: new FormControl('aaa', Validators.required)
+    password: new FormControl('aaa', Validators.required),
   });
 
   save(): void {
-    if(this.loginForm.value.email && this.loginForm.value.password) {
+    if (this.loginForm.value.email && this.loginForm.value.password) {
       this.application.login(this.loginForm.value.email, this.loginForm.value.password);
     }
   }
@@ -36,5 +42,4 @@ export class LoginWithFormComponent {
   get isValid(): boolean {
     return this.loginForm.valid;
   }
-
 }

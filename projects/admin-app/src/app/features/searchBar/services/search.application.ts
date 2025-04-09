@@ -1,9 +1,6 @@
 import { effect, inject, Injectable, Signal } from '@angular/core';
 import { SearchStore } from '../store';
-import {
-  MessageAction,
-  SearchMessageService
-} from "./search-message/search-message.service";
+import { MessageAction, SearchMessageService } from './search-message/search-message.service';
 
 @Injectable({ providedIn: 'root' })
 export class SearchApplication {
@@ -21,11 +18,11 @@ export class SearchApplication {
     this.isIdeaEffect();
     this.isGeneratedArticleEffect();
     this.isUpgradedArticleEffect();
-    this.isFormatInHtmlArticleEffect()
+    this.isFormatInHtmlArticleEffect();
     this.isMeteoEffect();
     this.isPostIdEffect();
     this.isAddedInternalLinkByChapterEffect();
-    this.isAddedPostTitreAndIdEffect()
+    this.isAddedPostTitreAndIdEffect();
   }
 
   get isSearching(): Signal<boolean> {
@@ -33,8 +30,10 @@ export class SearchApplication {
   }
 
   searchArticle(): void {
-      this.messageService.sendMessage('Articles recherche en cours pour ' + ((this.cptSearchArticle===0)?' Belgique' : 'Europe.'));
-      this.store.searchArticle(this.cptSearchArticle++);
+    this.messageService.sendMessage(
+      'Articles recherche en cours pour ' + (this.cptSearchArticle === 0 ? ' Belgique' : 'Europe.'),
+    );
+    this.store.searchArticle(this.cptSearchArticle++);
   }
 
   selectArticle(): void {
@@ -43,8 +42,8 @@ export class SearchApplication {
   }
 
   searchIdea(): void {
-      this.messageService.sendMessage('Idée recherche en cours.');
-      this.store.searchIdea();
+    this.messageService.sendMessage('Idée recherche en cours.');
+    this.store.searchIdea();
   }
 
   generateArticle(url_post?: string): void {
@@ -101,11 +100,10 @@ export class SearchApplication {
     this.store.postTitreAndId();
   }
 
-
   private isSearchingEffect(): void {
     effect(() => {
-      if (this.store.getArticles()!==null) {
-        if (this.store.isArticlesFound() ) {
+      if (this.store.getArticles() !== null) {
+        if (this.store.isArticlesFound()) {
           this.messageService.sendSuccess('Articles trouvés.', MessageAction.ARTICLE);
         } else if (this.cptSearchArticle < 2) {
           this.messageService.sendMessage('Articles recherche élargie pour l’Europe.');
@@ -119,7 +117,7 @@ export class SearchApplication {
 
   private isArticleValidEffect(): void {
     effect(() => {
-      if(this.store.getArticleValid().valid !== null) {
+      if (this.store.getArticleValid().valid !== null) {
         if (this.store.isArticleValid()) {
           this.messageService.sendSuccess('Article validé trouvé.', MessageAction.ARTICLE_VALID);
         } else {
@@ -131,7 +129,7 @@ export class SearchApplication {
 
   private isIdeaEffect(): void {
     effect(() => {
-      if(this.store.getIdeaPost()!==null) {
+      if (this.store.getIdeaPost() !== null) {
         if (!this.store.isIdeaPost()) {
           this.messageService.sendError('Idée non trouvé dans la liste.');
         } else {
@@ -143,8 +141,8 @@ export class SearchApplication {
 
   private isGeneratedArticleEffect(): void {
     effect(() => {
-      if(this.store.getArticleGenerated()!==null) {
-        if(this.store.isArticleGenerated()) {
+      if (this.store.getArticleGenerated() !== null) {
+        if (this.store.isArticleGenerated()) {
           this.messageService.sendSuccess('Géneration terminé.', MessageAction.GENERATED_ARTICLE);
         } else {
           this.messageService.sendError('Géneration a une erreur.');
@@ -155,8 +153,8 @@ export class SearchApplication {
 
   private isUpgradedArticleEffect(): void {
     effect(() => {
-      if(this.store.getArticleUpgraded()!==null) {
-        if(this.store.isArticleUpgraded()) {
+      if (this.store.getArticleUpgraded() !== null) {
+        if (this.store.isArticleUpgraded()) {
           this.messageService.sendSuccess('Upgrade terminé.', MessageAction.UPGRADED_ARTICLE);
         } else {
           this.messageService.sendError('Upgrade a une erreur.');
@@ -167,8 +165,8 @@ export class SearchApplication {
 
   private isAddedPostTitreAndIdEffect(): void {
     effect(() => {
-      if(this.store.getPostTitreAndId()!==null) {
-        if(this.store.isPostTitreAndId()) {
+      if (this.store.getPostTitreAndId() !== null) {
+        if (this.store.isPostTitreAndId()) {
           this.messageService.sendMessage('get Post Titre And Id terminé.');
         } else {
           this.messageService.sendError('get Post Titre And Id a une erreur.');
@@ -179,9 +177,12 @@ export class SearchApplication {
 
   private isAddedInternalLinkByChapterEffect(): void {
     effect(() => {
-      if(this.store.getArticleLinkAdded()!==null) {
-        if(this.store.isArticleLinkAdded()) {
-          this.messageService.sendSuccess('Lien interne terminé.', MessageAction.INTERNAL_LINK_ADDED);
+      if (this.store.getArticleLinkAdded() !== null) {
+        if (this.store.isArticleLinkAdded()) {
+          this.messageService.sendSuccess(
+            'Lien interne terminé.',
+            MessageAction.INTERNAL_LINK_ADDED,
+          );
         } else {
           this.messageService.sendError('Lien interne a une erreur.');
         }
@@ -191,9 +192,12 @@ export class SearchApplication {
 
   private isFormatInHtmlArticleEffect(): void {
     effect(() => {
-      if(this.store.getArticleHtml() && this.store.getArticleHtml()!==null) {
-        if(this.store.isArticleHtml()) {
-          this.messageService.sendSuccess('Format en HTML terminé.', MessageAction.FORMATED_IN_HTML_ARTICLE);
+      if (this.store.getArticleHtml() && this.store.getArticleHtml() !== null) {
+        if (this.store.isArticleHtml()) {
+          this.messageService.sendSuccess(
+            'Format en HTML terminé.',
+            MessageAction.FORMATED_IN_HTML_ARTICLE,
+          );
         } else {
           this.messageService.sendError('Format en HTML a une erreur.');
         }
@@ -203,8 +207,8 @@ export class SearchApplication {
 
   private isMeteoEffect(): void {
     effect(() => {
-      if(this.store.getMeteo() && this.store.getMeteo()!==null) {
-        if(this.store.isMeteo()) {
+      if (this.store.getMeteo() && this.store.getMeteo() !== null) {
+        if (this.store.isMeteo()) {
           this.messageService.sendSuccess('Météo terminé.', MessageAction.METEO);
         } else {
           this.messageService.sendError('Météo a une erreur.');
@@ -215,19 +219,26 @@ export class SearchApplication {
 
   private isPostIdEffect(): void {
     effect(() => {
-      if(this.store.postId()!==null) {
-        if(this.store.isPostId()) {
-          this.messageService.sendSuccess('Post sauvé en db et id dans le store.', MessageAction.SAVED_POST);
+      if (this.store.postId() !== null) {
+        if (this.store.isPostId()) {
+          this.messageService.sendSuccess(
+            'Post sauvé en db et id dans le store.',
+            MessageAction.SAVED_POST,
+          );
         } else {
           this.messageService.sendError('Post pas sauvé y a une erreur.');
         }
-        if(!this.store.isArticleValid() && !this.store.isArticleUrlImage()) {
-          this.messageService.sendSuccess('Pas de article valide et donc pas d url image.', MessageAction.IDEA_IMAGE_UPDATED);
+        if (!this.store.isArticleValid() && !this.store.isArticleUrlImage()) {
+          this.messageService.sendSuccess(
+            'Pas de article valide et donc pas d url image.',
+            MessageAction.IDEA_IMAGE_UPDATED,
+          );
         } else {
-          this.messageService.sendError('Article valid et url image trouvé donc pas de generation image.');
+          this.messageService.sendError(
+            'Article valid et url image trouvé donc pas de generation image.',
+          );
         }
       }
     });
   }
-
 }

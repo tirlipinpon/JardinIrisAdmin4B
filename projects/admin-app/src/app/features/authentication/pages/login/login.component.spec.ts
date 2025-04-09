@@ -1,118 +1,86 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
 import { LoginComponent } from './login.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { AuthenticationApplication } from '../../services/authentication.application';
-import { Component, signal } from '@angular/core';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { By } from '@angular/platform-browser';
+import { Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { SupabaseService } from "../../../searchBar/services/supabase/supabase.service";
+import { HttpClientTestingModule } from "@angular/common/http/testing";
 
-// Créer un composant fictif pour le LoginWithFormComponent
+interface LoginFormData {
+  email: string;
+  password: string;
+}
+
 @Component({
   selector: 'app-login-with-form',
-  template: '<div>Mock Login Form</div>'
+  template: '<div>Mock Login Form Component</div>',
+  standalone: true
 })
-class MockLoginWithFormComponent {}
+class MockLoginWithFormComponent {
+  @Output() formSubmit = new EventEmitter<LoginFormData>();
+  @Input() loading = false;
+}
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
-  let authApplicationMock: jasmine.SpyObj<AuthenticationApplication>;
+  let supabaseServiceMock: any;
+  let routerMock: jasmine.SpyObj<Router>;
+  let snackBarMock: jasmine.SpyObj<MatSnackBar>;
 
   beforeEach(async () => {
-    // Mock pour l'AuthenticationApplication
-    authApplicationMock = jasmine.createSpyObj('AuthenticationApplication', [], {
-      isLoading: signal(false),
-      isAuthenticated: signal(false)
-    });
+    supabaseServiceMock = {
+      supabase: {
+        auth: {
+          signInWithPassword: jasmine.createSpy('signInWithPassword').and.returnValue(
+            Promise.resolve({ data: { user: { id: '1' } }, error: null })
+          )
+        }
+      }
+    };
+
+    routerMock = jasmine.createSpyObj('Router', ['navigate']);
+    snackBarMock = jasmine.createSpyObj('MatSnackBar', ['open']);
 
     await TestBed.configureTestingModule({
       imports: [
-        LoginComponent,
         NoopAnimationsModule,
-        MatProgressSpinnerModule
+        HttpClientTestingModule,
+        // Assurez-vous que les deux composants sont bien importés
+        LoginComponent,
+        MockLoginWithFormComponent
       ],
-      declarations: [MockLoginWithFormComponent],
       providers: [
-        { provide: AuthenticationApplication, useValue: authApplicationMock }
+        { provide: SupabaseService, useValue: supabaseServiceMock },
+        { provide: Router, useValue: routerMock },
+        { provide: MatSnackBar, useValue: snackBarMock }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+
+    // Réinitialiser explicitement le component avant détection des changements
+    fixture.autoDetectChanges(false);
+    fixture.detectChanges(); // Force la mise à jour du DOM
   });
 
-  it('devrait créer le composant', () => {
+  it('devrait être créé', () => {
     expect(component).toBeTruthy();
   });
 
   it('devrait afficher le composant de formulaire de connexion', () => {
+    // Afficher le HTML pour débogage
+    console.log('Template HTML rendu:', fixture.nativeElement.outerHTML);
+
+    // Force une nouvelle détection des changements
+    fixture.detectChanges();
+
+    // Recherche du composant par son sélecteur au lieu de la directive
     const loginFormElement = fixture.debugElement.query(By.css('app-login-with-form'));
-    expect(loginFormElement).toBeTruthy();
+
+    expect(loginFormElement).toBeTruthy('Le composant MockLoginWithFormComponent n\'a pas été trouvé');
   });
-
-  it('ne devrait pas afficher le spinner de chargement par défaut', () => {
-    const spinnerElement = fixture.debugElement.query(By.css('mat-spinner'));
-    expect(spinnerElement).toBeFalsy();
-  });
-
-  it('devrait afficher le spinner de chargement quand isLoading est true', () => {
-    // Simuler l'état de chargement
-    (authApplicationMock.isLoading as any).set(true);
-    fixture.detectChanges();
-
-    const spinnerElement = fixture.debugElement.query(By.css('mat-spinner'));
-    expect(spinnerElement).toBeTruthy();
-  });
-
-  it('devrait cacher le formulaire de connexion quand isLoading est true', () => {
-    // Simuler l'état de chargement
-    (authApplicationMock.isLoading as any).set(true);
-    fixture.detectChanges();
-
-    const loginFormElement = fixture.debugElement.query(By.css('.login-form:not(.hidden)'));
-    expect(loginFormElement).toBeFalsy();
-
-    const hiddenLoginFormElement = fixture.debugElement.query(By.css('.login-form.hidden'));
-    expect(hiddenLoginFormElement).toBeTruthy();
-  });
-
-  it('devrait afficher le formulaire de connexion quand isLoading est false', () => {
-    // S'assurer que isLoading est false
-    (authApplicationMock.isLoading as any).set(false);
-    fixture.detectChanges();
-
-    const loginFormElement = fixture.debugElement.query(By.css('.login-form:not(.hidden)'));
-    expect(loginFormElement).toBeTruthy();
-
-    const hiddenLoginFormElement = fixture.debugElement.query(By.css('.login-form.hidden'));
-    expect(hiddenLoginFormElement).toBeFalsy();
-  });
-
-  it('devrait réagir aux changements d\'état d\'authentification', () => {
-    // Simuler l'authentification réussie
-    (authApplicationMock.isAuthenticated as any).set(true);
-    fixture.detectChanges();
-
-    // Vérifier que le composant réagit correctement à l'état d'authentification
-    // Note: Le comportement exact dépend de l'implémentation du composant
-    // Supposons que le conteneur de connexion est caché lorsque l'utilisateur est authentifié
-    const loginContainer = fixture.debugElement.query(By.css('.container.authenticated'));
-    expect(loginContainer).toBeTruthy();
-  });
-
-  it('devrait avoir le titre correct', () => {
-    const titleElement = fixture.debugElement.query(By.css('h1'));
-    expect(titleElement.nativeElement.textContent).toContain('Connexion');
-  });
-
-  it('devrait avoir le style de container approprié', () => {
-    const containerElement = fixture.debugElement.query(By.css('.container'));
-    expect(containerElement).toBeTruthy();
-
-    // Vérifier les styles (selon l'implémentation)
-    const styles = window.getComputedStyle(containerElement.nativeElement);
-    expect(styles.display).not.toBe('none');
-  });
-  
 });

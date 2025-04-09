@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "./projects/admin-app/tsconfig.spec.json"
+    }
+  ]
+}
+

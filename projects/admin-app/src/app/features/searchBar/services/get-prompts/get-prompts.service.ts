@@ -1,19 +1,22 @@
-import { Injectable } from '@angular/core';
-import {afficherCategories} from "../../../../utils/afficherCategories";
-import {formatCurrentDateUs} from "../../../../utils/getFormattedDate";
+import {Injectable} from '@angular/core';
+import {afficherCategories} from '../../../../utils/afficherCategories';
+import {formatCurrentDateUs} from '../../../../utils/getFormattedDate';
+
+interface I_GetPromptsService {
+  selectArticle(newsApiData: any): any;
+}
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class GetPromptsService {
-
+export class GetPromptsService implements I_GetPromptsService {
   // évaluer une liste d'articles provenant d'une API de news.
   // retourne un objet avec des instructions pour analyser chaque article selon des critères spécifiques liés au jardinage en Belgique.
   selectArticle(newsApiData: any): any {
     return {
       systemRole: {
-        "role": "system",
-        "content": `
+        role: 'system',
+        content: `
         Analysez une liste d'articles pour déterminer s'il y a un article pertinent pour un blog.
 Considérez si l'article est adapté à des amateurs ou professionnels et s'il est lié aux catégories ${afficherCategories(', ')}.
 # Critères d'évaluation
@@ -46,19 +49,22 @@ Le résultat doit être un JSON strictement valide comme ceci:
 - Ne retournez **qu'un seul objet JSON** correspondant à l'article pertinent si trouvé.
 - Pour les articles jugés non pertinents, l'explication doit tout de même être fournie dans le champ \`explication\`.
 - Aucune structuration ou texte supplémentaire n'est nécessaire en dehors du JSON.
-        `},
+        `,
+      },
       userRole: {
-        "role": "user",
-        "content": `Voici la liste des articles à évaluer : ${JSON.stringify(newsApiData)}.
+        role: 'user',
+        content: `Voici la liste des articles à évaluer : ${JSON.stringify(newsApiData)}.
       Tu dois retourner un objet JSON avec un seul article valide s'il y en a un, avec un tableau 'explication' contenant la raison de pertinence ou non pertinence pour chaque article analysé.
-      `
-      }
-    }
+      `,
+      },
+    };
   }
 
   generateArticle(article?: any): any {
     return {
-      systemRole: {"role": "system","content":`
+      systemRole: {
+        role: 'system',
+        content: `
 
        Tu es chargé de réécrire un article détaillé pour un blog de jardinage situé à Bruxelles,
        en préservant un maximum de détails techniques et contextuels tout en intégrant de nouveaux éléments pertinents si nécessaire.
@@ -101,14 +107,20 @@ Le résultat doit être un JSON strictement valide comme ceci:
     - Ne renvoie qu'un seul objet JSON sans autre texte ou structuration.
     - Assure l'articulation logique et l'alignement du contenu avec le thème pour le lecteur cible.
     - Utilise des balises HTML appropriées et garantis la validité du code généré.
-      `},
-      userRole: { "role": "user", "content": `utilise les informations contenu sur la page dont l 'url est la suivante:  ${article} pour remplir les infos.` }
-    }
+      `,
+      },
+      userRole: {
+        role: 'user',
+        content: `utilise les informations contenu sur la page dont l 'url est la suivante:  ${article} pour remplir les infos.`,
+      },
+    };
   }
 
   upgradeArticle(article: any): any {
     return {
-      systemRole: {"role": "system","content":`
+      systemRole: {
+        role: 'system',
+        content: `
 Improve a segment of a landscaper's blog entry by adding additional information that complements the existing content. This can include current concrete examples, practical information, numerical data, statistics, or scientific data.
 
 # Steps
@@ -130,14 +142,17 @@ Provide the enhanced blog segment in a valid JSON format as follows: {"upgraded"
 # Notes
 - Ensure all added information is accurate and up-to-date.
 - Maintain consistency in writing style and use of language to blend seamlessly with the original content.
-    `},
-      userRole: { "role": "user", "content": `Voici le texte à améliorer ${article}.` }
-    }
+    `,
+      },
+      userRole: { role: 'user', content: `Voici le texte à améliorer ${article}.` },
+    };
   }
 
   formatInHtmlArticle(article: string): any {
     return {
-      systemRole: {"role": "system","content":`
+      systemRole: {
+        role: 'system',
+        content: `
      Intégrer des balises HTML aux textes afin de structurer le contenu et en améliorer la lisibilité, sans modifier le contenu texte ou les balises HTML déjà présentes.
 - Respecter les étapes suivantes pour la mise en forme.
 # Steps
@@ -164,15 +179,20 @@ Un texte avec du contenu varié, incluant des phrases clés, des titres, des lis
 # Notes
 - Le JSON doit strictement contenir les balises HTML requises ou déjà présentes, sans aucun texte ou formatage non essentiel au-delà de celles spécifiées.
 - Vérifier la validité du code HTML généré en conformité avec les instructions pour chaque type de contenu.
-      `},
-      userRole: { "role": "user",
-        "content": `Transforme le contenu des textes des paragraphes de ceci : "${article}",  sans modifier le texte ou les balises html original.` }
-    }
+      `,
+      },
+      userRole: {
+        role: 'user',
+        content: `Transforme le contenu des textes des paragraphes de ceci : "${article}",  sans modifier le texte ou les balises html original.`,
+      },
+    };
   }
 
   meteoArticle(): any {
     return {
-      systemRole: {"role": "system","content":`
+      systemRole: {
+        role: 'system',
+        content: `
  Créez une prévision météorologique poétique pour le blog d’un jardinier, en intégrant vos doubles perspectives de météorologue et de poète.
  Utilisez un langage évocateur pour illustrer les effets du temps sur les activités de jardinage.
  La une prévision météorologique factuelle pour Bruxelles, doit comprendre la température minimale et maximale, la vitesse du vent et la durée d'ensoleillement aujourd'hui.
@@ -186,26 +206,36 @@ Présente le résultat sous la forme d'un JSON valide structuré comme suit :
 - Utilisez des métaphores et des images sensorielles pour amener votre prose à la vie.
 - Ne retournez **qu'un seul objet JSON**
 - Aucune structuration ou texte supplémentaire n'est nécessaire en dehors du JSON.
-      `},
-      userRole: { "role": "user", "content": `Donne la meteo en date du ${formatCurrentDateUs()}. Pour Bruxelles` }
-    }
-  }
-
-  getPromptGenericSelectKeyWordsFromChapitresInArticle(titreArticle: string, chapitreKeyWordList: string[]) {
-    return {
-      systemRole: {
-        role: "system",
-        content: this.getPerplexityPromptSystemSelectKeyWordsFromChapitresInArticle()
+      `,
       },
       userRole: {
-        role: "user",
-        content: this.getPerplexityPromptUserSelectKeyWordsFromChapitresInArticle(titreArticle, chapitreKeyWordList)
-      }
-    }
+        role: 'user',
+        content: `Donne la meteo en date du ${formatCurrentDateUs()}. Pour Bruxelles`,
+      },
+    };
   }
 
-  getPerplexityPromptSystemSelectKeyWordsFromChapitresInArticle(){
-    const prompt = `Identifie le mot-clé unique le plus pertinent à partir du titre d'un blog pour effectuer une recherche d'image sur le site Unsplash.com.
+  getPromptGenericSelectKeyWordsFromChapitresInArticle(
+    titreArticle: string,
+    chapitreKeyWordList: string[],
+  ) {
+    return {
+      systemRole: {
+        role: 'system',
+        content: this.getPerplexityPromptSystemSelectKeyWordsFromChapitresInArticle(),
+      },
+      userRole: {
+        role: 'user',
+        content: this.getPerplexityPromptUserSelectKeyWordsFromChapitresInArticle(
+          titreArticle,
+          chapitreKeyWordList,
+        ),
+      },
+    };
+  }
+
+  getPerplexityPromptSystemSelectKeyWordsFromChapitresInArticle() {
+    return `Identifie le mot-clé unique le plus pertinent à partir du titre d'un blog pour effectuer une recherche d'image sur le site Unsplash.com.
 Extrait un seul mot-clé du titre du blog. Assure-toi que ce mot résume efficacement l'essence du titre ou capte l'atmosphère centrale pour maximiser la pertinence des images recherchées.
 # Steps
 1. **Analyse du Titre**: Lis attentivement le titre du blog et les concepts clés et le thème principal.
@@ -228,48 +258,48 @@ Extrait un seul mot-clé du titre du blog. Assure-toi que ce mot résume efficac
 **Output**: "{"keyWord":"mountains", "explanation":"Le mot montagnes est central pour la recherche visuelle"}"
 # Notes
 - Si le titre contient plusieurs thèmes, choisis le mot-clé qui représente le mieux le message principal ou l'élément le plus visuel.
-- Le mot-clé choisi doit être suffisamment large pour couvrir un éventail d'images mais précis pour rester pertinent.`
-    return prompt;
+- Le mot-clé choisi doit être suffisamment large pour couvrir un éventail d'images mais précis pour rester pertinent.`;
+
   }
 
-  getPerplexityPromptUserSelectKeyWordsFromChapitresInArticle(titreArticle: string, chapitreKeyWordList: string[]){
-    const prompt = `Voici le titre: ${titreArticle}.
-    Si la liste n'est pas vide : ( ${chapitreKeyWordList} ) , choisi un autre mot que ceux qui sont deja dans cette liste.`
-    return prompt;
+  getPerplexityPromptUserSelectKeyWordsFromChapitresInArticle(
+    titreArticle: string,
+    chapitreKeyWordList: string[],
+  ) {
+    return `Voici le titre: ${titreArticle}.
+    Si la liste n'est pas vide : ( ${chapitreKeyWordList} ) , choisi un autre mot que ceux qui sont deja dans cette liste.`;
   }
 
   getPromptGenericSelectBestImageForChapitresInArticle(article: string, images: any) {
     return {
       systemRole: {
-        role: "system",
-        content: this.getPerplexityPromptSystemcSelectBestImageForChapitresInArticle()
+        role: 'system',
+        content: this.getPerplexityPromptSystemcSelectBestImageForChapitresInArticle(),
       },
       userRole: {
-        role: "user",
-        content: this.getPerplexityPromptUserSelectBestImageForChapitresInArticle(article, images)
-      }
-    }
+        role: 'user',
+        content: this.getPerplexityPromptUserSelectBestImageForChapitresInArticle(article, images),
+      },
+    };
   }
 
-  getPerplexityPromptSystemcSelectBestImageForChapitresInArticle(){
-    const prompt = `Tu es une IA spécialisée dans l'analyse de textes et la sélection d'illustrations adaptées pour un blog de jardinier paysagiste.
+  getPerplexityPromptSystemcSelectBestImageForChapitresInArticle() {
+    return `Tu es une IA spécialisée dans l'analyse de textes et la sélection d'illustrations adaptées pour un blog de jardinier paysagiste.
             Ta tâche consiste à lire un texte.
             En analysant le contenu du texte, identifie les thèmes, le ton, et les éléments visuels ou concepts clés qui pourraient être illustrés.
             À partir d'une liste d'URL d'images, trouve celle qui représente le mieux le contenu de ce texte,
-            en considérant l'aspect narratif et la cohérence avec le style du texte.`
-    return prompt;
+            en considérant l'aspect narratif et la cohérence avec le style du texte.`;
   }
 
-  getPerplexityPromptUserSelectBestImageForChapitresInArticle(article: string, images: any){
-    const prompt = `Voici le texte  : ${article}, ainsi qu'une liste d'URL d'images ${JSON.stringify(images)}.
+  getPerplexityPromptUserSelectBestImageForChapitresInArticle(article: string, images: any) {
+    return `Voici le texte  : ${article}, ainsi qu'une liste d'URL d'images ${JSON.stringify(images)}.
             Analyse le contenu du texte pour en extraire les thèmes et concepts principaux, et choisis l'image la plus représentative de cette partie du texte destinée sur un blog de jardinier.
             Assure-toi que l'image sélectionnée illustre bien l'ambiance et les éléments visuels pertinents.
-            Donne l'url de l'image choisie en suivant ce format JSON: {"imageUrl":"url"}`
-    return prompt;
+            Donne l'url de l'image choisie en suivant ce format JSON: {"imageUrl":"url"}`;
   }
 
   getOpenAiPromptImageGenerator(description: string): string {
-   return `Générez une description pour créer une image hyper réaliste sans texte ni représentations humaines, à partir d'un sujet donné que voici : ${description}.
+    return `Générez une description pour créer une image hyper réaliste sans texte ni représentations humaines, à partir d'un sujet donné que voici : ${description}.
     Cette image servira d'illustration pour un blog.
 
 - **Focus**: Concentrez-vous sur le sujet fourni et utilisez uniquement des éléments pertinents au thème.
@@ -290,23 +320,23 @@ Fournir une description détaillée en texte décrivant visuellement l'image.
 # Notes
 
 - Assurez-vous que l'image proposée soit suffisamment neutre pour s'adapter à divers contextes blog.
-- Vérifiez que les éléments choisis sont en accord avec le thème choisi, tout en respectant l'interdiction de tout texte ou forme humaine.`
+- Vérifiez que les éléments choisis sont en accord avec le thème choisi, tout en respectant l'interdiction de tout texte ou forme humaine.`;
   }
 
   getPromptGenericAddInternalLinkInArticle(article: any, listTitreId: any): any {
     return {
       systemRole: {
-        role: "system",
-        content: this.getPromptSystemAddInternalLinkInArticle()
+        role: 'system',
+        content: this.getPromptSystemAddInternalLinkInArticle(),
       },
       userRole: {
-        role: "user",
-        content: this.getPromptUserAddInternalLinkInArticle(article, listTitreId)
-      }
-    }
+        role: 'user',
+        content: this.getPromptUserAddInternalLinkInArticle(article, listTitreId),
+      },
+    };
   }
   getPromptSystemAddInternalLinkInArticle() {
-    const prompt = `
+    return `
 Embed a specific hyperlink into an article using an HTML tag according to detailed guidelines, without altering the article's text or html beyond the insertion.
 
 ## Détails de la Tâche
@@ -347,15 +377,11 @@ Présentez le résultat comme suit:
 - Assurez une correspondance minimum entre le mot-clé dans le texte et les titres du JSON.
 - Veillez à n'insérer qu'un seul lien par article pour éviter toute redondance.
 `;
-    return prompt;
   }
 
   getPromptUserAddInternalLinkInArticle(article: string, listTitreId: any): string {
-    const prompt: string = `Voici un tableau JSON contenant des articles avec les champs 'titre' et 'id' : ${JSON.stringify(listTitreId)}.
+    return `Voici un tableau JSON contenant des articles avec les champs 'titre' et 'id' : ${JSON.stringify(listTitreId)}.
     Voici l'article à traiter : ${JSON.stringify(article)}. Insérez le lien hypertexte conformément aux directives fournies, sans modifier le texte original
 `;
-
-    return prompt;
   }
-
 }

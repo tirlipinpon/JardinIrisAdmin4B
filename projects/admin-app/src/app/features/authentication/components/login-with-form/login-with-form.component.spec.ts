@@ -15,15 +15,11 @@ describe('LoginWithFormComponent', () => {
     authApplicationMock = jasmine.createSpyObj('AuthenticationApplication', ['login']);
 
     await TestBed.configureTestingModule({
-      imports: [
-        LoginWithFormComponent,
-        NoopAnimationsModule,
-        ReactiveFormsModule
-      ],
+      imports: [LoginWithFormComponent, NoopAnimationsModule, ReactiveFormsModule],
       providers: [
         FormBuilder,
-        { provide: AuthenticationApplication, useValue: authApplicationMock }
-      ]
+        { provide: AuthenticationApplication, useValue: authApplicationMock },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LoginWithFormComponent);
@@ -54,7 +50,7 @@ describe('LoginWithFormComponent', () => {
     expect(component.isValid).toBeFalse();
   });
 
-  it('devrait appeler la méthode login de l\'application lors de la soumission', () => {
+  it("devrait appeler la méthode login de l'application lors de la soumission", () => {
     // Préparation des données de test
     const testEmail = 'test@example.com';
     const testPassword = 'motdepasse123';

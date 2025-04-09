@@ -1,12 +1,11 @@
-
-import {AuthenticationUser} from "../models/authentication-user";
-import {patchState, signalStore, withComputed, withMethods, withState} from "@ngrx/signals";
-import {rxMethod} from "@ngrx/signals/rxjs-interop";
-import {concatMap, pipe, tap} from "rxjs";
-import {computed, inject} from "@angular/core";
-import {AuthenticationInfrastructure} from "../services/authentication.infrastructure";
-import {tapResponse} from "@ngrx/operators";
-import {updateState, withDevtools} from "@angular-architects/ngrx-toolkit";
+import { AuthenticationUser } from '../models/authentication-user';
+import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
+import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { concatMap, pipe, tap } from 'rxjs';
+import { computed, inject } from '@angular/core';
+import { AuthenticationInfrastructure } from '../services/authentication.infrastructure';
+import { tapResponse } from '@ngrx/operators';
+import { updateState, withDevtools } from '@angular-architects/ngrx-toolkit';
 
 // etat a creer
 export interface AuthenticationState {
@@ -15,40 +14,38 @@ export interface AuthenticationState {
 }
 
 export type AuthenticationType = {
-  login: string,
-  password: string
-}
+  login: string;
+  password: string;
+};
 
 // valeur initiale
 const initialValue: AuthenticationState = {
   user: undefined,
-  isLoading: false
-}
-
+  isLoading: false,
+};
 
 // reducer / store ...
-export const AuthenticationStore= signalStore(
+export const AuthenticationStore = signalStore(
   { providedIn: 'root' },
   withDevtools('auth'),
   withState(initialValue),
-  withComputed(store => ({ // like slice
-    isAuthenticated: computed(() => store.user() !== undefined)
+  withComputed(store => ({
+    // like slice
+    isAuthenticated: computed(() => store.user() !== undefined),
   })),
-  withMethods((store, infra = inject(AuthenticationInfrastructure))=> (
-    {
-      logIn: rxMethod<AuthenticationType>(
-        pipe(
-          tap(()=> updateState(store, '[AUTH] update loading', {isLoading: true})),
-          concatMap(input => {
-            return infra.login(input.login, input.password).pipe(
-              tapResponse({
-                next: user => patchState(store, {user, isLoading: false}),
-                error: error => patchState(store, {isLoading: false})
-              })
-            )
-          })
-        )
-      )
-    }
-  ))
+  withMethods((store, infra = inject(AuthenticationInfrastructure)) => ({
+    logIn: rxMethod<AuthenticationType>(
+      pipe(
+        tap(() => updateState(store, '[AUTH] update loading', { isLoading: true })),
+        concatMap(input => {
+          return infra.login(input.login, input.password).pipe(
+            tapResponse({
+              next: user => patchState(store, { user, isLoading: false }),
+              error: error => patchState(store, { isLoading: false }),
+            }),
+          );
+        }),
+      ),
+    ),
+  })),
 );

@@ -1,15 +1,15 @@
-import {inject, Injectable} from '@angular/core';
-import {catchError, from, mergeMap, Observable, of, toArray} from "rxjs";
-import {extractChapitreById, replaceChapitreById} from "../../../../utils/exctractChapitreById";
-import {map} from "rxjs/operators";
-import {extractJSONBlock, parseJsonSafe} from "../../../../utils/cleanJsonObject";
-import {TheNewsApiService} from "../the-news-api.service";
-import {OpenaiApiService} from "../openai-api/openai-api.service";
-import {PerplexityApiService} from "../perplexity-api/perplexity-api.service";
-import {GetPromptsService} from "../get-prompts/get-prompts.service";
-import {UnsplashImageService} from "../unsplash-image/unsplash-image.service";
-import {SupabaseService} from "../supabase/supabase.service";
-import {AddImagesToChaptersService} from "../add-image-to-chapters/add-images-to-chapters.service";
+import { inject, Injectable } from '@angular/core';
+import { catchError, from, mergeMap, Observable, of, toArray } from 'rxjs';
+import { extractChapitreById, replaceChapitreById } from '../../../../utils/exctractChapitreById';
+import { map } from 'rxjs/operators';
+import { extractJSONBlock, parseJsonSafe } from '../../../../utils/cleanJsonObject';
+import { TheNewsApiService } from '../the-news-api.service';
+import { OpenaiApiService } from '../openai-api/openai-api.service';
+import { PerplexityApiService } from '../perplexity-api/perplexity-api.service';
+import { GetPromptsService } from '../get-prompts/get-prompts.service';
+import { UnsplashImageService } from '../unsplash-image/unsplash-image.service';
+import { SupabaseService } from '../supabase/supabase.service';
+import { AddImagesToChaptersService } from '../add-image-to-chapters/add-images-to-chapters.service';
 
 @Injectable({
   providedIn: 'root',
@@ -22,18 +22,25 @@ import {AddImagesToChaptersService} from "../add-image-to-chapters/add-images-to
     const supabaseService = inject(SupabaseService);
     const addImagesToChaptersService = inject(AddImagesToChaptersService);
 
-    return new FormatInStructureService(theNewsApiService, openaiApiService, perplexityApiService, getPromptsService, unsplashImageService, supabaseService, addImagesToChaptersService);
-  }
+    return new FormatInStructureService(
+      theNewsApiService,
+      openaiApiService,
+      perplexityApiService,
+      getPromptsService,
+      unsplashImageService,
+      supabaseService
+    );
+  },
 })
 export class FormatInStructureService {
-
-  constructor(private theNewsApiService: TheNewsApiService
-    , private openaiApiService: OpenaiApiService
-    , private perplexityApiService: PerplexityApiService
-    , private getPromptsService: GetPromptsService
-    , private unsplashImageService: UnsplashImageService
-    , private supabaseService: SupabaseService
-    , private addImagesToChaptersService: AddImagesToChaptersService) { }
+  constructor(
+    private theNewsApiService: TheNewsApiService,
+    private openaiApiService: OpenaiApiService,
+    private perplexityApiService: PerplexityApiService,
+    private getPromptsService: GetPromptsService,
+    private unsplashImageService: UnsplashImageService,
+    private supabaseService: SupabaseService,
+  ) {}
 
   formatInStructure(article: string, type: string): Observable<string> {
     return of(article).pipe(
@@ -46,14 +53,18 @@ export class FormatInStructureService {
             return this.processChapitreBasedOnType(chapitreText, chapitreId, type);
           }),
           toArray(),
-          map(results => this.applyChangesToArticle(fullArticle, results))
+          map(results => this.applyChangesToArticle(fullArticle, results)),
         );
-      })
+      }),
     );
   }
 
-  private processChapitreBasedOnType(chapitreText: string, chapitreId: number, type: string): Observable<{id: number, text: string}> {
-    switch(type) {
+  private processChapitreBasedOnType(
+    chapitreText: string,
+    chapitreId: number,
+    type: string,
+  ): Observable<{ id: number; text: string }> {
+    switch (type) {
       case 'LINK':
         return this.processLinkType(chapitreText, chapitreId);
       case 'UPGRADE':
@@ -65,21 +76,38 @@ export class FormatInStructureService {
     }
   }
 
-  private processLinkType(chapitreText: string, chapitreId: number): Observable<{id: number, text: string}> {
+  private processLinkType(
+    chapitreText: string,
+    chapitreId: number,
+  ): Observable<{ id: number; text: string }> {
     return from(this.supabaseService.getPostTitreAndId()).pipe(
       mergeMap(listTitreId => {
-        const prompt = this.getPromptsService.getPromptGenericAddInternalLinkInArticle(chapitreText, listTitreId);
-        return this.processPromptAndExtractResult(prompt, chapitreText, chapitreId, 'textWithLinks');
-      })
+        const prompt = this.getPromptsService.getPromptGenericAddInternalLinkInArticle(
+          chapitreText,
+          listTitreId,
+        );
+        return this.processPromptAndExtractResult(
+          prompt,
+          chapitreText,
+          chapitreId,
+          'textWithLinks',
+        );
+      }),
     );
   }
 
-  private processUpgradeType(chapitreText: string, chapitreId: number): Observable<{id: number, text: string}> {
+  private processUpgradeType(
+    chapitreText: string,
+    chapitreId: number,
+  ): Observable<{ id: number; text: string }> {
     const prompt = this.getPromptsService.upgradeArticle(chapitreText);
     return this.processPromptAndExtractResult(prompt, chapitreText, chapitreId, 'textUpgraded');
   }
 
-  private processHtmlType(chapitreText: string, chapitreId: number): Observable<{id: number, text: string}> {
+  private processHtmlType(
+    chapitreText: string,
+    chapitreId: number,
+  ): Observable<{ id: number; text: string }> {
     const prompt = this.getPromptsService.formatInHtmlArticle(chapitreText);
     return this.processPromptAndExtractResult(prompt, chapitreText, chapitreId, 'htmlContent');
   }
@@ -88,30 +116,30 @@ export class FormatInStructureService {
     prompt: string,
     originalText: string,
     chapitreId: number,
-    resultPropertyName: string
-  ): Observable<{id: number, text: string}> {
+    resultPropertyName: string,
+  ): Observable<{ id: number; text: string }> {
     return from(this.openaiApiService.fetchData(prompt, true)).pipe(
       map(result => {
         if (result === null) {
-          throw new Error('Aucun résultat retourné par l\'API OpenAI');
+          throw new Error("Aucun résultat retourné par l'API OpenAI");
         }
         const parsedData = parseJsonSafe(extractJSONBlock(result));
         return {
           id: chapitreId,
-          text: parsedData[resultPropertyName]
+          text: parsedData[resultPropertyName],
         };
       }),
       catchError(error => {
         console.error(`Erreur lors du traitement du chapitre ${chapitreId}:`, error);
         return of({
           id: chapitreId,
-          text: originalText
+          text: originalText,
         });
-      })
+      }),
     );
   }
 
-  private applyChangesToArticle(article: string, results: {id: number, text: string}[]): string {
+  private applyChangesToArticle(article: string, results: { id: number; text: string }[]): string {
     let newArticle = article;
     results.forEach(result => {
       newArticle = replaceChapitreById(newArticle, result.id, result.text);

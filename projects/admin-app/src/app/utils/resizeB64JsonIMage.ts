@@ -1,5 +1,5 @@
 // Fonction pour redimensionner l'image
-export  function compressImage(base64Str: any, maxWidth = 800, maxHeight = 600): Promise<string> {
+export function compressImage(base64Str: any, maxWidth = 800, maxHeight = 600): Promise<string> {
   return new Promise((resolve, reject) => {
     try {
       // Si la chaîne ne contient pas de type MIME, on ajoute un préfixe par défaut
@@ -10,7 +10,7 @@ export  function compressImage(base64Str: any, maxWidth = 800, maxHeight = 600):
 
       const matches = base64Str.match(/data:(.*?);base64,/);
       if (!matches || matches.length < 2) {
-        reject("Erreur : Impossible de trouver le type MIME dans la chaîne base64.");
+        reject('Erreur : Impossible de trouver le type MIME dans la chaîne base64.');
         return;
       }
 
@@ -22,18 +22,18 @@ export  function compressImage(base64Str: any, maxWidth = 800, maxHeight = 600):
       // Créer un objet URL pour l'image Blob
       const imageUrl = URL.createObjectURL(imageBlob);
 
-      let img = new Image();
+      const img = new Image();
       img.src = imageUrl;
 
       img.onload = () => {
-        let canvas = document.createElement('canvas');
-        let ctx = canvas.getContext('2d');
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
 
         if (ctx) {
           // Calculer le ratio de redimensionnement
-          let ratio = Math.min(maxWidth / img.width, maxHeight / img.height);
-          let width = img.width * ratio;
-          let height = img.height * ratio;
+          const ratio = Math.min(maxWidth / img.width, maxHeight / img.height);
+          const width = img.width * ratio;
+          const height = img.height * ratio;
 
           // Redimensionner l'image
           canvas.width = width;
@@ -43,20 +43,18 @@ export  function compressImage(base64Str: any, maxWidth = 800, maxHeight = 600):
           // Obtenir l'image redimensionnée au format base64
           resolve(canvas.toDataURL('image/jpeg', 0.9)); // Compression à 70%
         } else {
-          reject("Erreur : Impossible de récupérer le contexte 2D du canvas.");
+          reject('Erreur : Impossible de récupérer le contexte 2D du canvas.');
         }
       };
 
-      img.onerror = (error) => {
+      img.onerror = error => {
         reject("Erreur lors du chargement de l'image : " + error);
       };
     } catch (error) {
-      reject("Erreur lors de la conversion : " + error);
+      reject('Erreur lors de la conversion : ' + error);
     }
   });
 }
-
-
 
 export function base64ToBlob(base64: any, mimeType: any) {
   const byteString = atob(base64.split(',')[1]);
@@ -67,4 +65,3 @@ export function base64ToBlob(base64: any, mimeType: any) {
   }
   return new Blob([ab], { type: mimeType });
 }
-

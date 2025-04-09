@@ -1,28 +1,32 @@
-import {Component, inject, OnDestroy, OnInit, signal} from '@angular/core';
-import {FormsModule} from "@angular/forms";
-import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
-import {MessageAction, SearchMessage, SearchMessageService} from "../../services/search-message/search-message.service";
-import {Subscription} from "rxjs";
-import {NgClass, NgForOf, NgIf} from "@angular/common";
-import {SearchApplication} from "../../services/search.application";
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import {
+  MessageAction,
+  SearchMessageService,
+} from '../../services/search-message/search-message.service';
+import { Subscription } from 'rxjs';
+import { NgClass, NgForOf } from '@angular/common';
+import { SearchApplication } from '../../services/search.application';
 
 @Component({
   selector: 'app-search-with-form',
-  imports: [FormsModule, MatProgressSpinnerModule, NgClass, NgForOf],
+  imports: [FormsModule, MatProgressSpinnerModule],
   templateUrl: './search-with-form.component.html',
-  styleUrl: './search-with-form.component.css'
+  styleUrl: './search-with-form.component.css',
 })
-export class SearchWithFormComponent implements OnInit, OnDestroy  {
+export class SearchWithFormComponent implements OnInit, OnDestroy {
   private readonly application = inject(SearchApplication);
   private readonly messageService = inject(SearchMessageService);
   private messageSubscription!: Subscription;
-  messages = signal<{type: string, content: string}[]>([]);
-  url_post = "";
-  isLoading =  this.application.isSearching;
+  messages = signal<{ type: string; content: string }[]>([]);
+  url_post = '';
+  isLoading = this.application.isSearching;
 
   ngOnInit() {
     this.messageSubscription = this.messageService.message$.subscribe(msg => {
-      if (msg) {this.messages.update(currentMessages => [...currentMessages, msg]);
+      if (msg) {
+        this.messages.update(currentMessages => [...currentMessages, msg]);
       }
       switch (msg?.type) {
         case 'message': {
@@ -36,7 +40,10 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
         case 'success': {
           if (msg.action === MessageAction.ARTICLE) {
             this.selectArticle();
-          } else if (msg.action === MessageAction.ARTICLE_VALID || msg.action === MessageAction.IDEA) {
+          } else if (
+            msg.action === MessageAction.ARTICLE_VALID ||
+            msg.action === MessageAction.IDEA
+          ) {
             this.generateArticle();
           } else if (msg.action === MessageAction.GENERATED_ARTICLE) {
             this.getPostTitreAndId();
@@ -52,9 +59,9 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           } else if (msg.action === MessageAction.SAVED_POST) {
             this.updateIdeaPost();
             this.addImagesInArticle();
-          }  else if (msg.action === MessageAction.IDEA_IMAGE_UPDATED) {
+          } else if (msg.action === MessageAction.IDEA_IMAGE_UPDATED) {
             this.generateImageIa();
-        }
+          }
           break;
         }
         case 'fail': {
@@ -75,27 +82,27 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
     }
   }
 
-   process() {
-    !this.url_post?this.searchArticle():this.generateArticle(this.url_post);
+  process() {
+    !this.url_post ? this.searchArticle() : this.generateArticle(this.url_post);
   }
 
-   searchArticle() {
+  searchArticle() {
     this.application.searchArticle();
   }
 
-   selectArticle() {
+  selectArticle() {
     this.application.selectArticle();
   }
 
-   searchIdea() {
+  searchIdea() {
     this.application.searchIdea();
   }
 
-   generateArticle(url_post? : string) {
+  generateArticle(url_post?: string) {
     this.application.generateArticle(url_post);
   }
 
-   upgradeArticle() {
+  upgradeArticle() {
     this.application.upgradeArticle();
   }
 
@@ -103,20 +110,20 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
     this.application.formatInHtmlArticle();
   }
 
-   checkMeteo() {
-      this.application.checkMeteo();
+  checkMeteo() {
+    this.application.checkMeteo();
   }
 
-   savePost() {
+  savePost() {
     this.application.savePost();
   }
 
-   addImagesInArticle() {
-     this.application.addImagesInArticle();
+  addImagesInArticle() {
+    this.application.addImagesInArticle();
   }
 
-   updateIdeaPost() {
-      this.application.updateIdeaPost();
+  updateIdeaPost() {
+    this.application.updateIdeaPost();
   }
 
   generateImageIa() {
@@ -130,5 +137,4 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
   getPostTitreAndId() {
     this.application.getPostTitreAndId();
   }
-
 }

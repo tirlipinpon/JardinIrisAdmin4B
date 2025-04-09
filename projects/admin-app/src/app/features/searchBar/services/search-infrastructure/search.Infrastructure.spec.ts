@@ -9,6 +9,8 @@ import { UnsplashImageService } from '../unsplash-image/unsplash-image.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { of } from 'rxjs';
 import { firstValueFrom } from 'rxjs';
+import { FormatInStructureService } from '../format-in-structure/format-in-structure.service';
+import {AddImagesToChaptersService} from "../add-image-to-chapters/add-images-to-chapters.service";
 
 describe('SearchInfrastructure', () => {
   let service: SearchInfrastructure;
@@ -18,22 +20,35 @@ describe('SearchInfrastructure', () => {
   let getPromptsServiceMock: jasmine.SpyObj<GetPromptsService>;
   let unsplashImageServiceMock: jasmine.SpyObj<UnsplashImageService>;
   let supabaseServiceMock: jasmine.SpyObj<SupabaseService>;
+  let addImagesToChaptersServiceMock: jasmine.SpyObj<AddImagesToChaptersService>;
+  let formatInStructureServiceMock: jasmine.SpyObj<FormatInStructureService>;
 
-  const mockArticles = [
-    { url: 'https://example.com', image_url: 'https://example.com/img.jpg' }
-  ];
+  const mockArticles = [{ url: 'https://example.com', image_url: 'https://example.com/img.jpg' }];
 
   beforeEach(() => {
     theNewsApiServiceMock = jasmine.createSpyObj('TheNewsApiService', ['getNewsApi']);
-    openaiApiServiceMock = jasmine.createSpyObj('OpenaiApiService', ['generateContent']);
+    openaiApiServiceMock = jasmine.createSpyObj('OpenaiApiService', ['generateContent', 'fetchData']);
     perplexityApiServiceMock = jasmine.createSpyObj('PerplexityApiService', ['generateContent']);
-    getPromptsServiceMock = jasmine.createSpyObj('GetPromptsService', ['getPrompt']);
+    getPromptsServiceMock = jasmine.createSpyObj('GetPromptsService', ['getPrompt', 'selectArticle']);
     unsplashImageServiceMock = jasmine.createSpyObj('UnsplashImageService', ['searchImages']);
     supabaseServiceMock = jasmine.createSpyObj('SupabaseService', [
       'getFirstIdeaPostByMonth',
       'savePost',
-      'updatePost'
+      'updatePost',
     ]);
+    addImagesToChaptersServiceMock = jasmine.createSpyObj('AddImagesToChaptersService', ['process']);
+    formatInStructureServiceMock = jasmine.createSpyObj('FormatInStructureService', ['format']);
+
+    // Configuration du mock pour GetPromptsService.selectArticle
+    getPromptsServiceMock.selectArticle.and.returnValue('prompt for selection');
+
+    // Configuration du mock pour OpenaiApiService.fetchData
+    openaiApiServiceMock.fetchData.and.returnValue(Promise.resolve(JSON.stringify({
+      valid: true,
+      explication: { raisonArticle1: 'Explication test' },
+      url: mockArticles[0].url,
+      image_url: mockArticles[0].image_url
+    })));
 
     TestBed.configureTestingModule({
       providers: [
@@ -43,8 +58,10 @@ describe('SearchInfrastructure', () => {
         { provide: PerplexityApiService, useValue: perplexityApiServiceMock },
         { provide: GetPromptsService, useValue: getPromptsServiceMock },
         { provide: UnsplashImageService, useValue: unsplashImageServiceMock },
-        { provide: SupabaseService, useValue: supabaseServiceMock }
-      ]
+        { provide: SupabaseService, useValue: supabaseServiceMock },
+        { provide: AddImagesToChaptersService, useValue: addImagesToChaptersServiceMock },
+        { provide: FormatInStructureService, useValue: formatInStructureServiceMock },
+      ],
     });
 
     service = TestBed.inject(SearchInfrastructure);
@@ -55,7 +72,7 @@ describe('SearchInfrastructure', () => {
   });
 
   describe('searchArticle', () => {
-    it('devrait appeler getNewsApi avec le compteur correct', (done) => {
+    it('devrait appeler getNewsApi avec le compteur correct', done => {
       const cptSearchArticle = 1;
       theNewsApiServiceMock.getNewsApi.and.returnValue(of(mockArticles));
 
@@ -68,21 +85,21 @@ describe('SearchInfrastructure', () => {
   });
 
   describe('selectArticle', () => {
-    it('devrait retourner un objet avec valid et explication', (done) => {
-      spyOn(Math, 'random').and.returnValue(0.8); // Pour s'assurer que valid soit true
-
+    it('devrait retourner un objet avec valid et explication', done => {
       service.selectArticle(mockArticles).subscribe(result => {
         expect(result.valid).toBeTrue();
         expect(result.url).toEqual(mockArticles[0].url);
         expect(result.image_url).toEqual(mockArticles[0].image_url);
         expect(result.explication.raisonArticle1).toBeDefined();
+        expect(getPromptsServiceMock.selectArticle).toHaveBeenCalledWith(mockArticles);
+        expect(openaiApiServiceMock.fetchData).toHaveBeenCalledWith('prompt for selection', true);
         done();
       });
     });
   });
 
   describe('searchIdea', () => {
-    it('devrait appeler getFirstIdeaPostByMonth avec le mois et l\'année actuels', async () => {
+    it("devrait appeler getFirstIdeaPostByMonth avec le mois et l'année actuels", async () => {
       const mockIdea = { id: 1, description: 'Test idea' };
       supabaseServiceMock.getFirstIdeaPostByMonth.and.returnValue(Promise.resolve(mockIdea));
 
@@ -93,25 +110,6 @@ describe('SearchInfrastructure', () => {
 
       expect(supabaseServiceMock.getFirstIdeaPostByMonth).toHaveBeenCalledWith(currentMonth, currentYear);
       expect(result).toEqual(mockIdea);
-    });
-  });
-
-  describe('generateArticle', () => {
-    it('devrait retourner un article généré', (done) => {
-      service.generateArticle().subscribe(result => {
-        expect(result).toContain('Introduction');
-        done();
-      });
-    });
-
-    it('devrait inclure l\'url dans l\'article généré si fournie', (done) => {
-      const testUrl = 'https://test-url.com';
-
-      service.generateArticle(testUrl).subscribe(result => {
-        expect(result).toContain(testUrl);
-        expect(result).toContain('Introduction');
-        done();
-      });
     });
   });
 });

@@ -1,9 +1,8 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { AuthenticationStore } from '../store';
+import { AuthenticationStore } from './index';
 import { AuthenticationInfrastructure } from '../services/authentication.infrastructure';
 import { of, throwError, Subject } from 'rxjs';
 import { AuthenticationUser } from '../models/authentication-user';
-import { Signal } from '@angular/core';
 
 describe('AuthenticationStore', () => {
   let authInfraMock: jasmine.SpyObj<AuthenticationInfrastructure>;
@@ -13,27 +12,27 @@ describe('AuthenticationStore', () => {
     const spy = jasmine.createSpyObj('AuthenticationInfrastructure', ['login']);
 
     TestBed.configureTestingModule({
-      providers: [
-        { provide: AuthenticationInfrastructure, useValue: spy }
-      ]
+      providers: [{ provide: AuthenticationInfrastructure, useValue: spy }],
     });
 
     store = TestBed.inject(AuthenticationStore);
-    authInfraMock = TestBed.inject(AuthenticationInfrastructure) as jasmine.SpyObj<AuthenticationInfrastructure>;
+    authInfraMock = TestBed.inject(
+      AuthenticationInfrastructure,
+    ) as jasmine.SpyObj<AuthenticationInfrastructure>;
   });
 
   it('devrait être créé', () => {
     expect(store).toBeTruthy();
   });
 
-  it('devrait avoir l\'état initial correct', () => {
+  it("devrait avoir l'état initial correct", () => {
     expect(store.user()).toBeUndefined();
     expect(store.isLoading()).toBeFalse();
     expect(store.isAuthenticated()).toBeFalse();
   });
 
   describe('logIn', () => {
-    it('devrait mettre à jour l\'état avec succès après une authentification réussie', () => {
+    it("devrait mettre à jour l'état avec succès après une authentification réussie", () => {
       // Arrange
       const credentials = { login: 'test@example.com', password: 'password123' };
       const mockUser: AuthenticationUser = { surname: 'Dupont' };
@@ -50,7 +49,7 @@ describe('AuthenticationStore', () => {
       expect(authInfraMock.login).toHaveBeenCalledWith(credentials.login, credentials.password);
     });
 
-    it('devrait mettre à jour l\'état isLoading pendant l\'authentification', fakeAsync(() => {
+    it("devrait mettre à jour l'état isLoading pendant l'authentification", fakeAsync(() => {
       // Arrange
       const credentials = { login: 'test@example.com', password: 'password123' };
       const mockUser: AuthenticationUser = { surname: 'Dupont' };
@@ -82,7 +81,7 @@ describe('AuthenticationStore', () => {
       expect(authInfraMock.login).toHaveBeenCalledWith(credentials.login, credentials.password);
     }));
 
-    it('devrait gérer les erreurs lors de l\'authentification', () => {
+    it("devrait gérer les erreurs lors de l'authentification", () => {
       // Arrange
       const credentials = { login: 'test@example.com', password: 'wrong' };
       const error = new Error('Invalid credentials');

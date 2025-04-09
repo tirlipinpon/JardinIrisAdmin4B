@@ -1,20 +1,15 @@
 import { Injectable } from '@angular/core';
-import {environment} from "../../../../../../../../environment";
-import {extractJSONBlock} from "../../../../utils/cleanJsonObject";
-
+import { environment } from '../../../../../../../../environment';
+import { extractJSONBlock } from '../../../../utils/cleanJsonObject';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PerplexityApiService {
-
   fetchData(prompt: any): Promise<any> {
     const jsonObject = {
-      model: "sonar-reasoning",
-      messages: [
-        prompt.systemRole,
-        prompt.userRole
-      ],
+      model: 'sonar-reasoning',
+      messages: [prompt.systemRole, prompt.userRole],
       max_tokens: 2000,
       temperature: 0.2,
       top_p: 0.9,
@@ -22,16 +17,19 @@ export class PerplexityApiService {
       search_domain_filter: [],
       return_images: false,
       return_related_questions: false,
-      search_recency_filter: "month",
+      search_recency_filter: 'month',
       stream: false,
       presence_penalty: 0,
-      frequency_penalty: 1
+      frequency_penalty: 1,
     };
     const jsonString = JSON.stringify(jsonObject, null, 2);
     const options = {
       method: 'POST',
-      headers: {Authorization: 'Bearer '+environment.perplexcityApi , 'Content-Type': 'application/json'},
-      body: jsonString
+      headers: {
+        Authorization: 'Bearer ' + environment.perplexcityApi,
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
     };
 
     // return this.MockgetMessageContent()

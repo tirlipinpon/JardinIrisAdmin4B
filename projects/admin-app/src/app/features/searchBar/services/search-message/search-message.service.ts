@@ -21,7 +21,7 @@ export const MessageAction = {
 } as const;
 
 // Type pour les actions (utilisant typeof pour inférer automatiquement les valeurs)
-export type MessageActionType = typeof MessageAction[keyof typeof MessageAction];
+export type MessageActionType = (typeof MessageAction)[keyof typeof MessageAction];
 
 // Interface de base
 interface BaseSearchMessage {
@@ -34,7 +34,7 @@ interface BaseSearchMessage {
 export type SearchMessage = BaseSearchMessage;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SearchMessageService {
   private messageSubject = new BehaviorSubject<SearchMessage | null>(null);
@@ -46,7 +46,7 @@ export class SearchMessageService {
   sendMessage(content: string): void {
     this.messageSubject.next({
       type: 'message',
-      content
+      content,
     });
   }
 
@@ -56,7 +56,7 @@ export class SearchMessageService {
   sendError(content: string): void {
     this.messageSubject.next({
       type: 'error',
-      content
+      content,
     });
   }
 
@@ -67,7 +67,7 @@ export class SearchMessageService {
     this.messageSubject.next({
       type: 'success',
       content,
-      action
+      action,
     });
   }
 
@@ -78,7 +78,7 @@ export class SearchMessageService {
     this.messageSubject.next({
       type: 'fail',
       content,
-      action
+      action,
     });
   }
 

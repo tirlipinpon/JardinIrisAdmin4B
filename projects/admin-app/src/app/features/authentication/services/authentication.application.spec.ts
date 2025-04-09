@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { AuthenticationApplication } from './authentication.application';
 import { AuthenticationStore } from '../store';
-import { signal, Signal, computed } from '@angular/core';
+import { signal, computed } from '@angular/core';
 
 describe('AuthenticationApplication', () => {
   let service: AuthenticationApplication;
@@ -18,7 +18,7 @@ describe('AuthenticationApplication', () => {
     storeMock = {
       logIn: jasmine.createSpy('logIn'),
       isAuthenticated: computed(() => authSignal()),
-      isLoading: signal(false)
+      isLoading: signal(false),
     };
 
     // Mock pour le Router
@@ -27,8 +27,8 @@ describe('AuthenticationApplication', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: AuthenticationStore, useValue: storeMock },
-        { provide: Router, useValue: routerMock }
-      ]
+        { provide: Router, useValue: routerMock },
+      ],
     });
   });
 
@@ -51,7 +51,6 @@ describe('AuthenticationApplication', () => {
   });
 
   describe('redirectToLoginEffect', () => {
-
     it('ne devrait pas rediriger quand isAuthenticated est false', () => {
       // S'assurer que le signal est à false (c'est déjà le cas par défaut)
       authSignal.set(false);
@@ -76,7 +75,7 @@ describe('AuthenticationApplication', () => {
     });
   });
 
-  describe('comportement avec le cycle de vie de l\'application', () => {
+  describe("comportement avec le cycle de vie de l'application", () => {
     it('devrait maintenir une référence stable au signal isLoading', () => {
       service = TestBed.inject(AuthenticationApplication);
 
