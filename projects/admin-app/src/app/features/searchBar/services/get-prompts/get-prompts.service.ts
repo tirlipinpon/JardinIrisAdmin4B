@@ -362,7 +362,6 @@ Embed a specific hyperlink into an article using an HTML tag according to detail
    - Confirmez que le lien est correctement inséré sans altérer le texte original.
 
 # Output Format
-
 Présentez le résultat comme suit:
 
 \`\`\`JSON
