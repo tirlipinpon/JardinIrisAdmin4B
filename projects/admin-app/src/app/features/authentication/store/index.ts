@@ -25,7 +25,6 @@ const initialValue: AuthenticationState = {
   isLoading: false
 }
 
-
 // reducer / store ...
 export const AuthenticationStore= signalStore(
   { providedIn: 'root' },
