@@ -3,13 +3,11 @@ import {createClient, PostgrestError, SupabaseClient} from "@supabase/supabase-j
 import {environment} from "../../../../../../../../environment";
 import {Post} from "../../../../types/post";
 import {catchError, from, Observable, of, throwError} from "rxjs";
-import {map} from "rxjs/operators";
-import { User, Session } from '@supabase/supabase-js';
 
 export interface AuthResponse {
   data: {
-    user: User | null;
-    session: Session | null;
+    user: any | null;
+    session: any | null;
   };
   error: any | null;
 }
