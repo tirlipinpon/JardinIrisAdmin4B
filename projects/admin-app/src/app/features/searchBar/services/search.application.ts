@@ -38,7 +38,7 @@ export class SearchApplication {
   }
 
   selectArticle(): void {
-    this.messageService.sendMessage('Selecte un Articles en cours.');
+    this.messageService.sendMessage('Selecte un Articles en cours ' + ((this.cptSearchArticle===1)?' Belgique' : 'Europe.'));
     this.store.selectArticle();
   }
 
@@ -106,12 +106,12 @@ export class SearchApplication {
     effect(() => {
       if (this.store.getArticles()!==null) {
         if (this.store.isArticlesFound() ) {
-          this.messageService.sendSuccess('Articles trouvés.', MessageAction.ARTICLE);
+          this.messageService.sendSuccess('Articles trouvés ' + ((this.cptSearchArticle===1)?' Belgique' : 'Europe.'), MessageAction.ARTICLE);
         } else if (this.cptSearchArticle < 2) {
           this.messageService.sendMessage('Articles recherche élargie pour l’Europe.');
           this.store.searchArticle(this.cptSearchArticle++);
         } else if (this.cptSearchArticle === 2) {
-          this.messageService.sendFail('Articles non trouvés en Europe.', MessageAction.ARTICLE);
+          this.messageService.sendFail('Articles non trouvés en Belgique et en Europe .', MessageAction.ARTICLE);
         }
       }
     });
@@ -122,8 +122,10 @@ export class SearchApplication {
       if(this.store.getArticleValid().valid !== null) {
         if (this.store.isArticleValid()) {
           this.messageService.sendSuccess('Article validé trouvé.', MessageAction.ARTICLE_VALID);
+        } else if (this.cptSearchArticle !== 2) {
+          this.messageService.sendFail('Articles non valid trouve pour '+ ((this.cptSearchArticle===1)?' Belgique' : 'Europe.'), MessageAction.ARTICLE);
         } else {
-          this.messageService.sendFail('Article non validé trouvé.', MessageAction.ARTICLE_VALID);
+          this.messageService.sendFail('Article non validé trouvé.', MessageAction.ARTICLE);
         }
       }
     });
