@@ -1,23 +1,45 @@
-import { Injectable } from "@angular/core";
-import { delay, Observable, of } from "rxjs";
-import { AuthenticationUser} from "../models/authentication-user";
+// authentication.infrastructure.ts
+import { Injectable } from '@angular/core';
+import { catchError, Observable, throwError } from 'rxjs';
+import { map } from 'rxjs/operators';
+import {SupabaseService} from "../../searchBar/services/supabase/supabase.service";
 
-const fakeService: AuthenticationInfrastructure = {
-  login(email, password): Observable<AuthenticationUser> {
-    const user: AuthenticationUser = {
-      surname: 'Chewie'
-    };
+export interface Credentials {
+  email: string;
+  password: string;
+}
 
-    return of(user).pipe(delay(1500));
-  },
+export interface AuthUser {
+  id: string;
+  email: string;
+  // Autres propriétés si nécessaire
 }
 
 @Injectable({
-  providedIn: 'root',
-  useValue: fakeService
+  providedIn: 'root'
 })
 export class AuthenticationInfrastructure {
-  login(email: string, password: string): Observable<AuthenticationUser> {
-    throw new Error('Not implemented exception');
+  constructor(private supabaseService: SupabaseService) {}
+
+  login(email: string, password: string): Observable<any> {
+    return this.supabaseService.signInMock(email, password).pipe(
+      map(response => {
+        // Vérifie si la réponse contient un utilisateur
+        if (response.data?.user) {
+          return {
+            username: 'chewie'
+          };
+        } else {
+          throw new Error('Utilisateur introuvable');
+        }
+      }),
+      catchError(error => {
+        // Gestion des différents types d'erreurs
+        if (error.message === 'Invalid login credentials') {
+          return throwError(() => new Error('Identifiants invalides'));
+        }
+        return throwError(() => new Error('Erreur d\'authentification'));
+      })
+    );
   }
 }

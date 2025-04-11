@@ -1,72 +1,85 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { AuthenticationInfrastructure } from './authentication.infrastructure';
-import {AuthenticationUser} from "../models/authentication-user";
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { of, throwError } from 'rxjs';
+
+// Mock pour SupabaseClient
+class SupabaseClientMock {
+  auth = {
+    signInWithPassword: jasmine.createSpy('signInWithPassword')
+    // Suppression de signOut puisque nous n'utilisons pas logout()
+  };
+}
 
 describe('AuthenticationInfrastructure', () => {
-  let infrastructure: AuthenticationInfrastructure;
-  let httpMock: HttpTestingController;
+  let service: AuthenticationInfrastructure;
+  let supabaseMock: SupabaseClientMock;
 
   beforeEach(() => {
+    supabaseMock = new SupabaseClientMock();
+
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [AuthenticationInfrastructure]
+      providers: [
+        AuthenticationInfrastructure,
+        { provide: SupabaseClient, useValue: supabaseMock }
+      ]
     });
 
-    infrastructure = TestBed.inject(AuthenticationInfrastructure);
-    httpMock = TestBed.inject(HttpTestingController);
+    service = TestBed.inject(AuthenticationInfrastructure);
   });
 
-  afterEach(() => {
-    httpMock.verify();
-  });
-
-  it('devrait être créé', () => {
-    expect(infrastructure).toBeTruthy();
+  it('should be created', () => {
+    expect(service).toBeTruthy();
   });
 
   describe('login', () => {
-    it('devrait authentifier un utilisateur avec des identifiants valides', () => {
-      // Arrange
-      const login = 'test@example.com';
-      const password = 'password123';
-
-      const mockUser: AuthenticationUser = {
-        surname: 'Dupont'
-        // Ajoutez d'autres propriétés requises selon la définition exacte de AuthenticationUser
+    it('should return user data when login is successful', (done) => {
+      const mockResponse = {
+        data: {
+          user: { id: 'user123', email: 'test@example.com' },
+          session: { access_token: 'token123' }
+        },
+        error: null
       };
-      
-      // Act
-      infrastructure.login(login, password).subscribe((user: AuthenticationUser) => {
-        // Assert
-        expect(user).toEqual(mockUser);
+
+      supabaseMock.auth.signInWithPassword.and.resolveTo(mockResponse);
+
+      service.login('test@example.com', 'password123').subscribe(result => {
+        expect(result).toEqual(mockResponse.data);
+        expect(supabaseMock.auth.signInWithPassword).toHaveBeenCalledWith({
+          email: 'test@example.com',
+          password: 'password123'
+        });
+        done();
       });
-
-      // Vérifier la requête HTTP
-      const req = httpMock.expectOne('http://localhost:3000/api/auth/login');
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual({ login, password });
-
-      req.flush(mockUser);
     });
 
-    it('devrait gérer les erreurs d\'authentification', () => {
-      // Arrange
-      const login = 'test@example.com';
-      const password = 'wrong';
-      const errorResponse = { status: 401, statusText: 'Unauthorized' };
+    it('devrait gérer les erreurs d\'authentification', (done) => {
+      const mockError = {
+        data: null,
+        error: {
+          message: 'Invalid login credentials',
+          status: 400
+        }
+      };
 
-      // Act & Assert
-      infrastructure.login(login, password).subscribe({
-        next: () => fail('La requête devrait échouer'),
+      supabaseMock.auth.signInWithPassword.and.resolveTo(mockError);
+
+      service.login('wrong@example.com', 'wrongpassword').subscribe({
+        next: (result) => {
+          fail('La requête devrait échouer');
+        },
         error: (error) => {
-          expect(error.status).toBe(401);
+          expect(error.message).toBe('Invalid login credentials');
+          expect(supabaseMock.auth.signInWithPassword).toHaveBeenCalledWith({
+            email: 'wrong@example.com',
+            password: 'wrongpassword'
+          });
+          done();
         }
       });
-
-      // Simuler une erreur HTTP
-      const req = httpMock.expectOne('http://localhost:3000/api/auth/login');
-      req.flush('Invalid credentials', errorResponse);
     });
   });
+
+  // Suppression complète de la section describe('logout', ...)
 });

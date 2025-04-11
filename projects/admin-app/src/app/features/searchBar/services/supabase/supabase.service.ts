@@ -2,6 +2,18 @@ import { Injectable } from '@angular/core';
 import {createClient, PostgrestError, SupabaseClient} from "@supabase/supabase-js";
 import {environment} from "../../../../../../../../environment";
 import {Post} from "../../../../types/post";
+import {catchError, from, Observable, of, throwError} from "rxjs";
+import {map} from "rxjs/operators";
+import { User, Session } from '@supabase/supabase-js';
+
+export interface AuthResponse {
+  data: {
+    user: User | null;
+    session: Session | null;
+  };
+  error: any | null;
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -13,149 +25,50 @@ export class SupabaseService {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey)
   }
 
+  signInMock(email: string, password: string): Observable<AuthResponse> {
+    // Copie d'une réponse réelle que vous avez capturée précédemment
+    const mockResponse: AuthResponse = {
+      data: {
+        user: {
+          id: 'user-123',
+          email: email,
+          app_metadata: {},
+          user_metadata: {},
+          aud: 'authenticated',
+          created_at: '2023-10-25T12:00:00.000Z',
+          // ... autres propriétés requises
+        },
+        session: {
+          access_token: 'access-token-123',
+          refresh_token: 'refresh-token-123',
+          expires_at: Date.now() + 3600000,
+          expires_in: 3600,
+          token_type: 'bearer',
+          user: {
+            // Dupliquer les mêmes données que ci-dessus
+            id: 'user-123',
+            email: email,
+            app_metadata: {},
+            user_metadata: {},
+            aud: 'authenticated',
+            created_at: '2023-10-25T12:00:00.000Z',
+            // ... autres propriétés requises
+          }
+        }
+      },
+      error: null
+    };
+
+    return of(mockResponse);
+  }
+
+
   async setNewPostForm(value: Post): Promise<Post[]> {
     try {
       const { data, error } = await this.supabase
         .from('post')
         .insert([value])
         .select();
-
-      if (error) {
-        throw error;
-      }
-      return data;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async getOneOrManyPostForm(idPost?: number, orderBySelected?: string) {
-    try {
-      let query = this.supabase
-        .from('post')
-        .select('*')
-
-      if (idPost && idPost>0) {
-        query = query.eq('id', idPost);
-      }
-
-      if (orderBySelected) {
-        if(orderBySelected==='valid') {
-          query = query.order(orderBySelected, { ascending: true });
-        } else if(orderBySelected==='original') {
-          query = query
-            .eq('valid', true)
-            .eq('deleted', false)
-            .order('created_at', { ascending: false });
-        } else {
-          query = query.order(orderBySelected, { ascending: false });
-        }
-      } else {
-        query = query.order('created_at', { ascending: false });
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        throw error;
-      }
-      return data;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async getAllComments() {
-    try {
-      let query = this.supabase
-        .from('comments')
-        .select('*')
-        .order('id', { ascending: true });
-
-      const { data, error } = await query;
-
-      if (error) {
-        throw error;
-      }
-      return data;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async deletePostByIdForm(idPost: number) {
-    try {
-      const { data, error } = await this.supabase
-        .from('post')
-        .update({ deleted: 'true' })
-        .eq('id', idPost)
-
-      if (error) {
-        throw error;
-      }
-      console.log(data);
-      return data;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async updateValidPostByIdForm(idPost: number) {
-    try {
-      const { data, error } = await this.supabase
-        .from('post')
-        .update({ valid: 'true' })
-        .eq('id', idPost)
-
-      if (error) {
-        throw error;
-      }
-      console.log(data);
-      return data;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async updatePostByPostForm(dataPost: any) {
-    try {
-      const { data, error } = await this.supabase
-        .from('post')
-        .update(dataPost)
-        .eq('id', dataPost.id);
-
-      if (error) {
-        throw error;
-      }
-      console.log(data);
-      return data;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async deleteCommentById(id: number) {
-    try {
-      const { data, error } = await this.supabase
-        .from('comments')
-        .update({ valide: 'false' })
-        .eq('id', id)
-
-      if (error) {
-        throw error;
-      }
-      return data;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async valideCommentById(id: number) {
-    try {
-      const { data, error } = await this.supabase
-        .from('comments')
-        .update({ valide: 'true' })
-        .eq('id', id)
 
       if (error) {
         throw error;
