@@ -123,7 +123,7 @@ export class SearchApplication {
         if (this.store.isArticleValid()) {
           this.messageService.sendSuccess('Article validé trouvé.', MessageAction.ARTICLE_VALID);
         } else if (this.cptSearchArticle !== 2) {
-          this.messageService.sendFail('Articles non valid trouve pour '+ ((this.cptSearchArticle===1)?' Belgique' : 'Europe.'), MessageAction.ARTICLE);
+          this.messageService.sendFail('Articles non valid trouve pour '+ ((this.cptSearchArticle===1)?' Belgique' : 'Europe.'), MessageAction.ARTICLE_VALID);
         } else {
           this.messageService.sendFail('Article non validé trouvé.', MessageAction.ARTICLE);
         }
