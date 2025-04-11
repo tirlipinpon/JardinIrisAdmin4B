@@ -1,6 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { HomeComponent } from './home.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { TheNewsApiService } from '../../features/searchBar/services/the-news-api.service';
+import {SearchInfrastructure} from "../../features/searchBar/services/search-infrastructure/search.infrastructure";
+import {SearchApplication} from "../../features/searchBar/services/search.application";
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -8,9 +12,18 @@ describe('HomeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HomeComponent]
+      imports: [
+        HomeComponent,
+        HttpClientTestingModule
+      ],
+      providers: [
+        SearchApplication,
+        SearchInfrastructure,
+        TheNewsApiService,
+        provideHttpClient()
+      ]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
