@@ -3,119 +3,106 @@ import {catchError, from, mergeMap, Observable, of, toArray} from "rxjs";
 import {extractChapitreById, replaceChapitreById} from "../../../../utils/exctractChapitreById";
 import {map} from "rxjs/operators";
 import {extractJSONBlock, parseJsonSafe} from "../../../../utils/cleanJsonObject";
-import {TheNewsApiService} from "../the-news-api.service";
 import {OpenaiApiService} from "../openai-api/openai-api.service";
-import {PerplexityApiService} from "../perplexity-api/perplexity-api.service";
 import {GetPromptsService} from "../get-prompts/get-prompts.service";
-import {UnsplashImageService} from "../unsplash-image/unsplash-image.service";
-import {SupabaseService} from "../supabase/supabase.service";
-import {AddImagesToChaptersService} from "../add-image-to-chapters/add-images-to-chapters.service";
 
 @Injectable({
   providedIn: 'root',
   useFactory: () => {
-    const theNewsApiService = inject(TheNewsApiService);
     const openaiApiService = inject(OpenaiApiService);
-    const perplexityApiService = inject(PerplexityApiService);
     const getPromptsService = inject(GetPromptsService);
-    const unsplashImageService = inject(UnsplashImageService);
-    const supabaseService = inject(SupabaseService);
-    const addImagesToChaptersService = inject(AddImagesToChaptersService);
 
-    return new FormatInStructureService(theNewsApiService, openaiApiService, perplexityApiService, getPromptsService, unsplashImageService, supabaseService, addImagesToChaptersService);
+    return new FormatInStructureService(openaiApiService, getPromptsService);
   }
 })
 export class FormatInStructureService {
 
-  constructor(private theNewsApiService: TheNewsApiService
-    , private openaiApiService: OpenaiApiService
-    , private perplexityApiService: PerplexityApiService
-    , private getPromptsService: GetPromptsService
-    , private unsplashImageService: UnsplashImageService
-    , private supabaseService: SupabaseService
-    , private addImagesToChaptersService: AddImagesToChaptersService) { }
+  constructor(private openaiApiService: OpenaiApiService
+    , private getPromptsService: GetPromptsService) { }
 
-  formatInStructure(article: string, type: string): Observable<string> {
-    return of(article).pipe(
-      mergeMap(fullArticle => {
-        const chapitreIds = [1, 2, 3, 4, 5, 6];
+  formatInStructure(article: string, type: string, postTitreAndId?: {
+    titre: string,
+    id: number
+  }[]): Observable<string> {
+    // Identifier les chapitres à traiter
+    const chapitreIds = [1,2,3,4,5,6];
+    // Copie locale de postTitreAndId pour pouvoir la modifier
+    let postTitreAndIdLocal = postTitreAndId ? [...postTitreAndId] : undefined;
 
-        return from(chapitreIds).pipe(
-          mergeMap(chapitreId => {
-            const chapitreText = extractChapitreById(fullArticle, chapitreId);
-            return this.processChapitreBasedOnType(chapitreText, chapitreId, type);
-          }),
-          toArray(),
-          map(results => this.applyChangesToArticle(fullArticle, results))
-        );
-      })
-    );
-  }
+    // Créer un Observable pour chaque traitement de chapitre
+    const chapitreObservables = chapitreIds.map(chapitreId => {
+      // Extraire le chapitre actuel
+      const chapitreText = extractChapitreById(article, chapitreId);
 
-  private processChapitreBasedOnType(chapitreText: string, chapitreId: number, type: string): Observable<{id: number, text: string}> {
-    switch(type) {
-      case 'LINK':
-        return this.processLinkType(chapitreText, chapitreId);
-      case 'UPGRADE':
-        return this.processUpgradeType(chapitreText, chapitreId);
-      case 'HTML':
-        return this.processHtmlType(chapitreText, chapitreId);
-      default:
-        return of({ id: chapitreId, text: chapitreText });
-    }
-  }
+      // Sélectionner le prompt approprié selon le type
+      let prompt: any;
+      if (type === 'HTML') {
+        prompt = this.getPromptsService.formatInHtmlArticle(chapitreText);
+      } else if (type === 'UPGRADE') {
+        prompt = this.getPromptsService.upgradeArticle(chapitreText);
+      } else if (type === 'LINK') {
+        prompt = this.getPromptsService.getPromptGenericAddInternalLinkInArticle(chapitreText, postTitreAndIdLocal);
+      }
 
-  private processLinkType(chapitreText: string, chapitreId: number): Observable<{id: number, text: string}> {
-    return from(this.supabaseService.getPostTitreAndId()).pipe(
-      mergeMap(listTitreId => {
-        const prompt = this.getPromptsService.getPromptGenericAddInternalLinkInArticle(chapitreText, listTitreId);
-        return this.processPromptAndExtractResult(prompt, chapitreText, chapitreId, 'textWithLinks');
-      })
-    );
-  }
+      // Convertir la Promise en Observable et traiter le résultat
+      return from(this.openaiApiService.fetchData(prompt, true)).pipe(
+        map(upgradedText => {
+          if (!upgradedText) {
+            return {
+              id: chapitreId,
+              nouveauContenu: chapitreText
+            };
+          }
 
-  private processUpgradeType(chapitreText: string, chapitreId: number): Observable<{id: number, text: string}> {
-    const prompt = this.getPromptsService.upgradeArticle(chapitreText);
-    return this.processPromptAndExtractResult(prompt, chapitreText, chapitreId, 'textUpgraded');
-  }
+          try {
+            const upgradedTextJson: {
+              upgraded: string,
+              idToRemove?: number
+            } = JSON.parse(extractJSONBlock(upgradedText));
+            const upgradedTextJsonObject = upgradedTextJson.upgraded;
 
-  private processHtmlType(chapitreText: string, chapitreId: number): Observable<{id: number, text: string}> {
-    const prompt = this.getPromptsService.formatInHtmlArticle(chapitreText);
-    return this.processPromptAndExtractResult(prompt, chapitreText, chapitreId, 'htmlContent');
-  }
+            // Mettre à jour postTitreAndIdLocal si nécessaire
+            if (type === 'LINK' && postTitreAndIdLocal && upgradedTextJson.idToRemove) {
+              const idToRemove = Number(upgradedTextJson.idToRemove);
+              postTitreAndIdLocal = postTitreAndIdLocal.filter((item) => item.id !== idToRemove);
+            }
 
-  private processPromptAndExtractResult(
-    prompt: string,
-    originalText: string,
-    chapitreId: number,
-    resultPropertyName: string
-  ): Observable<{id: number, text: string}> {
-    return from(this.openaiApiService.fetchData(prompt, true)).pipe(
-      map(result => {
-        if (result === null) {
-          throw new Error('Aucun résultat retourné par l\'API OpenAI');
-        }
-        const parsedData = parseJsonSafe(extractJSONBlock(result));
-        return {
-          id: chapitreId,
-          text: parsedData[resultPropertyName]
-        };
-      }),
-      catchError(error => {
-        console.error(`Erreur lors du traitement du chapitre ${chapitreId}:`, error);
-        return of({
-          id: chapitreId,
-          text: originalText
-        });
-      })
-    );
-  }
-
-  private applyChangesToArticle(article: string, results: {id: number, text: string}[]): string {
-    let newArticle = article;
-    results.forEach(result => {
-      newArticle = replaceChapitreById(newArticle, result.id, result.text);
+            return {
+              id: chapitreId,
+              nouveauContenu: upgradedTextJsonObject
+            };
+          } catch (error) {
+            console.error(`Erreur lors du traitement de la réponse pour le chapitre ${chapitreId}:`, error);
+            return {
+              id: chapitreId,
+              nouveauContenu: chapitreText
+            };
+          }
+        }),
+        catchError(error => {
+          console.error(`Erreur lors de l'appel API pour le chapitre ${chapitreId}:`, error);
+          return of({
+            id: chapitreId,
+            nouveauContenu: chapitreText
+          });
+        })
+      );
     });
-    return newArticle;
+
+    // Exécuter tous les appels en parallèle et assembler l'article final
+    return from(chapitreObservables).pipe(
+      mergeMap(obs => obs, 6), // Traitement parallèle avec max 6 appels simultanés
+      toArray(),
+      map(resultats => {
+        let articleModifie = article;
+        // Remplacer chaque chapitre par sa version traitée
+        resultats.forEach(resultat => {
+          articleModifie = replaceChapitreById(articleModifie, resultat.id, resultat.nouveauContenu);
+        });
+        return articleModifie;
+      })
+    );
   }
+
+
 }
