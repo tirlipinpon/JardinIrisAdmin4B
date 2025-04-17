@@ -340,12 +340,7 @@ export const SearchStore= signalStore(
             if (!postId) { patchState(store, { isLoading: false }); return EMPTY; }
             const isValid = store.isIdeaPost() && store.isPostId()
             if (!isValid) { patchState(store, { isLoading: false }); return EMPTY; }
-            return infra.updateIdeaPost(ideaPost.id as number, postId as number).pipe(
-              tapResponse({
-                next: ideaPost => patchState(store, {isLoading: false }),
-                error: error => patchState(store, {isLoading: false})
-              })
-            )
+            return infra.updateIdeaPost(ideaPost.id as number, postId as number)
           })
         )
       ),

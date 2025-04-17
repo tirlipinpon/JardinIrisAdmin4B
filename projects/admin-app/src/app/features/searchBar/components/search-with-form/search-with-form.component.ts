@@ -5,12 +5,15 @@ import {MessageAction, SearchMessageService} from "../../services/search-message
 import {Subscription} from "rxjs";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {SearchApplication} from "../../services/search.application";
+import { MatRadioModule } from '@angular/material/radio';
+;
 
 @Component({
+  imports: [FormsModule, MatProgressSpinnerModule, MatRadioModule
+    , NgClass, NgForOf],
   selector: 'app-search-with-form',
-  imports: [FormsModule, MatProgressSpinnerModule, NgClass, NgForOf],
-  templateUrl: './search-with-form.component.html',
-  styleUrl: './search-with-form.component.css'
+  styleUrl: './search-with-form.component.css',
+  templateUrl: './search-with-form.component.html'
 })
 export class SearchWithFormComponent implements OnInit, OnDestroy  {
   private readonly application = inject(SearchApplication);
@@ -19,6 +22,13 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
   messages = signal<{type: string, content: string}[]>([]);
   url_post = "";
   isLoading =  this.application.isSearching;
+  selectedOption: string = 'generate';
+
+  onOptionChange() {
+    if(this.selectedOption === 'article') {
+      this.url_post = "";
+    }
+  }
 
   ngOnInit() {
     this.messageSubscription = this.messageService.message$.subscribe(msg => {
@@ -29,7 +39,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           if (msg.action === MessageAction.ARTICLE) {
             this.application.selectArticle();
           } else if (msg.action === MessageAction.ARTICLE_VALID || msg.action === MessageAction.IDEA) {
-            this.application.generateArticle(this.url_post);
+            this.application.generateArticle();
           } else if (msg.action === MessageAction.GENERATED_ARTICLE) {
             this.application.getPostTitreAndId();
             this.application.addVideo();
@@ -53,7 +63,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
         case 'fail': {
           if (msg.action === MessageAction.ARTICLE_VALID) {
             this.application.searchArticle();
-          } else if (msg.action === MessageAction.ARTICLE) {
+          } else if (msg.action === MessageAction.ARTICLE && this.selectedOption === 'generate') {
             this.application.searchIdea();
           }
           break;
@@ -69,7 +79,13 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
   }
 
    process() {
-    !this.url_post?this.application.searchArticle():this.application.generateArticle(this.url_post);
+     if(this.url_post){
+       this.application.generateArticle(this.url_post)
+     } else if(this.selectedOption === 'generate') {
+       this.application.searchIdea();
+     } else {
+       this.application.searchArticle()
+     }
   }
 
 }

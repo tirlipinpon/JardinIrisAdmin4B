@@ -97,7 +97,7 @@ export class SupabaseService {
 
   async updateIdeaPostById(id: number, fk_idPost: number) {
     try {
-      const { data, error } = await this.supabase
+      const { error } = await this.supabase
         .from('ideaPost')
         .update({
           deleted: true,

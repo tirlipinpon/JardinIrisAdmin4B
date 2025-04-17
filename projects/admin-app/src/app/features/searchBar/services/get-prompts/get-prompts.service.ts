@@ -242,7 +242,7 @@ La réponse doit être sous format JSON, uniquement contenant le lien YouTube de
   }
 
   getPerplexityPromptSystemSelectKeyWordsFromChapitresInArticle(){
-    const prompt = `Identifie le mot-clé unique le plus pertinent à partir du titre d'un blog pour effectuer une recherche d'image sur le site Unsplash.com.
+    return `Identifie le mot-clé unique le plus pertinent à partir du titre d'un blog pour effectuer une recherche d'image sur le site Unsplash.com.
 Extrait un seul mot-clé du titre du blog. Assure-toi que ce mot résume efficacement l'essence du titre ou capte l'atmosphère centrale pour maximiser la pertinence des images recherchées.
 # Steps
 1. **Analyse du Titre**: Lis attentivement le titre du blog et les concepts clés et le thème principal.
@@ -266,13 +266,11 @@ Extrait un seul mot-clé du titre du blog. Assure-toi que ce mot résume efficac
 # Notes
 - Si le titre contient plusieurs thèmes, choisis le mot-clé qui représente le mieux le message principal ou l'élément le plus visuel.
 - Le mot-clé choisi doit être suffisamment large pour couvrir un éventail d'images mais précis pour rester pertinent.`
-    return prompt;
   }
 
   getPerplexityPromptUserSelectKeyWordsFromChapitresInArticle(titreArticle: string, chapitreKeyWordList: string[]){
-    const prompt = `Voici le titre: ${titreArticle}.
+    return `Voici le titre: ${titreArticle}.
     Si la liste n'est pas vide : ( ${chapitreKeyWordList} ) , choisi un autre mot que ceux qui sont deja dans cette liste.`
-    return prompt;
   }
 
   getPromptGenericSelectBestImageForChapitresInArticle(article: string, images: any) {
@@ -380,7 +378,7 @@ Fournir une description détaillée en texte décrivant visuellement l'image.
     }
   }
   getPromptSystemAddInternalLinkInArticle() {
-    const prompt = `
+    return `
 Embed a specific hyperlink into an article using an HTML tag according to detailed guidelines, without altering the article's text or html beyond the insertion.
 
 ## Détails de la Tâche
@@ -421,15 +419,12 @@ Présentez le résultat comme suit:
 - Assurez une correspondance minimum entre le mot-clé dans le texte et les titres du JSON.
 - Veillez à n'insérer qu'un seul lien par article pour éviter toute redondance.
 `;
-    return prompt;
   }
 
   getPromptUserAddInternalLinkInArticle(article: string, listTitreId: any): string {
-    const prompt: string = `Voici un tableau JSON contenant des articles avec les champs 'titre' et 'id' : ${JSON.stringify(listTitreId)}.
+    return `Voici un tableau JSON contenant des articles avec les champs 'titre' et 'id' : ${JSON.stringify(listTitreId)}.
     Voici l'article à traiter : ${JSON.stringify(article)}. Insérez le lien hypertexte conformément aux directives fournies, sans modifier le texte original
 `;
-
-    return prompt;
   }
 
 }

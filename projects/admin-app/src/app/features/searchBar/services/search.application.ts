@@ -40,7 +40,7 @@ export class SearchApplication {
   }
 
   selectArticle(): void {
-    this.messageService.sendMessage('Selecte un Articles en cours ' + ((this.cptSearchArticle===1)?' Belgique' : 'Europe.'));
+    this.messageService.sendMessage('Select un Articles en cours ' + ((this.cptSearchArticle===1)?' Belgique' : 'Europe.'));
     this.store.selectArticle();
   }
 
@@ -132,7 +132,7 @@ export class SearchApplication {
         } else if (this.cptSearchArticle !== 2) {
           this.messageService.sendFail('Articles non valid trouve pour '+ ((this.cptSearchArticle===1)?' Belgique' : 'Europe.'), MessageAction.ARTICLE_VALID);
         } else {
-          this.messageService.sendFail('Article non validé trouvé.', MessageAction.ARTICLE);
+          this.messageService.sendFail('Article non validé trouvé pour les deux .', MessageAction.ARTICLE);
         }
       }
     });
