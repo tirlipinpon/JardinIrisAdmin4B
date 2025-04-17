@@ -1,7 +1,7 @@
 import {Component, inject, OnDestroy, OnInit, signal} from '@angular/core';
 import {FormsModule} from "@angular/forms";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
-import {MessageAction, SearchMessage, SearchMessageService} from "../../services/search-message/search-message.service";
+import {MessageAction, SearchMessageService} from "../../services/search-message/search-message.service";
 import {Subscription} from "rxjs";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {SearchApplication} from "../../services/search.application";
@@ -25,44 +25,36 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
       if (msg) {this.messages.update(currentMessages => [...currentMessages, msg]);
       }
       switch (msg?.type) {
-        case 'message': {
-          //statements;
-          break;
-        }
-        case 'error': {
-          //statements;
-          break;
-        }
         case 'success': {
           if (msg.action === MessageAction.ARTICLE) {
-            this.selectArticle();
+            this.application.selectArticle();
           } else if (msg.action === MessageAction.ARTICLE_VALID || msg.action === MessageAction.IDEA) {
-            this.generateArticle();
+            this.application.generateArticle(this.url_post);
           } else if (msg.action === MessageAction.GENERATED_ARTICLE) {
-            this.getPostTitreAndId();
-            this.addVideo();
-            this.upgradeArticle();
+            this.application.getPostTitreAndId();
+            this.application.addVideo();
+            this.application.upgradeArticle();
           } else if (msg.action === MessageAction.UPGRADED_ARTICLE) {
-            this.formatInHtmlArticle();
+            this.application.formatInHtmlArticle();
           } else if (msg.action === MessageAction.FORMATED_IN_HTML_ARTICLE) {
-            this.addInternalLinkByChapter();
+            this.application.addInternalLinkByChapter();
           } else if (msg.action === MessageAction.INTERNAL_LINK_ADDED) {
-            this.checkMeteo();
+            this.application.checkMeteo();
           } else if (msg.action === MessageAction.METEO) {
-            this.savePost();
+            this.application.savePost();
           } else if (msg.action === MessageAction.SAVED_POST) {
-            this.updateIdeaPost();
-            this.addImagesInArticle();
+            this.application.updateIdeaPost();
+            this.application.addImagesInArticle();
           }  else if (msg.action === MessageAction.IDEA_IMAGE_UPDATED) {
-            this.generateImageIa();
+            this.application.generateImageIa();
         }
           break;
         }
         case 'fail': {
           if (msg.action === MessageAction.ARTICLE_VALID) {
-            this.searchArticle();
+            this.application.searchArticle();
           } else if (msg.action === MessageAction.ARTICLE) {
-            this.searchIdea();
+            this.application.searchIdea();
           }
           break;
         }
@@ -77,63 +69,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
   }
 
    process() {
-    !this.url_post?this.searchArticle():this.generateArticle(this.url_post);
-  }
-
-   searchArticle() {
-    this.application.searchArticle();
-  }
-
-   selectArticle() {
-    this.application.selectArticle();
-  }
-
-   searchIdea() {
-    this.application.searchIdea();
-  }
-
-   generateArticle(url_post? : string) {
-    this.application.generateArticle(url_post);
-  }
-
-   upgradeArticle() {
-    this.application.upgradeArticle();
-  }
-
-  formatInHtmlArticle() {
-    this.application.formatInHtmlArticle();
-  }
-
-   checkMeteo() {
-      this.application.checkMeteo();
-  }
-
-   savePost() {
-    this.application.savePost();
-  }
-
-   addImagesInArticle() {
-     this.application.addImagesInArticle();
-  }
-
-   updateIdeaPost() {
-      this.application.updateIdeaPost();
-  }
-
-  generateImageIa() {
-    this.application.generateImageIa();
-  }
-
-  addInternalLinkByChapter() {
-    this.application.addInternalLinkByChapter();
-  }
-
-  getPostTitreAndId() {
-    this.application.getPostTitreAndId();
-  }
-
-  addVideo() {
-    this.application.addVideo();
+    !this.url_post?this.application.searchArticle():this.application.generateArticle(this.url_post);
   }
 
 }

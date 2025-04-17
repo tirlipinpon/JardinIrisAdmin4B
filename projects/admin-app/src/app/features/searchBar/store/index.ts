@@ -76,71 +76,15 @@ export const SearchStore= signalStore(
       const post = store.post();
       return post?.titre;
     }),
-    isPostTitre: computed(() => {
-      const post = store.post();
-      return post !== null && post.titre !== undefined && post.titre !== null && post.titre !== '';
-    }),
-
-    getPostDescriptionMeteo: computed(() => {
-      const post = store.post();
-      return post?.description_meteo;
-    }),
-    isPostDescriptionMeteo: computed(() => {
-      const post = store.post();
-      return post !== null && post.description_meteo !== undefined && post.description_meteo !== null && post.description_meteo !== '';
-    }),
 
     getPostPhraseAccroche: computed(() => {
       const post = store.post();
       return post?.phrase_accroche;
     }),
-    isPostPhraseAccroche: computed(() => {
-      const post = store.post();
-      return post !== null && post.phrase_accroche !== undefined && post.phrase_accroche !== null && post.phrase_accroche !== '';
-    }),
-
-    getPostCitation: computed(() => {
-      const post = store.post();
-      return post && post.citation;
-    }),
-    isPostCitation: computed(() => {
-      const post = store.post();
-      return post !== null && post.citation !== undefined && post.citation !== null && post.citation !== '';
-    }),
-
-
-    isPostLienUrlArticle: computed(() => {
-      const post = store.post();
-      return post !== null && post.lien_url_article !== undefined && post.lien_url_article !== null && post.lien_url_article.lien1 !== '';
-    }),
-
-
-    getPostImageUrl: computed(() => {
-      const post = store.post();
-      return post && post.image_url;
-    }),
-    isPostImageUrl: computed(() => {
-      const post = store.post();
-      return post !== null && post.image_url !== undefined && post.image_url !== null && post.image_url !== '';
-    }),
 
     isArticleUrlImage: computed(() => {
       const post = store.articleValid();
       return post !== null && post.image_url !== undefined && post.image_url !== null && post.image_url !== '';
-    }),
-    getPostCategorie: computed(() => {
-      const post = store.post();
-      return post && post.categorie;
-    }),
-    isPostCategorie: computed(() => {
-      const post = store.post();
-      return post !== null && post.categorie !== undefined && post.categorie !== null && post.categorie !== '';
-    }),
-
-
-    isPostValid: computed(() => {
-      const post = store.post();
-      return post !== null && post.valid === true;
     }),
 
     getArticleHtml: computed(() =>  store.articleHtml()),
@@ -157,7 +101,6 @@ export const SearchStore= signalStore(
     isVideo: computed(() =>  {  const video = store.video();
       return video!==null && video.length > 1
     }),
-
 
     getPostId: computed(() =>  store.postId()),
     isPostId: computed(() =>  {  const postId = store.postId();

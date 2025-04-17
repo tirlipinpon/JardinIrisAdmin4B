@@ -1,15 +1,13 @@
 import {inject, Injectable} from "@angular/core";
 import {
   from,
-  Observable,
-  of,
+  Observable
 } from "rxjs";
 import {TheNewsApiService} from "../the-news-api.service";
 import {OpenaiApiService} from "../openai-api/openai-api.service";
 import {GetPromptsService} from "../get-prompts/get-prompts.service";
 import {PerplexityApiService} from "../perplexity-api/perplexity-api.service";
 import {extractJSONBlock, parseJsonSafe} from "../../../../utils/cleanJsonObject";
-import {UnsplashImageService} from "../unsplash-image/unsplash-image.service";
 import {SupabaseService} from "../supabase/supabase.service";
 import {map} from "rxjs/operators";
 import {Post} from "../../../../types/post";
@@ -24,11 +22,11 @@ import {compressImage} from "../../../../utils/resizeB64JsonIMage";
     const openaiApiService = inject(OpenaiApiService);
     const perplexityApiService = inject(PerplexityApiService);
     const getPromptsService = inject(GetPromptsService);
-    const unsplashImageService = inject(UnsplashImageService);
     const supabaseService = inject(SupabaseService);
     const addImagesToChaptersService = inject(AddImagesToChaptersService);
     const formatInStructureService = inject(FormatInStructureService);
-    return new SearchInfrastructure(theNewsApiService, openaiApiService, perplexityApiService, getPromptsService, unsplashImageService, supabaseService, addImagesToChaptersService, formatInStructureService);
+    return new SearchInfrastructure(theNewsApiService, openaiApiService, perplexityApiService,
+      getPromptsService, supabaseService, addImagesToChaptersService, formatInStructureService);
   }
 })
 export class SearchInfrastructure {
@@ -37,22 +35,21 @@ export class SearchInfrastructure {
     , private openaiApiService: OpenaiApiService
     , private perplexityApiService: PerplexityApiService
     , private getPromptsService: GetPromptsService
-    , private unsplashImageService: UnsplashImageService
     , private supabaseService: SupabaseService
     , private addImagesToChaptersService: AddImagesToChaptersService
     , private formatInStructureService: FormatInStructureService
   ) {}
 
   searchArticle(cptSearchArticle: number): Observable<{ url: string; image_url: string  }[]> {
-    // return this.theNewsApiService.getNewsApi(cptSearchArticle);
-    return new Observable<{ url: string; image_url: string }[]>(subscriber => {
-      const mock = cptSearchArticle === 0 ? [] : [];
-      //{ url: 'https://example.com/article1', image_url: 'https://example.com/image1.jpg' }
-      setTimeout(() => {
-        subscriber.next(mock);
-        subscriber.complete();
-      }, 1000);
-    });
+    return this.theNewsApiService.getNewsApi(cptSearchArticle);
+    // return new Observable<{ url: string; image_url: string }[]>(subscriber => {
+    //   const mock = cptSearchArticle === 0 ? [] : [];
+    //   //{ url: 'https://example.com/article1', image_url: 'https://example.com/image1.jpg' }
+    //   setTimeout(() => {
+    //     subscriber.next(mock);
+    //     subscriber.complete();
+    //   }, 1000);
+    // });
   }
 
   selectArticle(articles: { url: string; image_url: string }[]): Observable<{ valid: boolean | null, explication:{raisonArticle1: string | null}, url: string | null, image_url: string | null }> {

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {createClient, PostgrestError, SupabaseClient} from "@supabase/supabase-js";
 import {environment} from "../../../../../../../../environment";
 import {Post} from "../../../../types/post";
-import {catchError, from, Observable, of, throwError} from "rxjs";
+import {Observable, of} from "rxjs";
 
 export interface AuthResponse {
   data: {
@@ -59,7 +59,6 @@ export class SupabaseService {
 
     return of(mockResponse);
   }
-
 
   async setNewPostForm(value: Post): Promise<Post[]> {
     try {
