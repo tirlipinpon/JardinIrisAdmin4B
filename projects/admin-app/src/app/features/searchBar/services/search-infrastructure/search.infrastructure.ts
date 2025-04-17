@@ -1,7 +1,7 @@
 import {inject, Injectable} from "@angular/core";
 import {
   from,
-  Observable
+  Observable, of
 } from "rxjs";
 import {TheNewsApiService} from "../the-news-api.service";
 import {OpenaiApiService} from "../openai-api/openai-api.service";
@@ -120,7 +120,14 @@ export class SearchInfrastructure {
   }
 
   formatInStructure(article: string, type: string, postTitreAndId?:{titre: string, id: number}[]): Observable<string> {
-    return this.formatInStructureService.formatInStructure(article, type, postTitreAndId)
+    return this.formatInStructureService.formatInStructure(article, type, postTitreAndId);
+    // return new Observable<string>(subscriber => {
+    //   const mock = article;
+    //   setTimeout(() => {
+    //     subscriber.next(mock);
+    //     subscriber.complete();
+    //   }, 1000);
+    // });
   }
 
   checkMeteo(): Observable<string> {
@@ -145,7 +152,6 @@ export class SearchInfrastructure {
     // });
   }
 
-
   addVideo(postTitle: string): Observable<string> {
     const prompt = this.getPromptsService.addVideo(postTitle);
     return from(this.perplexityApiService.fetchData(prompt)).pipe(
@@ -159,7 +165,7 @@ export class SearchInfrastructure {
     );
     // return new Observable<string>(subscriber => {
     //   const mock = `
-    //   Ma météo est bonne 12 degrés.
+    //   Ma video.
     //   `;
     //   setTimeout(() => {
     //     subscriber.next(mock);
@@ -168,7 +174,7 @@ export class SearchInfrastructure {
     // });
   }
 
-  savePost(post: Post, getMeteo: string, getArticleHtml: string, image_url: string, video: string): Observable<Post> {
+  savePost(post: Post, getMeteo: string, getArticleHtml: string, image_url: string, video: string | null): Observable<Post> {
     const updatedPost: Post = {
       ...post,
       description_meteo: getMeteo,

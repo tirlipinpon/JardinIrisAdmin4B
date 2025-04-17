@@ -39,7 +39,8 @@ export class AddImagesToChaptersService {
       console.log(`Traitement du chapitre ${i}`);
       const chapitreId = i;
       let chapitreKeyWord = "";
-      let chapitreExplanation = "";
+      let chapitreExplanationWord = "";
+      let chapitreExplanationImage = "";
       const extractedTitle = extractByPositionH4Title(article, chapitreId)
       console.log(`Chapitre ${chapitreId} - Titre extrait:`, extractedTitle);
       const extractedParagraphe = extractSecondSpanContent(article, chapitreId)
@@ -59,7 +60,7 @@ export class AddImagesToChaptersService {
                 let test2 = extractJSONBlock(keyWord[0])
                 respKeyword = JSON.parse(test2);
                 chapitreKeyWord = respKeyword.keyWord;
-                chapitreExplanation = respKeyword.explanation;
+                chapitreExplanationWord = respKeyword.explanation;
               }
               }
             } catch (parseError) {
@@ -84,6 +85,7 @@ export class AddImagesToChaptersService {
             const jsonBlock = extractJSONBlock(bestImageResponse!);
             if (jsonBlock) {
               dataUrl = JSON.parse(jsonBlock);
+              chapitreExplanationImage = dataUrl.explanation;
             } else {
               // Gérer le cas où aucun bloc JSON n'a été trouvé
               console.error("Aucun bloc JSON trouvé dans la réponse");
@@ -94,7 +96,7 @@ export class AddImagesToChaptersService {
           }
           // Sauvegarde de l'URL de l'image pour le chapitre dans Supabase
           try {
-            await this.supabaseService.setNewUrlImagesChapitres(dataUrl.imageUrl, chapitreId, articleId, chapitreKeyWord, chapitreExplanation);
+            await this.supabaseService.setNewUrlImagesChapitres(dataUrl.imageUrl, chapitreId, articleId, chapitreKeyWord, chapitreExplanationWord, chapitreExplanationImage);
             console.log("URL d'image enregistrée avec succès:", dataUrl);
           } catch (saveError) {
             console.error("Erreur lors de la sauvegarde de l'URL de l'image dans Supabase :", saveError);

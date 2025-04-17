@@ -195,23 +195,23 @@ Présente le résultat sous la forme d'un JSON valide structuré comme suit :
     return {
       systemRole: {"role": "system","content":`
 
-Trouve la vidéo YouTube la plus pertinente et la plus vue et la plus récente, exclusivement en français, sur un sujet donné, et fournis le lien sous format JSON.
+Essaye de trouver la vidéo YouTube la plus pertinente et la plus vue et la plus récente, exclusivement en français ou en anglais, sur un sujet donné, et fournis le lien sous format JSON.
 
 Assure-toi que la vidéo est en français et que le nombre de vues est l'un des plus élevés pour la pertinence du sujet qui a été mis en ligne le plus récement.
 
 # Steps
 
 1. Recherchez la vidéo YouTube le plus pertinente en utilisant des mots-clés associés à que tu vas recevoir.
-2. Filtrez les résultats pour vous assurer que la langue est exclusivement le français.
+2. Filtrez les résultats pour vous assurer que la langue est exclusivement le français et ou anglais.
 3. Comparez les vidéos pour déterminer celle avec le plus grand nombre de vues et la plus récente.
 4. Vérifiez la pertinence du contenu en rapport avec le sujet que tu vas recevoir.
-5. Choisissez la vidéo la plus pertinente et la plus vue.
+5. Choisissez la vidéo la plus pertinente et la plus vue si tu en trouve une.
 
 # Output Format
 
 La réponse doit être sous format JSON, uniquement contenant le lien YouTube de la vidéo trouvée :
 \`\`\`json
-{ "video": "LINK YOUTUBE" }
+{ "video": "LINK YOUTUBE ou une chaine vide si tu ne trouve pas " }
 \`\`\`
 
 # Notes
@@ -289,20 +289,57 @@ Extrait un seul mot-clé du titre du blog. Assure-toi que ce mot résume efficac
   }
 
   getPerplexityPromptSystemcSelectBestImageForChapitresInArticle(){
-    const prompt = `Tu es une IA spécialisée dans l'analyse de textes et la sélection d'illustrations adaptées pour un blog de jardinier paysagiste.
-            Ta tâche consiste à lire un texte.
-            En analysant le contenu du texte, identifie les thèmes, le ton, et les éléments visuels ou concepts clés qui pourraient être illustrés.
-            À partir d'une liste d'URL d'images, trouve celle qui représente le mieux le contenu de ce texte,
-            en considérant l'aspect narratif et la cohérence avec le style du texte.`
-    return prompt;
+    return `Analyse the provided text to identify the main themes and concepts, then select the most representative image from the provided list for a gardening blog post.
+
+You are given a text, and a list of image URLs. Your task is to extract key themes and concepts from the text and choose one image from the list that best represents these elements for inclusion in a blog post. Ensure that the selected image effectively illustrates the relevant ambiance and visual elements.
+
+# Steps
+
+1. **Read and Understand the Text**: Analyze  to identify the main themes and concepts. Focus on identifying elements that are visually significant or central to the message intended for a gardening audience.
+
+2. **Evaluate Images**: Examine each image from to determine how well it matches the identified themes and concepts.
+
+3. **Selection Criteria**: Choose the image that aligns best with the theme, ensuring it represents the ambiance and the key elements of the text.
+
+4. **Explanation**: Provide reasoning for the selection of the chosen image and explanations for why other images were not selected.
+
+# Output Format
+
+Provide the output in JSON format as follows:
+\`\`\`json
+    {
+      "imageUrl": "url",
+      "explanation": "explication de la première image en francais"
+    }
+    \`\`\`
+
+- The 'imageUrl' is the URL of the chosen image.
+- Each 'raisonImage' corresponds to an image from the list, with a brief explanation of why it was selected or not selected.
+
+# Examples
+
+**Input Example:**
+
+- Article Text: "Les tomates sont parfaites pour les climats chauds."
+- Images: ["https://example.com/image1.jpg", "https://example.com/image2.jpg"]
+
+**Output Example:**
+
+\`\`\`JSON
+    {
+      "imageUrl": "https://example.com/image1.jpg",
+      "explanation": "Choisi pour la raison suivante..."
+    }
+    \`\`\`
+
+# Notes
+
+- The decoding process should emphasize the image's relevance to the gardening context.
+- Ensure clarity and relevance in each explanation provided for image choices.`
   }
 
   getPerplexityPromptUserSelectBestImageForChapitresInArticle(article: string, images: any){
-    const prompt = `Voici le texte  : ${article}, ainsi qu'une liste d'URL d'images ${JSON.stringify(images)}.
-            Analyse le contenu du texte pour en extraire les thèmes et concepts principaux, et choisis l'image la plus représentative de cette partie du texte destinée sur un blog de jardinier.
-            Assure-toi que l'image sélectionnée illustre bien l'ambiance et les éléments visuels pertinents.
-            Donne l'url de l'image choisie en suivant ce format JSON: {"imageUrl":"url"}`
-    return prompt;
+    return `Voici le texte  à analyser : "${article}", ainsi qu'une liste d'URL d'images "${JSON.stringify(images)}".`
   }
 
   getOpenAiPromptImageGenerator(description: string): string {

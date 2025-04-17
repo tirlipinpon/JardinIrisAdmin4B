@@ -27,6 +27,7 @@ export class SearchApplication {
     this.isAddedInternalLinkByChapterEffect();
     this.isAddedPostTitreAndIdEffect()
     this.isVideoEffect()
+    this.isImagesInArticleEffect()
   }
 
   get isSearching(): Signal<boolean> {
@@ -245,6 +246,18 @@ export class SearchApplication {
           this.messageService.sendSuccess('Pas de article valide et donc pas d url image.', MessageAction.IDEA_IMAGE_UPDATED);
         } else {
           this.messageService.sendError('Article valid et url image trouvé donc pas de generation image.');
+        }
+      }
+    });
+  }
+
+  private isImagesInArticleEffect(): void {
+    effect(() => {
+      if(this.store.getMeteo() && this.store.getMeteo()!==null) {
+        if(this.store.isMeteo()) {
+          this.messageService.sendSuccess('Météo terminé.', MessageAction.METEO);
+        } else {
+          this.messageService.sendError('Météo a une erreur.');
         }
       }
     });

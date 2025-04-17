@@ -314,7 +314,6 @@ export const SearchStore= signalStore(
             const getPost = store.getPost();
             if (!getPost) { patchState(store, { isLoading: false }); return EMPTY; }
             const getVideo = store.getVideo();
-            if (!getVideo) { patchState(store, { isLoading: false }); return EMPTY; }
             const getArticleValid = store.getArticleValid();
             if (!getArticleValid) { patchState(store, { isLoading: false }); return EMPTY; }
             const imageUrl = getArticleValid.image_url || '';

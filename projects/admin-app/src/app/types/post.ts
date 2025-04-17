@@ -15,7 +15,7 @@ export interface Post {
   visite?: number;
   valid?: boolean;
   deleted?: boolean;
-  video?: string;
+  video?: string | null;
 }
 
 /*
