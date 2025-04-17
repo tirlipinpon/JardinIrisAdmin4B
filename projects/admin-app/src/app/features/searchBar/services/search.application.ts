@@ -26,6 +26,7 @@ export class SearchApplication {
     this.isPostIdEffect();
     this.isAddedInternalLinkByChapterEffect();
     this.isAddedPostTitreAndIdEffect()
+    this.isVideoEffect()
   }
 
   get isSearching(): Signal<boolean> {
@@ -48,7 +49,7 @@ export class SearchApplication {
   }
 
   generateArticle(url_post?: string): void {
-    this.messageService.sendMessage('Géneration d article en cour.');
+    this.messageService.sendMessage('Géneration d article en cours.');
     this.store.generateArticle(url_post);
     if (url_post) {
       this.messageService.sendMessage('Sauvegarde de l url de post a generer.');
@@ -101,6 +102,11 @@ export class SearchApplication {
     this.store.postTitreAndId();
   }
 
+  addVideo(): void {
+    this.messageService.sendMessage('add video en cours.');
+    this.store.addVideo();
+  }
+
 
   private isSearchingEffect(): void {
     effect(() => {
@@ -138,6 +144,18 @@ export class SearchApplication {
           this.messageService.sendError('Idée non trouvé dans la liste.');
         } else {
           this.messageService.sendSuccess('Idée trouvés dans la liste.', MessageAction.IDEA);
+        }
+      }
+    });
+  }
+
+  private isVideoEffect(): void {
+    effect(() => {
+      if(this.store.getVideo()!==null) {
+        if (!this.store.isVideo()) {
+          this.messageService.sendError('Video non trouvé.');
+        } else {
+          this.messageService.sendMessage('Video trouvés.');
         }
       }
     });

@@ -16,6 +16,7 @@ export interface SearchState {
   post: Post | null;
   meteo: string | null;
   postId: number | null;
+  video: string | null;
   postTitreAndId: {titre: string; id: number}[] | null;
   articleGenerated: string | null;
   articleUpgraded: string | null;
@@ -32,6 +33,7 @@ const initialValue: SearchState = {
   post: null,
   meteo: null,
   postId: null,
+  video: null,
   postTitreAndId: null,
   articleGenerated: null,
   articleUpgraded: null,
@@ -150,6 +152,12 @@ export const SearchStore= signalStore(
     isMeteo: computed(() =>  {  const meteo = store.meteo();
       return meteo!==null && meteo.length > 1
     }),
+
+    getVideo: computed(() =>  store.video()),
+    isVideo: computed(() =>  {  const video = store.video();
+      return video!==null && video.length > 1
+    }),
+
 
     getPostId: computed(() =>  store.postId()),
     isPostId: computed(() =>  {  const postId = store.postId();
@@ -281,6 +289,21 @@ export const SearchStore= signalStore(
           })
         )
       ),
+      addVideo: rxMethod<void>(
+        pipe(
+          tap(()=> updateState(store, '[addVideo] update loading', {isLoading: true})    ),
+          switchMap(() => {
+            const postTitle = store.getPostTitle();
+            if (!postTitle) { patchState(store, { isLoading: false }); return EMPTY; }
+            return infra.addVideo(postTitle).pipe(
+              tapResponse({
+                next: video => patchState(store, { video: video, isLoading: false }),
+                error: error => patchState(store, {isLoading: false})
+              })
+            )
+          })
+        )
+      ),
       postTitreAndId: rxMethod<void>(
         pipe(
           tap(() => updateState(store, '[postTitreAndId] update loading', { isLoading: true })),
@@ -347,6 +370,8 @@ export const SearchStore= signalStore(
           switchMap(() => {
             const getPost = store.getPost();
             if (!getPost) { patchState(store, { isLoading: false }); return EMPTY; }
+            const getVideo = store.getVideo();
+            if (!getVideo) { patchState(store, { isLoading: false }); return EMPTY; }
             const getArticleValid = store.getArticleValid();
             if (!getArticleValid) { patchState(store, { isLoading: false }); return EMPTY; }
             const imageUrl = getArticleValid.image_url || '';
@@ -354,7 +379,7 @@ export const SearchStore= signalStore(
             if (!getMeteo) { patchState(store, { isLoading: false }); return EMPTY; }
             const getArticleLinkAdded = store.getArticleLinkAdded();
             if (!getArticleLinkAdded) { patchState(store, { isLoading: false }); return EMPTY; }
-            return infra.savePost(getPost, getMeteo, getArticleLinkAdded, imageUrl).pipe(
+            return infra.savePost(getPost, getMeteo, getArticleLinkAdded, imageUrl, getVideo).pipe(
               tapResponse({
                 next: post => patchState(store, { postId: post.id, isLoading: false }),
                 error: error => patchState(store, {isLoading: false})

@@ -26,7 +26,6 @@ export class TheNewsApiService {
     &exclude_categories=sports
     &published_on=${formatCurrentDateUs()}
     &search=${this.criteriaList[1]}+(${afficherCategories('|')})
-    &language=fr,nl,en
     &page=1`;
 
   http = inject(HttpClient);

@@ -142,7 +142,7 @@ Provide the enhanced blog segment in a valid JSON format as follows: {"upgraded"
 - Respecter les étapes suivantes pour la mise en forme.
 # Steps
 1. Entourer les phrases clés avec la balise \`<b>\` pour les mettre en évidence et attirer l'attention du lecteur.
-2. Intégrer un emoji pertinent illustrant le sujet du paragraphe à l'intérieur de chaque titre en \`<h4>\` déjà présent sans ajouter de nouveaux \`<h4>\`.
+2. Intégrer un emoji pertinent illustrant le sujet du paragraphe à l'intérieur du titre en \`<h4>\` déjà présent sans ajouter de nouveaux \`<h4>\`.
 3. Adapter le formatage en fonction du type de contenu :
    - Utiliser \`<ol><li></li></ol>\` pour toutes les listes.
    - Utiliser la balise \`<u>\` pour souligner des informations spécifiques.
@@ -188,6 +188,43 @@ Présente le résultat sous la forme d'un JSON valide structuré comme suit :
 - Aucune structuration ou texte supplémentaire n'est nécessaire en dehors du JSON.
       `},
       userRole: { "role": "user", "content": `Donne la meteo en date du ${formatCurrentDateUs()}. Pour Bruxelles` }
+    }
+  }
+
+  addVideo(postTitle: string): any {
+    return {
+      systemRole: {"role": "system","content":`
+
+Trouve la vidéo YouTube la plus pertinente et la plus vue et la plus récente, exclusivement en français, sur un sujet donné, et fournis le lien sous format JSON.
+
+Assure-toi que la vidéo est en français et que le nombre de vues est l'un des plus élevés pour la pertinence du sujet qui a été mis en ligne le plus récement.
+
+# Steps
+
+1. Recherchez la vidéo YouTube le plus pertinente en utilisant des mots-clés associés à que tu vas recevoir.
+2. Filtrez les résultats pour vous assurer que la langue est exclusivement le français.
+3. Comparez les vidéos pour déterminer celle avec le plus grand nombre de vues et la plus récente.
+4. Vérifiez la pertinence du contenu en rapport avec le sujet que tu vas recevoir.
+5. Choisissez la vidéo la plus pertinente et la plus vue.
+
+# Output Format
+
+La réponse doit être sous format JSON, uniquement contenant le lien YouTube de la vidéo trouvée :
+\`\`\`json
+{ "video": "LINK YOUTUBE" }
+\`\`\`
+
+# Notes
+
+- Assurez-vous que la vidéo est en français et très pertinente pour le sujet.
+- La quantité de vues et la mise en ligne récente sont des critères important, mais pas au détriment de la pertinence du contenu.
+- Uniquement des vidéos en français doivent être considérées.
+# Notes
+- Ne retournez **qu'un seul objet JSON**
+- Aucune structuration ou texte supplémentaire n'est nécessaire en dehors du JSON.
+      `},
+      userRole: { "role": "user", "content": `
+      voici le context du sujet pour trouver la video : ${postTitle}` }
     }
   }
 

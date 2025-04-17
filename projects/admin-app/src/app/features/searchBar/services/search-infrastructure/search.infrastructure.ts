@@ -44,15 +44,15 @@ export class SearchInfrastructure {
   ) {}
 
   searchArticle(cptSearchArticle: number): Observable<{ url: string; image_url: string  }[]> {
-    return this.theNewsApiService.getNewsApi(cptSearchArticle);
-    // return new Observable<{ url: string; image_url: string }[]>(subscriber => {
-    //   const mock = cptSearchArticle === 0 ? [] : [];
-    //   //{ url: 'https://example.com/article1', image_url: 'https://example.com/image1.jpg' }
-    //   setTimeout(() => {
-    //     subscriber.next(mock);
-    //     subscriber.complete();
-    //   }, 1000);
-    // });
+    // return this.theNewsApiService.getNewsApi(cptSearchArticle);
+    return new Observable<{ url: string; image_url: string }[]>(subscriber => {
+      const mock = cptSearchArticle === 0 ? [] : [];
+      //{ url: 'https://example.com/article1', image_url: 'https://example.com/image1.jpg' }
+      setTimeout(() => {
+        subscriber.next(mock);
+        subscriber.complete();
+      }, 1000);
+    });
   }
 
   selectArticle(articles: { url: string; image_url: string }[]): Observable<{ valid: boolean | null, explication:{raisonArticle1: string | null}, url: string | null, image_url: string | null }> {
@@ -148,12 +148,36 @@ export class SearchInfrastructure {
     // });
   }
 
-  savePost(post: Post, getMeteo: string, getArticleHtml: string, image_url: string): Observable<Post> {
+
+  addVideo(postTitle: string): Observable<string> {
+    const prompt = this.getPromptsService.addVideo(postTitle);
+    return from(this.perplexityApiService.fetchData(prompt)).pipe(
+      map(result => {
+        if (result === null) {
+          throw new Error('Aucun résultat retourné par l\'API OpenAI');
+        }
+        const data: {video: string} = JSON.parse(extractJSONBlock(result))
+        return data.video;
+      })
+    );
+    // return new Observable<string>(subscriber => {
+    //   const mock = `
+    //   Ma météo est bonne 12 degrés.
+    //   `;
+    //   setTimeout(() => {
+    //     subscriber.next(mock);
+    //     subscriber.complete();
+    //   }, 1000);
+    // });
+  }
+
+  savePost(post: Post, getMeteo: string, getArticleHtml: string, image_url: string, video: string): Observable<Post> {
     const updatedPost: Post = {
       ...post,
       description_meteo: getMeteo,
       article: getArticleHtml,
       image_url: image_url,
+      video: video
     };
     return from(this.supabaseService.setNewPostForm(updatedPost)).pipe(
       map(data => {

@@ -40,6 +40,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
             this.generateArticle();
           } else if (msg.action === MessageAction.GENERATED_ARTICLE) {
             this.getPostTitreAndId();
+            this.addVideo();
             this.upgradeArticle();
           } else if (msg.action === MessageAction.UPGRADED_ARTICLE) {
             this.formatInHtmlArticle();
@@ -129,6 +130,10 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
 
   getPostTitreAndId() {
     this.application.getPostTitreAndId();
+  }
+
+  addVideo() {
+    this.application.addVideo();
   }
 
 }
