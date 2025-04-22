@@ -8,14 +8,14 @@ import {extractJSONBlock} from "../../../../utils/cleanJsonObject";
 })
 export class PerplexityApiService {
 
-  fetchData(prompt: any): Promise<any> {
+  fetchData(prompt: any, maxTokens?: number): Promise<any> {
     const jsonObject = {
       model: "sonar-reasoning",
       messages: [
         prompt.systemRole,
         prompt.userRole
       ],
-      max_tokens: 2000,
+      max_tokens: maxTokens? maxTokens : 1000,
       temperature: 0.2,
       top_p: 0.9,
       return_citations: true,

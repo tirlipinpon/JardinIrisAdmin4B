@@ -210,9 +210,14 @@ export class SearchInfrastructure {
         switchMap(result => {
           const data: {video: string} = JSON.parse(extractJSONBlock(result))
           if(!data.video || !data.video.length) {
-            return this.googleSearchService.searchMostViewedFrenchVideo(postTitle).pipe(
-              map(videoUrl => {
-                return videoUrl;
+            return this.googleSearchService.searchFrenchVideo(postTitle).pipe(
+              map(videoUrls => {
+                const prompt = this.getPromptsService.searchVideoFromYoutubeResult(postTitle);
+                return from(this.openaiApiService.fetchData(prompt, true)).pipe(
+                  switchMap(result => {
+                    return of(videoUrls[0]);
+                  })
+                )
               })
             );
           } else {
@@ -220,6 +225,7 @@ export class SearchInfrastructure {
           }
         })
       );
+
     }
   }
 

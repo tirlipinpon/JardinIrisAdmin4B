@@ -14,7 +14,7 @@ export class OpenaiApiService {
     dangerouslyAllowBrowser: true,
     apiKey: environment.deepseekApi
   });
-  async fetchData(prompt: any, deepseek: boolean) {
+  async fetchData(prompt: any, deepseek?: boolean) {
     const client = deepseek ? this.deepseek : this.openai;
     const completion = await client.chat.completions.create({
       messages: [

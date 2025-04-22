@@ -3,6 +3,12 @@ import {HttpClient} from "@angular/common/http";
 import {forkJoin, Observable, of, switchMap} from "rxjs";
 import {environment} from "../../../../../../../../environment";
 import {map} from "rxjs/operators";
+export interface VideoInfo {
+  videoId: string;
+  channelTitle: string;
+  description: string;
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -15,9 +21,10 @@ export class GoogleSearchService {
   private videosUrl = 'https://www.googleapis.com/youtube/v3/videos';
   private translationApiUrl = 'https://translation.googleapis.com/language/translate/v2';
 
+
   constructor(private http: HttpClient) { }
 
-  searchMostViewedFrenchVideo(keyWords: string): Observable<string> {
+  searchFrenchVideo(keyWords: string): Observable<string> {
     const regions = ['FR', 'BE']; // Liste des régions à tester
     const requests = regions.map(region => {
       const params = {
@@ -42,7 +49,7 @@ export class GoogleSearchService {
         // Récupérer les IDs des vidéos pour récupérer les statistiques
         const videoIds = allItems.map((item: any) => item.id.videoId).join(',');
         const statsParams = {
-          part: 'snippet,statistics',
+          part: 'snippet',
           id: videoIds,
           key: this.apiKey
         };
@@ -53,12 +60,13 @@ export class GoogleSearchService {
             const items = videoResponse?.items || [];
             if (items.length === 0) return '';
 
-            // Trouver la vidéo la plus vue
-            const mostViewed = items.reduce((prev: any, current: any) => {
-              return (+current.statistics.viewCount > +prev.statistics.viewCount) ? current : prev;
-            });
+            // Transformer les résultats en objets VideoInfo
+            return items.map((item: any) => ({
+              videoId: item.id,
+              channelTitle: item.snippet.channelTitle,
+              description: item.snippet.description
+            }));
 
-            return `https://www.youtube.com/watch?v=${mostViewed.id}`;
           })
         );
       })

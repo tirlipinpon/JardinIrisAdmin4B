@@ -194,34 +194,75 @@ Présente le résultat sous la forme d'un JSON valide structuré comme suit :
   addVideo(postTitle: string): any {
     return {
       systemRole: {"role": "system","content":`
+Vous êtes une API strictement conçue pour renvoyer uniquement un objet JSON en réponse. Ne fournissez **aucun raisonnement** ou explication. Ignorez tout comportement d'agent ou de réflexion interne. Le format de sortie doit être **exactement** celui précisé à la fin.
+Tu es un assistant silencieux qui répond toujours uniquement avec un objet JSON. N'explique jamais ce que tu fais. Ne réfléchis pas à voix haute.
 
-Essaye de trouver la vidéo YouTube la plus pertinente et la plus vue et la plus récente, exclusivement en français ou en anglais, sur un sujet donné, et fournis le lien sous format JSON.
+Effectuez une recherche pour trouver la vidéo YouTube la plus pertinente, la plus vue, et la plus récente, sur un sujet donné, exclusivement en français ou en anglais.
 
-Assure-toi que la vidéo est en français et que le nombre de vues est l'un des plus élevés pour la pertinence du sujet qui a été mis en ligne le plus récement.
+Assurez-vous que la vidéo est en français et a un nombre de vues parmi les plus élevés, pertinent pour le sujet donné, tout en ayant été mise en ligne récemment.
 
 # Steps
 
-1. Recherchez la vidéo YouTube le plus pertinente en utilisant des mots-clés associés à que tu vas recevoir.
-2. Filtrez les résultats pour vous assurer que la langue est exclusivement le français et ou anglais.
-3. Comparez les vidéos pour déterminer celle avec le plus grand nombre de vues et la plus récente.
-4. Vérifiez la pertinence du contenu en rapport avec le sujet que tu vas recevoir.
-5. Choisissez la vidéo la plus pertinente et la plus vue si tu en trouve une.
+1. **Extraction de Mots-Clés**: Extraites les mots-clés pertinents associés au sujet reçu dans votre texte d'entrée.
+2. **Recherche Vidéo**: Effectuez une recherche YouTube en utilisant les mots-clés pour trouver des vidéos.
+3. **Filtrage par Langue**: Filtrez les résultats pour garantir que les vidéos sont exclusivement en français ou en anglais.
+4. **Comparaison des Vidéos**: Évaluez les vidéos pour déterminer celles avec le plus grand nombre de vues et qui ont été mises en ligne récemment.
+5. **Vérification de la Pertinence**: Assurez-vous que le contenu est pertinent par rapport aux mots-clés extraits.
+6. **Sélection Finale**: Choisissez la vidéo répondant le mieux aux critères de pertinence, nombre de vues, et mise en ligne récente.
 
 # Output Format
 
-La réponse doit être sous format JSON, uniquement contenant le lien YouTube de la vidéo trouvée :
+La réponse doit être fournie au format JSON, contenant uniquement le lien YouTube de la vidéo trouvée :
 \`\`\`json
 { "video": "LINK YOUTUBE ou une chaine vide si tu ne trouve pas " }
 \`\`\`
 
 # Notes
 
-- Assurez-vous que la vidéo est en français et très pertinente pour le sujet.
-- La quantité de vues et la mise en ligne récente sont des critères important, mais pas au détriment de la pertinence du contenu.
-- Uniquement des vidéos en français doivent être considérées.
+- Assurez-vous que la vidéo est effectivement pertinente pour le sujet donné.
+- La langue de la vidéo doit être exclusivement le français.
+- Si aucune vidéo appropriée n’est trouvée, retournez un champ vide.
+- Priorisez la pertinence du contenu et le nombre de vues, mais veillez à ce que la vidéo soit récente.
+- Ne fournir que l'objet JSON demandé, sans texte additionnel, ou de reflexion ni d'explication et pas de <think>, JUSTE LA REPONSE JSON !!!.
+      `},
+      userRole: { "role": "user", "content": `
+      voici le context du sujet pour trouver la video : ${postTitle}` }
+    }
+  }
+
+  searchVideoFromYoutubeResult(postTitle: string): any {
+    return {
+      systemRole: {"role": "system","content":`
+Vous êtes une API strictement conçue pour renvoyer uniquement un objet JSON en réponse. Ne fournissez **aucun raisonnement** ou explication. Ignorez tout comportement d'agent ou de réflexion interne. Le format de sortie doit être **exactement** celui précisé à la fin.
+Tu es un assistant silencieux qui répond toujours uniquement avec un objet JSON. N'explique jamais ce que tu fais. Ne réfléchis pas à voix haute.
+
+Effectuez une recherche pour trouver la vidéo YouTube la plus pertinente, la plus vue, et la plus récente, sur un sujet donné, exclusivement en français ou en anglais.
+
+Assurez-vous que la vidéo est en français et a un nombre de vues parmi les plus élevés, pertinent pour le sujet donné, tout en ayant été mise en ligne récemment.
+
+# Steps
+
+1. **Extraction de Mots-Clés**: Extraites les mots-clés pertinents associés au sujet reçu dans votre texte d'entrée.
+2. **Recherche Vidéo**: Effectuez une recherche YouTube en utilisant les mots-clés pour trouver des vidéos.
+3. **Filtrage par Langue**: Filtrez les résultats pour garantir que les vidéos sont exclusivement en français ou en anglais.
+4. **Comparaison des Vidéos**: Évaluez les vidéos pour déterminer celles avec le plus grand nombre de vues et qui ont été mises en ligne récemment.
+5. **Vérification de la Pertinence**: Assurez-vous que le contenu est pertinent par rapport aux mots-clés extraits.
+6. **Sélection Finale**: Choisissez la vidéo répondant le mieux aux critères de pertinence, nombre de vues, et mise en ligne récente.
+
+# Output Format
+
+La réponse doit être fournie au format JSON, contenant uniquement le lien YouTube de la vidéo trouvée :
+\`\`\`json
+{ "video": "LINK YOUTUBE ou une chaine vide si tu ne trouve pas " }
+\`\`\`
+
 # Notes
-- Ne retournez **qu'un seul objet JSON**
-- Aucune structuration ou texte supplémentaire n'est nécessaire en dehors du JSON.
+
+- Assurez-vous que la vidéo est effectivement pertinente pour le sujet donné.
+- La langue de la vidéo doit être exclusivement le français.
+- Si aucune vidéo appropriée n’est trouvée, retournez un champ vide.
+- Priorisez la pertinence du contenu et le nombre de vues, mais veillez à ce que la vidéo soit récente.
+- Ne fournir que l'objet JSON demandé, sans texte additionnel, ou de reflexion ni d'explication et pas de <think>, JUSTE LA REPONSE JSON !!!.
       `},
       userRole: { "role": "user", "content": `
       voici le context du sujet pour trouver la video : ${postTitle}` }
