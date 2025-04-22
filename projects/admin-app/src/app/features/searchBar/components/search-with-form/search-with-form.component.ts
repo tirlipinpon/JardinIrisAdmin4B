@@ -22,7 +22,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
   messages = signal<{type: string, content: string}[]>([]);
   url_post = "";
   isLoading =  this.application.isSearching;
-  selectedOption: string = 'generate';
+  selectedOption: string = 'all';
 
   onOptionChange() {
     if(this.selectedOption === 'article') {
@@ -63,7 +63,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
         case 'fail': {
           if (msg.action === MessageAction.ARTICLE_VALID) {
             this.application.searchArticle();
-          } else if (msg.action === MessageAction.ARTICLE && this.selectedOption === 'generate' && this.url_post === '') {
+          } else if (msg.action === MessageAction.ARTICLE && this.selectedOption !== 'article' && this.url_post === '') {
             this.application.searchIdea();
           }
           break;
@@ -79,12 +79,12 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
   }
 
    process() {
-     if(this.url_post){
-       this.application.generateArticle(this.url_post)
-     } else if(this.selectedOption === 'generate') {
+     if(this.selectedOption === 'generate' && this.url_post === '') {
        this.application.searchIdea();
+     } else if (this.url_post){
+       this.application.generateArticle(this.url_post);
      } else {
-       this.application.searchArticle()
+       this.application.searchArticle();
      }
   }
 

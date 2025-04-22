@@ -1,7 +1,7 @@
 import {inject, Injectable} from "@angular/core";
 import {
   from,
-  Observable, of
+  Observable, of, switchMap
 } from "rxjs";
 import {TheNewsApiService} from "../the-news-api.service";
 import {OpenaiApiService} from "../openai-api/openai-api.service";
@@ -14,6 +14,7 @@ import {Post} from "../../../../types/post";
 import {AddImagesToChaptersService} from "../add-image-to-chapters/add-images-to-chapters.service";
 import {FormatInStructureService} from "../format-in-structure/format-in-structure.service";
 import {compressImage} from "../../../../utils/resizeB64JsonIMage";
+import {GoogleSearchService} from "../google-search/google-search.service";
 
 @Injectable({
   providedIn: 'root',
@@ -25,8 +26,9 @@ import {compressImage} from "../../../../utils/resizeB64JsonIMage";
     const supabaseService = inject(SupabaseService);
     const addImagesToChaptersService = inject(AddImagesToChaptersService);
     const formatInStructureService = inject(FormatInStructureService);
+    const googleSearchService = inject(GoogleSearchService);
     return new SearchInfrastructure(theNewsApiService, openaiApiService, perplexityApiService,
-      getPromptsService, supabaseService, addImagesToChaptersService, formatInStructureService);
+      getPromptsService, supabaseService, addImagesToChaptersService, formatInStructureService, googleSearchService);
   }
 })
 export class SearchInfrastructure {
@@ -38,26 +40,29 @@ export class SearchInfrastructure {
     , private supabaseService: SupabaseService
     , private addImagesToChaptersService: AddImagesToChaptersService
     , private formatInStructureService: FormatInStructureService
+    , private googleSearchService: GoogleSearchService
+
   ) {}
 
   isLocalhost(): boolean {
     const hostname = window.location.hostname;
-    return hostname === 'localhost' || hostname === '127.0.0.1';
+    return hostname === 'localhost';
   }
 
 
   searchArticle(cptSearchArticle: number): Observable<{ url: string; image_url: string  }[]> {
     if(this.isLocalhost()) {
-      return this.theNewsApiService.getNewsApi(cptSearchArticle);
-    } else {
       return new Observable<{ url: string; image_url: string }[]>(subscriber => {
-        const mock = cptSearchArticle === 0 ? [{ url: 'https://example.com/belgique', image_url: 'https://example.com/belgique.jpg' }] : [];
-        //{ url: 'https://example.com/europe', image_url: 'https://example.com/europe.jpg' }
+        const mock = cptSearchArticle === 0 ? [] : [{ url: 'https://example.com/europe', image_url: 'https://example.com/europe.jpg' }];
+        //
+        // { url: 'https://example.com/belgique', image_url: 'https://example.com/belgique.jpg' }
         setTimeout(() => {
           subscriber.next(mock);
           subscriber.complete();
         }, 1000);
       });
+    } else {
+      return this.theNewsApiService.getNewsApi(cptSearchArticle);
     }
   }
 
@@ -189,7 +194,7 @@ export class SearchInfrastructure {
   }
 
   addVideo(postTitle: string): Observable<string> {
-    if(this.isLocalhost()) {
+    if(!this.isLocalhost()) {
       return new Observable<string>(subscriber => {
         const mock = `
         http://www.youtube.com/watch?v=exempleVideo
@@ -202,12 +207,17 @@ export class SearchInfrastructure {
     } else {
       const prompt = this.getPromptsService.addVideo(postTitle);
       return from(this.perplexityApiService.fetchData(prompt)).pipe(
-        map(result => {
-          if (result === null) {
-            throw new Error('Aucun résultat retourné par l\'API OpenAI');
-          }
+        switchMap(result => {
           const data: {video: string} = JSON.parse(extractJSONBlock(result))
-          return data.video;
+          if(!data.video || !data.video.length) {
+            return this.googleSearchService.searchMostViewedFrenchVideo(postTitle).pipe(
+              map(videoUrl => {
+                return videoUrl;
+              })
+            );
+          } else {
+            return of(data.video);
+          }
         })
       );
     }

@@ -298,6 +298,8 @@ export const SearchStore= signalStore(
         pipe(
           tap(() => updateState(store, '[checkMeteo] update loading', { isLoading: true })),
           switchMap(() => {
+            const isMeteo = store.isMeteo();
+            if (isMeteo) { patchState(store, { isLoading: false }); return EMPTY; }
             return infra.checkMeteo().pipe(
               tapResponse({
                 next: (meteo) => patchState(store, { meteo: meteo, isLoading: false }),

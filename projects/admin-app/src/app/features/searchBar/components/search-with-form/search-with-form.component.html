@@ -1,6 +1,6 @@
 <section>
   <div>
-    <input type="text" [(ngModel)]="url_post" [disabled]="selectedOption==='article'" placeholder="mettre le lien URL de l article ici." size="50" style="
+    <input type="text" [(ngModel)]="url_post" [disabled]="selectedOption!=='generate'" placeholder="mettre le lien URL de l article ici." size="50" style="
     padding: 20px;
     font-size: 15px;
     width: 100%;">
@@ -15,7 +15,7 @@
   </div>
   <div style="margin: 20px 0;">
     <mat-radio-group aria-label="Sélectionnez une option" [(ngModel)]="selectedOption" (ngModelChange)="onOptionChange()">
-      <mat-radio-button value="all">article ou idée</mat-radio-button>
+      <mat-radio-button value="all">article et/ou idée</mat-radio-button>
       <mat-radio-button value="article">Recherche juste dans les Articles</mat-radio-button>
       <mat-radio-button value="generate" style="margin-left: 20px;">Générer un article</mat-radio-button>
     </mat-radio-group>
