@@ -325,7 +325,7 @@ export const SearchStore= signalStore(
             if (!getMeteo) { patchState(store, { isLoading: false }); return EMPTY; }
             const getArticleLinkAdded = store.getArticleLinkAdded();
             if (!getArticleLinkAdded) { patchState(store, { isLoading: false }); return EMPTY; }
-            return infra.savePost(getPost, getMeteo, getArticleLinkAdded, imageUrl, getVideo).pipe(
+            return infra.savePost(getPost, getMeteo, getArticleLinkAdded, imageUrl, getVideo, store.isArticleValid()).pipe(
               tapResponse({
                 next: post => patchState(store, { postId: post.id, isLoading: false }),
                 error: error => patchState(store, {isLoading: false})

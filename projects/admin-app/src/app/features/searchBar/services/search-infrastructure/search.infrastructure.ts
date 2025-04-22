@@ -226,7 +226,7 @@ export class SearchInfrastructure {
     }
   }
 
-  savePost(post: Post, getMeteo: string, getArticleHtml: string, image_url: string, video: string | null): Observable<Post> {
+  savePost(post: Post, getMeteo: string, getArticleHtml: string, image_url: string, video: string | null, isArticleValid: boolean | null): Observable<Post> {
     if(this.isLocalhost()) {
       return of(
         {  "id": 1,
@@ -239,7 +239,7 @@ export class SearchInfrastructure {
           "citation": "Le soleil brille pour tout le monde. - Sénèque",
           "lien_url_article": { "lien1": "https://www.senecacom.be/fr/actualites/le-soleil-brille-pour-tout-le-monde"},
           "image_url": "https://exemple.com/images/soleil.jpg",
-          "categorie": "Météo",
+          "categorie": isArticleValid ? 'actualité' : post.categorie,
           "visite": 1234,
           "valid": true,
           "deleted": false}
@@ -250,7 +250,8 @@ export class SearchInfrastructure {
         description_meteo: getMeteo,
         article: getArticleHtml,
         image_url: image_url,
-        video: video
+        video: video,
+        categorie: isArticleValid ? 'actualité' : post.categorie
       };
       return from(this.supabaseService.setNewPostForm(updatedPost)).pipe(
         map(data => {
