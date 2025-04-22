@@ -24,7 +24,7 @@ export class GoogleSearchService {
 
   constructor(private http: HttpClient) { }
 
-  searchFrenchVideo(keyWords: string): Observable<string> {
+  searchFrenchVideo(keyWords: string): Observable<VideoInfo[]> {
     const regions = ['FR', 'BE']; // Liste des régions à tester
     const requests = regions.map(region => {
       const params = {
@@ -61,7 +61,7 @@ export class GoogleSearchService {
             if (items.length === 0) return '';
 
             // Transformer les résultats en objets VideoInfo
-            return items.map((item: any) => ({
+            return items.map((item: any): VideoInfo => ({
               videoId: item.id,
               channelTitle: item.snippet.channelTitle,
               description: item.snippet.description

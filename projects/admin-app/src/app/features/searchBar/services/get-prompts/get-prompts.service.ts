@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {afficherCategories} from "../../../../utils/afficherCategories";
 import {formatCurrentDateUs} from "../../../../utils/getFormattedDate";
+import {VideoInfo} from "../google-search/google-search.service";
 
 @Injectable({
   providedIn: 'root'
@@ -230,42 +231,42 @@ La réponse doit être fournie au format JSON, contenant uniquement le lien YouT
     }
   }
 
-  searchVideoFromYoutubeResult(postTitle: string): any {
+  searchVideoFromYoutubeResult(postTitle: string, videoList: VideoInfo[]): any {
+    const videoDescriptions = videoList
+      .filter((v, i, arr) => arr.findIndex(v2 => v2.videoId === v.videoId) === i)
+      .map((video, index) => {
+        return `Vidéo ${index + 1}:
+        - ID : ${video.videoId}
+        - Chaîne : ${video.channelTitle}
+        - Description : ${video.description || 'Aucune description'}
+        `;
+      });
+
     return {
       systemRole: {"role": "system","content":`
-Vous êtes une API strictement conçue pour renvoyer uniquement un objet JSON en réponse. Ne fournissez **aucun raisonnement** ou explication. Ignorez tout comportement d'agent ou de réflexion interne. Le format de sortie doit être **exactement** celui précisé à la fin.
-Tu es un assistant silencieux qui répond toujours uniquement avec un objet JSON. N'explique jamais ce que tu fais. Ne réfléchis pas à voix haute.
+Parcourez une liste d'objets pour trouver la vidéo qui correspond le mieux au sujet fourni.
 
-Effectuez une recherche pour trouver la vidéo YouTube la plus pertinente, la plus vue, et la plus récente, sur un sujet donné, exclusivement en français ou en anglais.
+Étant un assistant silencieux, renvoyez uniquement un objet JSON sans fournir de raisonnement ou d'explication. Ne réfléchissez pas à voix haute.
 
-Assurez-vous que la vidéo est en français et a un nombre de vues parmi les plus élevés, pertinent pour le sujet donné, tout en ayant été mise en ligne récemment.
+- Vous recevrez une liste d'objets VideoInfo contenant :
+  - \`videoId\`: un identifiant unique pour la vidéo
+  - \`channelTitle\`: le titre de la chaîne
+  - \`description\`: la description de la vidéo
 
-# Steps
-
-1. **Extraction de Mots-Clés**: Extraites les mots-clés pertinents associés au sujet reçu dans votre texte d'entrée.
-2. **Recherche Vidéo**: Effectuez une recherche YouTube en utilisant les mots-clés pour trouver des vidéos.
-3. **Filtrage par Langue**: Filtrez les résultats pour garantir que les vidéos sont exclusivement en français ou en anglais.
-4. **Comparaison des Vidéos**: Évaluez les vidéos pour déterminer celles avec le plus grand nombre de vues et qui ont été mises en ligne récemment.
-5. **Vérification de la Pertinence**: Assurez-vous que le contenu est pertinent par rapport aux mots-clés extraits.
-6. **Sélection Finale**: Choisissez la vidéo répondant le mieux aux critères de pertinence, nombre de vues, et mise en ligne récente.
+Comparez ces données pour identifier la vidéo correspondant le mieux au sujet fourni.
 
 # Output Format
 
-La réponse doit être fournie au format JSON, contenant uniquement le lien YouTube de la vidéo trouvée :
+La réponse doit être fournie dans un objet JSON contenant uniquement le lien YouTube de la vidéo trouvée ou une chaîne vide si aucune vidéo ne correspond:
 \`\`\`json
-{ "video": "LINK YOUTUBE ou une chaine vide si tu ne trouve pas " }
+{
+"video": "LINK YOUTUBE ou une chaine vide si tu ne trouve pas ",
+ explanation": "explication de ton choix par rapport au titre du sujet"}
 \`\`\`
-
-# Notes
-
-- Assurez-vous que la vidéo est effectivement pertinente pour le sujet donné.
-- La langue de la vidéo doit être exclusivement le français.
-- Si aucune vidéo appropriée n’est trouvée, retournez un champ vide.
-- Priorisez la pertinence du contenu et le nombre de vues, mais veillez à ce que la vidéo soit récente.
-- Ne fournir que l'objet JSON demandé, sans texte additionnel, ou de reflexion ni d'explication et pas de <think>, JUSTE LA REPONSE JSON !!!.
       `},
       userRole: { "role": "user", "content": `
-      voici le context du sujet pour trouver la video : ${postTitle}` }
+      voici le context du sujet : "${postTitle}";  et la site de videos à comparer : "${videoDescriptions.join('\n')}".
+      ` }
     }
   }
 

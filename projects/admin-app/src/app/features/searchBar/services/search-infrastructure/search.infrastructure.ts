@@ -193,8 +193,8 @@ export class SearchInfrastructure {
 
   }
 
-  addVideo(postTitle: string): Observable<string> {
-    if(!this.isLocalhost()) {
+  addVideo(postTitle: string): Observable<any> {
+    if(this.isLocalhost()) {
       return new Observable<string>(subscriber => {
         const mock = `
         http://www.youtube.com/watch?v=exempleVideo
@@ -205,27 +205,24 @@ export class SearchInfrastructure {
         }, 1000);
       });
     } else {
-      const prompt = this.getPromptsService.addVideo(postTitle);
-      return from(this.perplexityApiService.fetchData(prompt)).pipe(
-        switchMap(result => {
-          const data: {video: string} = JSON.parse(extractJSONBlock(result))
-          if(!data.video || !data.video.length) {
-            return this.googleSearchService.searchFrenchVideo(postTitle).pipe(
-              map(videoUrls => {
-                const prompt = this.getPromptsService.searchVideoFromYoutubeResult(postTitle);
-                return from(this.openaiApiService.fetchData(prompt, true)).pipe(
-                  switchMap(result => {
-                    return of(videoUrls[0]);
-                  })
-                )
-              })
-            );
-          } else {
-            return of(data.video);
-          }
-        })
-      );
-
+        const prompt = this.getPromptsService.addVideo(postTitle);
+        return from(this.perplexityApiService.fetchData(prompt)).pipe(
+            switchMap(result => {
+                const videoData: { video: string } = JSON.parse(extractJSONBlock(result));
+                const videoUrl = videoData.video && videoData.video.length ? videoData.video : null;
+                return videoUrl ? of(videoUrl) : this.googleSearchService.searchFrenchVideo(postTitle).pipe(
+                map(videoUrls => {
+                  if (!videoUrls.length) return '';
+                  const prompt = this.getPromptsService.searchVideoFromYoutubeResult(postTitle, videoUrls);
+                  return from(this.openaiApiService.fetchData(prompt, true)).pipe(switchMap(result => {
+                    const videoData: { video: string } = JSON.parse(extractJSONBlock(result));
+                    const videoUrl = videoData.video && videoData.video.length ? videoData.video : null;
+                    return videoUrl ? of(videoUrl) : of('');
+                  }));
+                })
+              );
+            })
+        );
     }
   }
 
