@@ -53,7 +53,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           } else if (msg.action === MessageAction.METEO) {
             this.application.savePost();
           } else if (msg.action === MessageAction.SAVED_POST) {
-            this.application.updateIdeaPost();
+              this.application.updateIdeaPost();
             this.application.addImagesInArticle();
           }  else if (msg.action === MessageAction.IDEA_IMAGE_UPDATED) {
             this.application.generateImageIa();
@@ -63,7 +63,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
         case 'fail': {
           if (msg.action === MessageAction.ARTICLE_VALID) {
             this.application.searchArticle();
-          } else if (msg.action === MessageAction.ARTICLE && this.selectedOption === 'generate') {
+          } else if (msg.action === MessageAction.ARTICLE && this.selectedOption === 'generate' && this.url_post === '') {
             this.application.searchIdea();
           }
           break;

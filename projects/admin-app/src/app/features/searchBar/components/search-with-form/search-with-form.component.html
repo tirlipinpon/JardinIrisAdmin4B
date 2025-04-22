@@ -15,6 +15,7 @@
   </div>
   <div style="margin: 20px 0;">
     <mat-radio-group aria-label="Sélectionnez une option" [(ngModel)]="selectedOption" (ngModelChange)="onOptionChange()">
+      <mat-radio-button value="all">article ou idée</mat-radio-button>
       <mat-radio-button value="article">Recherche juste dans les Articles</mat-radio-button>
       <mat-radio-button value="generate" style="margin-left: 20px;">Générer un article</mat-radio-button>
     </mat-radio-group>

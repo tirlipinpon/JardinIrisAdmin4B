@@ -69,18 +69,24 @@ export class SearchApplication {
   }
 
   checkMeteo(): void {
-    this.messageService.sendMessage('Météo en cours.');
-    this.store.checkMeteo();
+    if(!this.store.isMeteo()){
+      this.messageService.sendMessage('Météo en cours.');
+      this.store.checkMeteo();
+    }
   }
 
   savePost(): void {
-    this.messageService.sendMessage('Enregistrement du post en cours.');
-    this.store.savePost();
+    if(!this.store.isPostId()) {
+      this.messageService.sendMessage('Enregistrement du post en cours.');
+      this.store.savePost();
+    }
   }
 
   updateIdeaPost(): void {
-    this.messageService.sendMessage('Update de post idea en cours.');
-    this.store.updateIdeaPost();
+    if(this.store.isIdeaPost()) {
+      this.messageService.sendMessage('Update de post idea en cours.');
+      this.store.updateIdeaPost();
+    }
   }
 
   addImagesInArticle(): void {
@@ -94,8 +100,10 @@ export class SearchApplication {
   }
 
   addInternalLinkByChapter(): void {
-    this.messageService.sendMessage('Lien interne en cours.');
-    this.store.addInternalLinkByChapter();
+    if(!this.store.isArticleLinkAdded()) {
+      this.messageService.sendMessage('Lien interne en cours.');
+      this.store.addInternalLinkByChapter();
+    }
   }
 
   getPostTitreAndId(): void {

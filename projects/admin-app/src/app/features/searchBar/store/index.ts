@@ -311,6 +311,8 @@ export const SearchStore= signalStore(
         pipe(
           tap(()=> updateState(store, '[savePost] update loading', {isLoading: true})    ),
           switchMap(() => {
+            const isPostId = store.isPostId();
+            if (isPostId) { patchState(store, { isLoading: false }); return EMPTY; }
             const getPost = store.getPost();
             if (!getPost) { patchState(store, { isLoading: false }); return EMPTY; }
             const getVideo = store.getVideo();
