@@ -5,7 +5,7 @@ import {userIsAuthenticateGuard} from "./features/authentication/guards/authenti
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'authenticate/login',
     pathMatch: 'full'
   },
   {
@@ -18,8 +18,8 @@ export const routes: Routes = [
     children: authenticationRoutes
   },
   {
-    path: '*',
-    redirectTo: 'authenticate/login',
-    pathMatch: 'full'
+    path: 'home/edit/:id',
+    loadComponent: () => import('../app/features/edit/edit.component').then(m => m.EditComponent)
   }
+
 ];

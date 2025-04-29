@@ -21,12 +21,13 @@ export class SearchApplication {
     this.isIdeaEffect();
     this.isGeneratedArticleEffect();
     this.isUpgradedArticleEffect();
-    this.isFormatInHtmlArticleEffect()
+    this.isFormatInHtmlArticleEffect();
     this.isMeteoEffect();
     this.isPostIdEffect();
     this.isAddedInternalLinkByChapterEffect();
-    this.isAddedPostTitreAndIdEffect()
-    this.isVideoEffect()
+    this.isAddedPostTitreAndIdEffect();
+    this.isVideoEffect();
+    this.isFaqEffect();
   }
 
   get isSearching(): Signal<boolean> {
@@ -61,6 +62,16 @@ export class SearchApplication {
     this.messageService.sendMessage('Upgrade article en cours.');
     this.store.upgradeArticle();
   }
+
+  faq(): void {
+    this.messageService.sendMessage('FAQ en cours.');
+    this.store.faq();
+  }
+  saveFaq(): void {
+    this.messageService.sendMessage('Save FAQ en cours.');
+    this.store.saveFaq();
+  }
+
 
   formatInHtmlArticle(): void {
     this.messageService.sendMessage('Format en HTML upgradeArticle en cours.');
@@ -164,6 +175,18 @@ export class SearchApplication {
           this.messageService.sendError('Video non trouvé.');
         } else {
           this.messageService.sendMessage('Video trouvés.');
+        }
+      }
+    });
+  }
+
+  private isFaqEffect(): void {
+    effect(() => {
+      if(this.store.getFaq()!==null) {
+        if (!this.store.isFaq()) {
+          this.messageService.sendError('Faq Error.');
+        } else {
+          this.messageService.sendMessage('Faq terminé.');
         }
       }
     });

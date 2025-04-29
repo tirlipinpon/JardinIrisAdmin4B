@@ -76,6 +76,17 @@ export class SupabaseService {
     }
   }
 
+  async setNewFaq(value: any): Promise<any> {
+    try {
+      const { data, error } = await this.supabase
+        .from('faq')
+        .insert([value]);
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async getFirstIdeaPostByMonth(month: number, year: number): Promise<{ id: number | null, "description": string | null } | PostgrestError>  {
     const { data, error } = await this.supabase
       .from('ideaPost')
@@ -181,4 +192,140 @@ export class SupabaseService {
     }
   }
 
+  async getOneOrManyPostForm(idPost?: number, orderBySelected?: string) {
+    try {
+      let query = this.supabase
+        .from('post')
+        .select('*')
+
+      if (idPost && idPost>0) {
+        query = query.eq('id', idPost);
+      }
+
+      if (orderBySelected) {
+        if(orderBySelected==='valid') {
+          query = query.order(orderBySelected, { ascending: true });
+        } else if(orderBySelected==='original') {
+          query = query
+            .eq('valid', true)
+            .eq('deleted', false)
+            .order('created_at', { ascending: false });
+        } else {
+          query = query.order(orderBySelected, { ascending: false });
+        }
+      } else {
+        query = query.order('created_at', { ascending: false });
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        throw error;
+      }
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAllComments() {
+    try {
+      let query = this.supabase
+        .from('comments')
+        .select('*')
+        .order('id', { ascending: true });
+
+      const { data, error } = await query;
+
+      if (error) {
+        throw error;
+      }
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deletePostByIdForm(idPost: number) {
+    try {
+      const { data, error } = await this.supabase
+        .from('post')
+        .update({ deleted: 'true' })
+        .eq('id', idPost)
+
+      if (error) {
+        throw error;
+      }
+      console.log(data);
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateValidPostByIdForm(idPost: number) {
+    try {
+      const { data, error } = await this.supabase
+        .from('post')
+        .update({ valid: 'true' })
+        .eq('id', idPost)
+
+      if (error) {
+        throw error;
+      }
+      console.log(data);
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updatePostByPostForm(dataPost: Post) {
+    try {
+      const { data, error } = await this.supabase
+        .from('post')
+        .update(dataPost)
+        .eq('id', dataPost.id);
+
+      if (error) {
+        throw error;
+      }
+      console.log(data);
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteCommentById(id: number) {
+    try {
+      const { data, error } = await this.supabase
+        .from('comments')
+        .update({ valide: 'false' })
+        .eq('id', id)
+
+      if (error) {
+        throw error;
+      }
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async valideCommentById(id: number) {
+    try {
+      const { data, error } = await this.supabase
+        .from('comments')
+        .update({ valide: 'true' })
+        .eq('id', id)
+
+      if (error) {
+        throw error;
+      }
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

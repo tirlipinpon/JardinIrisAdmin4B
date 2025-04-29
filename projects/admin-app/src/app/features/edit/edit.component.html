@@ -1,0 +1,30 @@
+<p>edit works s! {{id()}}.</p>
+<router-outlet></router-outlet>
+
+@let loading = isLoading();
+@if (loading) {
+  <i>loading...</i>
+}
+
+@let postForm = postFromSignal();
+
+@if (postForm) {
+  <form [formGroup]="postForm">
+    <input type="text" formControlName="id">
+    <input type="text" formControlName="created_at">
+    <input type="text" formControlName="titre">
+    <input type="text" formControlName="description_meteo">
+    <input type="text" formControlName="article">
+    <input type="text" formControlName="phrase_accroche">
+    <input type="text" formControlName="citation">
+    <input type="text" formControlName="lien_url_article">
+    <input type="text" formControlName="image_url">
+    <input type="text" formControlName="categorie">
+    <input type="text" formControlName="visite">
+    <input type="text" formControlName="valid">
+    <input type="text" formControlName="video">
+    <input type="text" formControlName="deleted">
+    <input type="text" formControlName="comments">
+    <button type="submit">Submit</button>
+  </form>
+}

@@ -231,6 +231,50 @@ La réponse doit être fournie au format JSON, contenant uniquement le lien YouT
     }
   }
 
+  getPromptFaq(upgradedArticle: string): any {
+    return {
+      systemRole: {"role": "system","content":`
+Pour chaque article contenant des chapitres balisés, générez des questions et réponses pertinentes pour chaque chapitre, sous forme d'objet JSON.
+
+1. **Identifier les chapitres**: Repérez les chapitres dans l'article à l'aide des balises \`<span id="paragraphe-#">...texte...</span>\`.
+2. **Formuler une question**: Pour chaque chapitre, posez une question d'environ 10 mots qui approfondit le contenu au-delà de ce qui est fourni.
+3. **Fournir une réponse**: Proposez une réponse avec des informations supplémentaires pertinentes à la question formulée.
+
+# Steps
+
+1. Parcourir l'article pour repérer les chapitres à l'aide des balises HTML spécifiques.
+2. Lire le contenu de chaque chapitre afin de comprendre les points clés.
+3. Formuler une question par chapitre qui irait plus loin dans le sujet abordé dans le texte.
+4. Rédiger une réponse qui complète la question avec des détails ou informations supplémentaires.
+
+# Output Format
+
+Présentez les questions et réponses sous forme d'un objet JSON structuré, sans texte supplémentaire :
+
+\`\`\`json
+[
+  {
+    "question": "la question pour le chapitre 1",
+    "response": "la réponse pour le chapitre 1"
+  },
+  {
+    "question": "la question pour le chapitre 2",
+    "response": "la réponse pour le chapitre 2"
+  }
+  // A continuer pour chaque chapitre
+]
+\`\`\`
+
+# Notes
+
+- Assurez-vous que les questions et réponses fournies sont pertinentes et approfondissent le sujet discuté dans chaque chapitre.
+- Ne retournez que l'objet JSON attendu, sans inclusion de texte explicatif ou supplémentaire.
+      `},
+      userRole: { "role": "user", "content": `
+      voici le context du sujet pour les questions : ${upgradedArticle}` }
+    }
+  }
+
   searchVideoFromYoutubeResult(postTitle: string, videoList: VideoInfo[]): any {
     const videoDescriptions = videoList
       .filter((v, i, arr) => arr.findIndex(v2 => v2.videoId === v.videoId) === i)

@@ -18,6 +18,7 @@ export interface SearchState {
   postId: number | null;
   video: string | null;
   postTitreAndId: {titre: string; id: number}[] | null;
+  faq: {question: string; response: string}[] | null;
   articleGenerated: string | null;
   articleUpgraded: string | null;
   articleHtml: string | null;
@@ -35,6 +36,7 @@ const initialValue: SearchState = {
   postId: null,
   video: null,
   postTitreAndId: null,
+  faq: null,
   articleGenerated: null,
   articleUpgraded: null,
   articleHtml: null,
@@ -69,6 +71,11 @@ export const SearchStore= signalStore(
     getArticleUpgraded: computed(() =>  store.articleUpgraded()),
     isArticleUpgraded: computed(() =>  {  const articleUpgraded = store.articleUpgraded();
       return articleUpgraded!==null && articleUpgraded.length > 1
+    }),
+
+    getFaq: computed(() =>  store.faq()),
+    isFaq: computed(() =>  {  const faq = store.faq();
+      return faq!==null && faq.length > 0
     }),
 
     getPost: computed(() => store.post()),
@@ -217,6 +224,21 @@ export const SearchStore= signalStore(
           })
         )
       ),
+      faq: rxMethod<void>(
+        pipe(
+          tap(() => updateState(store, '[FAQ] update loading', { isLoading: true })),
+          switchMap(() => {
+            const getArticleUpgraded = store.getArticleUpgraded();
+            if (!getArticleUpgraded) { patchState(store, { isLoading: false }); return EMPTY; }
+            return infra.faq(getArticleUpgraded).pipe(
+              tapResponse({
+                next: (faq) => patchState(store, { faq: faq, isLoading: false }),
+                error: () => patchState(store, { isLoading: false }),
+              })
+            );
+          })
+        )
+      ),
       upgradeArticle: rxMethod<void>(
         pipe(
           tap(() => updateState(store, '[upgradeArticle] update loading', { isLoading: true })),
@@ -328,6 +350,23 @@ export const SearchStore= signalStore(
             return infra.savePost(getPost, getMeteo, getArticleLinkAdded, imageUrl, getVideo, store.isArticleValid()).pipe(
               tapResponse({
                 next: post => patchState(store, { postId: post.id, isLoading: false }),
+                error: error => patchState(store, {isLoading: false})
+              })
+            )
+          })
+        )
+      ),
+      saveFaq: rxMethod<void>(
+        pipe(
+          tap(()=> updateState(store, '[saveFaq] update loading', {isLoading: true})    ),
+          switchMap(() => {
+            const isPostId = store.isPostId();
+            if (!isPostId) { patchState(store, { isLoading: false }); return EMPTY; }
+            const isFaq = store.isFaq();
+            if (!isFaq) { patchState(store, { isLoading: false }); return EMPTY; }
+            return infra.saveFaq(store.getPostId(), store.getFaq()).pipe(
+              tapResponse({
+                next: post => patchState(store, { isLoading: false }),
                 error: error => patchState(store, {isLoading: false})
               })
             )

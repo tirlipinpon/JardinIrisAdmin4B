@@ -45,6 +45,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
             this.application.addVideo();
             this.application.upgradeArticle();
           } else if (msg.action === MessageAction.UPGRADED_ARTICLE) {
+            this.application.faq();
             this.application.formatInHtmlArticle();
           } else if (msg.action === MessageAction.FORMATED_IN_HTML_ARTICLE) {
             this.application.addInternalLinkByChapter();
@@ -53,8 +54,9 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           } else if (msg.action === MessageAction.METEO) {
             this.application.savePost();
           } else if (msg.action === MessageAction.SAVED_POST) {
-              this.application.updateIdeaPost();
+            this.application.updateIdeaPost();
             this.application.addImagesInArticle();
+            this.application.saveFaq();
           }  else if (msg.action === MessageAction.IDEA_IMAGE_UPDATED) {
             this.application.generateImageIa();
         }

@@ -118,6 +118,34 @@ export class SearchInfrastructure {
 
   }
 
+  faq(articleUpgraded: string): Observable<{question: string; response: string}[]> {
+    if(this.isLocalhost()) {
+      return new Observable<{question: string; response: string}[]>(subscriber => {
+        const mock = [
+          {question: 'question 1', response: 'response 1'},
+          {question: 'question 2', response: 'response 2'},
+          {question: 'question 3', response: 'response 3'},
+        ]
+        setTimeout(() => {
+          subscriber.next(mock);
+          subscriber.complete();
+        }, 1000);
+      });
+    } else {
+      const prompt = this.getPromptsService.getPromptFaq(articleUpgraded);
+      return from(this.openaiApiService.fetchData(prompt, true)).pipe(
+        map(result => {
+          if (result === null) {
+            throw new Error('Aucun résultat retourné par l\'API OpenAI');
+          }
+          const data: {question: string; response: string}[]  = JSON.parse(extractJSONBlock(result))
+          return data;
+        })
+      );
+    }
+
+  }
+
   generateArticle(url_post?: string): Observable<Post> {
     if(this.isLocalhost()) {
       return new Observable<Post>(subscriber => {
@@ -229,7 +257,7 @@ export class SearchInfrastructure {
   savePost(post: Post, getMeteo: string, getArticleHtml: string, image_url: string, video: string | null, isArticleValid: boolean | null): Observable<Post> {
     if(this.isLocalhost()) {
       return of(
-        {  "id": 1,
+        {  "id": 644,
           "created_at": "2025-03-25T10:30:00Z",
           "titre": "Le retour du soleil après une semaine pluvieuse",
           "description_meteo": "Un ciel dégagé et des températures en hausse marquent cette belle journée de printemps.",
@@ -262,6 +290,28 @@ export class SearchInfrastructure {
         })
       );
     }
+  }
+
+  saveFaq(postId: number | null, faq: {question: string, response: string}[] | null): Observable<boolean> {
+    if(this.isLocalhost()) { return of(true); }
+    else {
+      if (!postId || !faq || faq.length === 0) { return of(false); }
+      // Utiliser RxJS pour créer un Observable qui traitera séquentiellement chaque élément FAQ
+      return from(faq).pipe(
+        // Pour chaque élément FAQ du tableau
+        switchMap(faqItem => {
+          const value = {
+            question: faqItem.question,
+            response: faqItem.response,
+            fk_post_id: postId
+          };
+          return this.supabaseService.setNewFaq(value);
+        }),
+        // Après avoir traité tous les éléments, retourner true pour indiquer le succès
+        map(() => true),
+      );
+    }
+
   }
 
   updateIdeaPost(ideaPostId: number, postId: number): Observable<any> {
@@ -305,6 +355,10 @@ export class SearchInfrastructure {
       return from(this.supabaseService.getPostTitreAndId())
     }
 
+  }
+
+  getOneOrManyPostForm(postId?: number): Observable<Post[]> {
+    return from(this.supabaseService.getOneOrManyPostForm(postId));
   }
 
 }
