@@ -1,0 +1,126 @@
+
+/** blog-css **/
+
+.blog-sidebar .post-widget .post .post-thumb{
+	left: 0px;
+	top: 5px;
+	width: 80px;
+	overflow: hidden;
+}
+
+.blog-sidebar .post-widget .post .post-thumb img{
+	width: 100%;
+	transition: all 500ms ease;
+}
+
+.blog-sidebar .post-widget .post:hover .post-thumb img{
+	opacity: 0.5;
+}
+
+.blog-sidebar .post-widget .post h5 a{
+	color: #141417;
+}
+
+.blog-sidebar .post-widget .post h5 a:hover{
+
+}
+
+.blog-sidebar .post-widget .post{
+	border-bottom: 1px solid #dfe5e5;
+	min-height: 107px;
+}
+
+.blog-sidebar .post-widget .post:last-child{
+	border-bottom: none;
+}
+
+.blog-details-content blockquote{
+	background-color: #f0f7f7;
+}
+
+.blog-details-content .news-block-one img{
+	transform: scale(1) !important;
+	opacity: 1 !important;
+}
+
+.blog-details-content .list li{
+	color: #141417;
+}
+
+.blog-details-content .list li:before{
+    position: absolute;
+    content: '';
+    width: 7px;
+    height: 7px;
+    left: 0px;
+    top: 9px;
+    border-radius: 50%;
+}
+
+.blog-details-content .two-column .image-box img{
+	width: 100%;
+	border-radius: 5px;
+}
+
+.blog-details-content blockquote h5:before{
+	position: absolute;
+	content: '';
+	width: 35px;
+	height: 2px;
+	left: 0px;
+	top: 12px;
+}
+
+.blog-details-content blockquote .shape{
+	right: 50px;
+	bottom: 0px;
+	width: 50px;
+	height: 99px;
+	background-repeat: no-repeat;
+}
+
+.blog-details-content .post-share-option .post-tag li a{
+	color: #808080;
+	border: 1px solid #e5e5e5;
+	line-height: 33px;
+}
+
+.blog-details-content .post-share-option .post-tag li a:hover{
+	color: #fff;
+}
+
+.blog-details-content .post-share-option .share-links li a{
+	width: 35px;
+	height: 35px;
+	line-height: 35px;
+	color: #acadb4;
+	border: 1px solid #e5e5e5;
+}
+
+.blog-details-content .post-share-option .share-links li a:hover{
+	color: #fff;
+}
+
+.blog-details-content .comment-box .thumb-box{
+	left: 0px;
+	top: 2px;
+	width: 80px;
+	height: 80px;
+}
+
+.blog-details-content .comment-box .thumb-box img{
+	width: 100%;
+	border-radius: 5px;
+}
+
+.blog-details-content .comment-box .comment-inner{
+	border-bottom: 1px solid #e5e5e5;
+}
+
+.blog-details-content .comment-box .comment:last-child .comment-inner{
+	border-bottom: none;
+}
+
+.blog-details-content .comment-box .comment-inner .reply-btn{
+	color: #141417;
+}

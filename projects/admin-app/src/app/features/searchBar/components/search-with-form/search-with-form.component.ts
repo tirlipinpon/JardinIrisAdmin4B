@@ -6,11 +6,12 @@ import {Subscription} from "rxjs";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {SearchApplication} from "../../services/search.application";
 import { MatRadioModule } from '@angular/material/radio';
+import {RouterLink} from "@angular/router";
 ;
 
 @Component({
   imports: [FormsModule, MatProgressSpinnerModule, MatRadioModule
-    , NgClass, NgForOf],
+    , NgClass, NgForOf, RouterLink],
   selector: 'app-search-with-form',
   styleUrl: './search-with-form.component.css',
   templateUrl: './search-with-form.component.html'
@@ -23,6 +24,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
   url_post = "";
   isLoading =  this.application.isSearching;
   selectedOption: string = 'all';
+  editPostId= 0;
 
   onOptionChange() {
     if(this.selectedOption === 'article') {

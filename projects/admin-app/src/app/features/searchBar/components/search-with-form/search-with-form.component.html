@@ -1,3 +1,10 @@
+<div>
+  <input type="text" [(ngModel)]="editPostId" placeholder="ID du post à éditer" size="10">
+  <a routerLink="/home/edit/{{editPostId}}">edit</a>
+</div>
+
+
+
 <section>
   <div>
     <input type="text" [(ngModel)]="url_post" [disabled]="selectedOption!=='generate'" placeholder="mettre le lien URL de l article ici." size="50" style="
