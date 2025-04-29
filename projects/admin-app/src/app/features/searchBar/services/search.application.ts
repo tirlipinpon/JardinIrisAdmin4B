@@ -34,6 +34,10 @@ export class SearchApplication {
     return this.store.isLoading;
   }
 
+  get getPostId(): Signal<number | null> {
+    return this.store.getPostId;
+  }
+
   searchArticle(): void {
       this.messageService.sendMessage('Articles recherche en cours pour ' + ((this.cptSearchArticle===0)?' Belgique' : 'Europe.'));
       this.store.searchArticle(this.cptSearchArticle++);

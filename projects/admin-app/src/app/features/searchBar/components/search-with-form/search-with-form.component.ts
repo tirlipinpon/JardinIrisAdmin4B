@@ -24,7 +24,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
   url_post = "";
   isLoading =  this.application.isSearching;
   selectedOption: string = 'all';
-  editPostId= 0;
+  editPostId= this.application.getPostId;
 
   onOptionChange() {
     if(this.selectedOption === 'article') {
