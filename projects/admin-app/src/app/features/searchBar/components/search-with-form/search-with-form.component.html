@@ -1,38 +1,36 @@
-<div><input [placeholder]="editPostId() ? editPostId() : 'ID du post à éditer'" size="15" type="number">
-  <a routerLink="/home/edit/{{editPostId()}}">edit</a>
+<div>
+  <input #postIdInput [value]="editPostId() ? editPostId() : ''"
+         [placeholder]="editPostId() ? editPostId() : 'ID du post à éditer'" size="15" type="number">
+  <a [routerLink]="['/home/edit', editPostId() ? editPostId() : postIdInput.value]">edit</a>
 </div>
-
-
 
 <section>
   <div>
-    <input type="text" [(ngModel)]="url_post" [disabled]="selectedOption!=='generate'" placeholder="mettre le lien URL de l article ici." size="50" style="
+    <input type="text" [(ngModel)]="url_post" [disabled]="selectedOption!=='generate'"
+           placeholder="mettre le lien URL de l article ici." size="50" style="
     padding: 20px;
     font-size: 15px;
     width: 100%;">
   </div>
   <div>
-    <button  (click)="process()" [disabled]="isLoading()" style="
+    <button (click)="process()" [disabled]="isLoading()" style="
     padding: 20px;
     width: 100%;
     font-size: 22px;
     margin: 20px 0 0 0;
-    background-color: aliceblue;">Clicker ici pour faire le résumé de l 'article.</button>
+    background-color: aliceblue;">Clicker ici pour faire le résumé de l 'article.
+    </button>
   </div>
   <div style="margin: 20px 0;">
-    <mat-radio-group aria-label="Sélectionnez une option" [(ngModel)]="selectedOption" (ngModelChange)="onOptionChange()">
+    <mat-radio-group aria-label="Sélectionnez une option" [(ngModel)]="selectedOption"
+                     (ngModelChange)="onOptionChange()">
       <mat-radio-button value="all">article et/ou idée</mat-radio-button>
       <mat-radio-button value="article">Recherche juste dans les Articles</mat-radio-button>
       <mat-radio-button value="generate" style="margin-left: 20px;">Générer un article</mat-radio-button>
     </mat-radio-group>
   </div>
-
-
 </section>
 
 <div *ngFor="let msg of messages()" [ngClass]="'message-' + msg.type" style="margin: 5px 0;">
   {{ msg.type }} - {{ msg.content }}
 </div>
-
-
-
