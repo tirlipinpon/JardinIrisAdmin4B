@@ -5,16 +5,23 @@ import {FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {Post} from "../../types/post";
 import {SupabaseService} from "../searchBar/services/supabase/supabase.service";
 import {Editor, NgxEditorModule, Toolbar} from "ngx-editor";
-import {NgIf} from "@angular/common";
+import {NgForOf, NgIf} from "@angular/common";
+import {MatFormField, MatFormFieldModule} from "@angular/material/form-field";
+import {MatOption, MatSelect} from "@angular/material/select";
+import {CathegoriesBlog} from "../../types/cathegoriesBlog";
+import {MatInputModule} from "@angular/material/input";
 
 
 @Component({
   selector: 'app-edit',
-  imports: [RouterOutlet, ReactiveFormsModule, NgxEditorModule, NgIf, RouterLink],
+  imports: [RouterOutlet, ReactiveFormsModule, NgxEditorModule, NgIf, NgForOf, RouterLink, MatFormFieldModule
+    , MatSelect, MatInputModule, MatOption],
   templateUrl: './edit.component.html',
   styleUrl: './edit.component.css'
 })
 export class EditComponent implements OnInit {
+    cathegoriesBlog = CathegoriesBlog; // si besoin dans le template
+    categoryList = Object.values(this.cathegoriesBlog); // Tableau utilisable dans le *ngFor
     id = input<number>();
     private readonly store = inject(PostStore);
     private readonly formBuilder = inject(FormBuilder);
@@ -23,19 +30,19 @@ export class EditComponent implements OnInit {
     isLoading = this.store.loading;
     post: Post[] | null = null;
     postForm!: FormGroup;
-   editor!: Editor;
-  toolbar: Toolbar = [
-    // default value
-    ["bold", "italic"],
-    ["underline", "strike"],
-    ["code", "blockquote"],
-    ["ordered_list", "bullet_list"],
-    [{ heading: ["h1", "h2", "h3", "h4", "h5", "h6"] }],
-    ["link", "image"],
-    ["text_color", "background_color"],
-    ["align_left", "align_center", "align_right", "align_justify"],
-  ];
-  isEditorTextON: boolean = false;
+    editor!: Editor;
+    toolbar: Toolbar = [
+      // default value
+      ["bold", "italic"],
+      ["underline", "strike"],
+      ["code", "blockquote"],
+      ["ordered_list", "bullet_list"],
+      [{ heading: ["h1", "h2", "h3", "h4", "h5", "h6"] }],
+      ["link", "image"],
+      ["text_color", "background_color"],
+      ["align_left", "align_center", "align_right", "align_justify"],
+    ];
+    isEditorTextON: boolean = false;
     postFromSignal = computed(() => {
        this.post = this.store.post()
       if(this.post) {
@@ -84,4 +91,5 @@ export class EditComponent implements OnInit {
   }
 
 
+  protected readonly CathegoriesBlog = CathegoriesBlog;
 }

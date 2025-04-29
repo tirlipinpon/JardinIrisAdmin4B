@@ -38,10 +38,13 @@
                         <!-- Post Info -->
                         <ul class="post-info p_relative d_block mb_35 clearfix">
                           <li class="p_relative d_iblock float_left fs_15 mr_25">
-                            <a aria-label="link on web site jardin iri jardinier bruxelles" href="#"
-                               onclick="return false;" class="fw_medium hov_color" style="text-transform: capitalize;">
-                              <textarea formControlName="categorie" class="form-control"></textarea>
-                            </a>
+                            <mat-form-field appearance="fill" class="fw_medium hov_color">
+                              <mat-select formControlName="categorie">
+                                <mat-option *ngFor="let category of categoryList" [value]="category">
+                                  {{ category }}
+                                </mat-option>
+                              </mat-select>
+                            </mat-form-field>
                           </li>
                         </ul>
 
