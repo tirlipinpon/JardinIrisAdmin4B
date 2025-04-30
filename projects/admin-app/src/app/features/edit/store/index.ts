@@ -40,6 +40,23 @@ export const PostStore = signalStore(
         })
       )
     ),
+    getPostWithComments: rxMethod<void>(
+      pipe(
+        tap(()=> patchState(store, {loading: true})),
+        switchMap(() => { // get = switch et push = concat
+          return infra.getPostWithComments().pipe(
+            tapResponse({
+              next: (postsWithComments) => patchState(store, {
+                post: postsWithComments, loading: false }),
+              error: (err) => {
+                patchState(store,{ loading: false, error: err})
+                console.log(err)
+              }
+            })
+          )
+        })
+      )
+    ),
     setOnePost: rxMethod<Post>(
       pipe(
         tap(()=> patchState(store, {loading: true})),

@@ -4,6 +4,7 @@ import {PostStore} from "../edit/store";
 import {Post} from "../../types/post";
 import {FormBuilder} from "@angular/forms";
 import { CommonModule } from '@angular/common';
+import {Comment} from "../../types/comment";
 
 @Component({
   selector: 'app-all',
@@ -22,8 +23,9 @@ export class AllComponent implements OnInit, AfterViewChecked {
     return this.store.post()
   })
 
+
   ngOnInit(): void {
-      this.store.getOneOrManyPostForm(undefined);
+      this.store.getPostWithComments(undefined);
   }
 
   ngAfterViewChecked() {
@@ -72,12 +74,7 @@ export class AllComponent implements OnInit, AfterViewChecked {
   deletePost(post: Post) {
   }
 
-  editPostById(id: any) {
-
-  }
-
   validPostById(id: any) {
-
   }
 
   getValidCommentsCount(post: any) {
@@ -85,10 +82,8 @@ export class AllComponent implements OnInit, AfterViewChecked {
   }
 
   deleteCommentById(comment: any) {
-
   }
 
   valideCommentById(comment: any) {
-
   }
 }

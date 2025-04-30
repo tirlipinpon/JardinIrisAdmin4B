@@ -329,4 +329,18 @@ export class SupabaseService {
       throw error;
     }
   }
+
+  async getPostWithComments() {
+    try {
+      const { data, error } = await this.supabase.rpc('get_posts_with_comments_all')
+      if (error) {
+        console.error('Erreur lors de l’appel de la fonction :', error)
+        return error
+      } else {
+        return data
+      }
+    } catch (error) {
+        throw error;
+   }
+  }
 }

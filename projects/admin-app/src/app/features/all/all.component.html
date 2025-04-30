@@ -2,17 +2,17 @@
 
 <p>all works!</p>
 
-@let postData = postFromSignal();
+@let postDataWithComments = postFromSignal();
 
-@if (postData) {
+@if (postDataWithComments) {
   <section style="display: flex; flex-wrap: wrap; flex-direction: row;">
-    @for (post of postData; track post.id) {
+    @for (post of postDataWithComments; track post.id) {
       <div [ngClass]="getPostStatusClass(post)" class="post-container post-card">
         <div>
           @if (!post.deleted) {
             <button style="background-color:red; margin: 0 10px 0 0; padding: 10px;" (click)="deletePost(post)">supprimer</button>
           }
-          <button style="margin: 0 10px 0 0;padding: 10px;" (click)="editPostById(post.id)">Editer</button>
+          <button style="margin: 0 10px 0 0;padding: 10px;" [routerLink]="['/home/edit', post.id]">Editer</button>
           @if (!post.valid) {
             <button  style="background-color:lightBlue;padding: 10px;" (click)="validPostById(post.id)">valider</button>
           }

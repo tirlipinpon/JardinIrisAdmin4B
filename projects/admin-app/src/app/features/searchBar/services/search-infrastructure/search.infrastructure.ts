@@ -379,6 +379,14 @@ export class SearchInfrastructure {
     return from(this.supabaseService.getOneOrManyPostForm(postId));
   }
 
+  getPostWithComments(): Observable<Post[]> {
+      return from(this.supabaseService.getPostWithComments());
+  }
+
+  getAllComments() {
+    return from(this.supabaseService.getAllComments());
+  }
+
 
 
 }
