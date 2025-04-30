@@ -24,10 +24,10 @@ export const PostStore = signalStore(
   withDevtools('post'),
   withState(initialPostState),
   withMethods((store, infra = inject(SearchInfrastructure)) => ({
-    getOnePost: rxMethod<number>(
+    getOneOrManyPostForm: rxMethod<number | undefined>(
       pipe(
         tap(()=> patchState(store, {loading: true})),
-        switchMap((postId) => { // get = switch et push = concat
+        switchMap((postId: number | undefined) => { // get = switch et push = concat
           return infra.getOneOrManyPostForm(postId).pipe(
             tapResponse({
               next: (post) => patchState(store, {post, loading: false}),

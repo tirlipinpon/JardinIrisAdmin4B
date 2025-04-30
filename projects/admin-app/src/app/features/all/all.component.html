@@ -1,3 +1,117 @@
 <a [routerLink]="['/home']">Create</a>
 
 <p>all works!</p>
+
+@let postData = postFromSignal();
+
+@if (postData) {
+  <section style="display: flex; flex-wrap: wrap; flex-direction: row;">
+    @for (post of postData; track post.id) {
+      <div [ngClass]="getPostStatusClass(post)" class="post-container post-card">
+        <div>
+          @if (!post.deleted) {
+            <button style="background-color:red; margin: 0 10px 0 0; padding: 10px;" (click)="deletePost(post)">supprimer</button>
+          }
+          <button style="margin: 0 10px 0 0;padding: 10px;" (click)="editPostById(post.id)">Editer</button>
+          @if (!post.valid) {
+            <button  style="background-color:lightBlue;padding: 10px;" (click)="validPostById(post.id)">valider</button>
+          }
+        </div>
+        <ul style="overflow-wrap: anywhere;">
+          <li style="margin: 0 0 10px 0;">{{ post.id }} - {{ post.created_at }} - {{ post.categorie }}  - {{ post.visite }} vues</li>
+          <li style="margin: 0 0 10px 0; font-weight: 700;"><a target="_blanc" href="https://jardin-iris.be/blog-detail.html?post={{ post.id }}">{{ post.titre }}</a></li>
+          <li><img [src]="post.image_url" alt="Image preview"></li>
+          <li style="margin: 0 0 10px 0;border: 1px solid gray;">{{ post.description_meteo }}</li>
+          <li style="margin: 0 0 10px 0;border: 1px solid gray;" [innerHTML]="post.phrase_accroche"></li>
+          <button class="accordion">Voir l'article</button>
+          <li class="panel" style="margin: 0 0 10px 0;" [innerHTML]="post.article"></li>
+          <li style="margin: 0 0 10px 0;background-color: aliceblue; padding: 3px;">{{ post.citation }}</li>
+          <li style="margin: 0 0 10px 0;"> <a [href]="post.lien_url_article" aria-label="lien vers article complet"
+                                              target="_blank" style="color: #28a745;">{{ post.lien_url_article }}</a></li>
+        </ul>
+        <div>
+
+
+          <!--      comments blok    -->
+          <div>
+
+            <button *ngIf="post?.comments?.length" class="accordionComments">{{post?.comments?.length}} commentaire dont {{ getValidCommentsCount(post) }}  commentaire valide</button>
+
+            <div class="panelComments col-lg-12 col-md-12 col-sm-12 review-block">
+              <div class="customer-review">
+                <div id="containerComment">
+
+
+                  <!-- Boucle sur les commentaires du post -->
+                  <div *ngFor="let comment of post.comments">
+                    <div class="mb_35" *ngIf="!comment.fk_reply"> <!-- Seuls les commentaires sans "fk_reply" -->
+                      <div class="single-review p_relative">
+                        <figure class="image-box p_absolute b_radius_50" style="height:40px; width:40px;">
+                          <img loading="lazy" src="{{comment.avatar}}" alt="{{ comment.name }}">
+                        </figure>
+                        <div class="inner p_relative pl_50">
+                          <h5 class="p_relative d_block fs_16 lh_26 fw_medium mb_7" style="display:flex">
+                            {{ comment.id}} - {{ comment.name }} &nbsp;&nbsp;&nbsp;
+                            <span class="d_iblock fs_15 fw_normal">{{ comment.created_at }} &nbsp;&nbsp;&nbsp;</span>
+                            <button *ngIf="comment.valide" style="height: 27px;background-color: red;color: white;" (click)="deleteCommentById(comment)">X</button>
+                            <button *ngIf="!comment.valide" style="height: 27px;background-color: green;color: black;" (click)="valideCommentById(comment)">v</button>
+                          </h5>
+                          <p class="fs_15 lh_26">{{ comment.comment }}</p>
+                        </div>
+                      </div>
+                      <div id="like" style="display:flex;flex-direction:row;justify-content:flex-end;align-items: baseline;">
+                        <div class="icon-box" style="margin: 0 20px 0 0;">
+                          <i id="like-{{ comment.id }}" class="fas fa-thumbs-up" style="cursor:pointer; color:darkgreen"></i>
+                          <span id="like-count-{{ comment.id }}">{{ comment.like }}</span>
+                        </div>
+                      </div>
+
+                      <!-- Réponses -->
+                      <div id="reply-comments-{{ comment.id }}" style="margin: 0 0 0 50px;">
+                        <!-- Ajout d'un div pour séparer les directives *ngFor et *ngIf -->
+                        <div *ngFor="let reply of post.comments">
+                          <div *ngIf="reply.fk_reply === comment.id"> <!-- Filtrer par fk_reply -->
+                            <div class="single-review p_relative">
+                              <figure class="image-box p_absolute b_radius_50" style="height:40px; width:40px;">
+                                <img loading="lazy" src="{{reply.avatar}}" alt="{{ reply.name }}">
+                              </figure>
+                              <div class="inner p_relative pl_50">
+                                <h5 class="p_relative d_block fs_16 lh_26 fw_medium mb_7" style="display:flex">
+                                  {{ reply.id}} - {{ reply.name }}
+                                  <span class="d_iblock fs_15 fw_normal">{{ reply.created_at  }} &nbsp;&nbsp;&nbsp;</span>
+                                  <button *ngIf="reply.valide" style="height: 27px;background-color: red;color: white;" (click)="deleteCommentById(reply)">X</button>
+                                  <button *ngIf="!reply.valide" style="height: 27px;background-color: green;color: black;" (click)="valideCommentById(reply)">v</button>
+                                </h5>
+                                <p class="fs_15 lh_26"> {{ reply.comment }}</p>
+                              </div>
+                            </div>
+                            <div id="like" style="display: flex;flex-direction: row;justify-content: flex-end;align-items: baseline;">
+                              <div class="icon-box" style="margin: 0 20px 0 0;">
+                                <i id="like-{{ reply.id }}" class="fas fa-thumbs-up" style="cursor:pointer; color:darkgreen"></i>
+                                <span id="like-count-{{ reply.id }}">{{ reply.like }}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- Fin Réponses -->
+                    </div>
+                  </div>
+
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--   fin   comment blok    -->
+
+
+        </div>
+      </div>
+    } @empty {
+      <li>There are no items.</li>
+    }
+  </section>
+
+}

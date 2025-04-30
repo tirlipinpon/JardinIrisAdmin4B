@@ -1,0 +1,67 @@
+.post-card {
+  width: 32%; /* Par défaut pour les écrans larges */
+}
+
+@media (max-width: 768px) { /* Ajustez la largeur pour les petits écrans */
+  .post-card {
+    width: 100%; /* Pleine largeur pour mobile */
+  }
+}
+.cdk-global-overlay-wrapper, .cdk-overlay-container {
+  z-index: 99999 !important;
+}
+
+.accordion {
+  cursor: pointer;
+  padding: 10px;
+  width: 100%;
+  text-align: left;
+  outline: none;
+  transition: background-color 0.4s;
+}
+
+.panel {
+  padding: 0 10px;
+  display: none;
+  background-color: lightgray;
+  overflow: hidden;
+}
+
+
+.accordionComments {
+  cursor: pointer;
+  padding: 10px;
+  width: 100%;
+  text-align: left;
+  outline: none;
+  transition: background-color 0.4s;
+}
+
+.panelComments {
+  padding: 0 10px;
+  display: none;
+  background-color: lightgray;
+  overflow: hidden;
+}
+
+.post-container {
+  padding: 30px;
+  margin: 5px 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+
+.post-deleted {
+  border: 6px solid red;
+}
+
+.post-invalid {
+  border: 6px solid blue;
+}
+
+.post-normal {
+  border: 6px solid black;
+}
+

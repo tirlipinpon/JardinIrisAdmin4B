@@ -46,7 +46,7 @@ export class EditComponent implements OnInit {
     this.editor = new Editor();
     const id = this.id();
     if(id) {
-      this.store.getOnePost(id);
+      this.store.getOneOrManyPostForm(id);
     }
   }
 
