@@ -1,9 +1,8 @@
 import {Component, computed, inject, input, OnInit} from '@angular/core';
-import {Router, RouterLink, RouterOutlet} from "@angular/router";
+import {RouterLink, RouterOutlet} from "@angular/router";
 import {PostStore} from "./store";
-import {FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
+import {FormBuilder, ReactiveFormsModule} from "@angular/forms";
 import {Post} from "../../types/post";
-import {SupabaseService} from "../searchBar/services/supabase/supabase.service";
 import {Editor, NgxEditorModule, Toolbar} from "ngx-editor";
 import {NgForOf, NgIf} from "@angular/common";
 import {MatFormFieldModule} from "@angular/material/form-field";
@@ -20,16 +19,14 @@ import {MatInputModule} from "@angular/material/input";
   styleUrl: './edit.component.css'
 })
 export class EditComponent implements OnInit {
+
+    private readonly id = input<number>();
     cathegoriesBlog = CathegoriesBlog;
     categoryList = Object.values(this.cathegoriesBlog);
-    id = input<number>();
     private readonly store = inject(PostStore);
     private readonly formBuilder = inject(FormBuilder);
-    private readonly router = inject(Router);
-    private readonly supabaseService = inject(SupabaseService);
     isLoading = this.store.loading;
     post: Post[] | null = null;
-    postForm: FormGroup = this.formBuilder.group({});
     editor!: Editor;
     toolbar: Toolbar = [
       // default value
@@ -56,13 +53,6 @@ export class EditComponent implements OnInit {
     postFromSignal = computed(() => {
       this.post = this.store.post()
       if(this.post) {
-        const group: any = {};
-        const copyPost = this.post[0];
-        Object.keys(copyPost).forEach(key => {
-          group[key] = [(copyPost as Record<string, any>)[key] ?? ''];
-        });
-        this.postForm = this.formBuilder.group(group);
-        this.postForm.patchValue(this.post, { emitEvent: false });
         return this.formBuilder.group({
           id: this.post[0].id,
           created_at: this.post[0].created_at,
@@ -80,7 +70,6 @@ export class EditComponent implements OnInit {
           deleted: this.post[0].deleted,
           video: this.post[0].video,
         });
-
       }
       return undefined;
     })
@@ -90,9 +79,11 @@ export class EditComponent implements OnInit {
     return createdAt ? new Date(createdAt).toLocaleDateString('fr-FR') : '';
   }
   onSubmit() {
-      console.log(this.postForm.value);
-    if (this.postForm.valid) {
-      this.store.setOnePost(this.postForm.value);
+    const postForm = this.postFromSignal();
+    if (postForm && postForm.valid) {
+      const { comments, ...postDataWithoutComments } = postForm.value;
+      this.store.setOnePost(postDataWithoutComments as Post);
+
     }
   }
 
