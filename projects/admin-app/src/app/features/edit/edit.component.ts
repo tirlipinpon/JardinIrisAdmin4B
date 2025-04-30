@@ -20,7 +20,7 @@ import {MatInputModule} from "@angular/material/input";
 })
 export class EditComponent implements OnInit {
 
-    private readonly id = input<number>();
+    id = input<number>();
     cathegoriesBlog = CathegoriesBlog;
     categoryList = Object.values(this.cathegoriesBlog);
     private readonly store = inject(PostStore);

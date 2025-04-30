@@ -46,7 +46,10 @@ export const PostStore = signalStore(
         switchMap((post: Post) => { // get = switch et push = concat
           return infra.setPost(post).pipe(
             tapResponse({
-              next: (post) => patchState(store, {loading: false}),
+              next: (post) => patchState(store, {
+                post: store.post()?.map(p => p.id === post.id ? post : p),
+                loading: false
+              }),
               error: (err) => {
                 patchState(store,{ loading: false, error: err})
                 console.log(err)
