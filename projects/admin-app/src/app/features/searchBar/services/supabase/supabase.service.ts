@@ -273,12 +273,13 @@ export class SupabaseService {
         .from('post')
         .update({valid: 'true'})
         .eq('id', idPost)
+        .select();
 
       if (error) {
         throw error;
       }
       console.log(data);
-      return data;
+      return data[0];
     } catch (error) {
       throw error;
     }

@@ -391,6 +391,10 @@ export class SearchInfrastructure {
     return from(this.supabaseService.deletePostByIdForm(id));
   }
 
+  validPost(id: number) {
+    return from(this.supabaseService.updateValidPostByIdForm(id));
+  }
+
 
 
 }

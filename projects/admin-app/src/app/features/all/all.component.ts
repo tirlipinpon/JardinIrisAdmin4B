@@ -122,6 +122,7 @@ export class AllComponent implements OnInit, AfterViewChecked {
   }
 
   validPostById(id: any) {
+    this.store.validPost(id)
   }
 
   getValidCommentsCount(post: any) {

@@ -90,5 +90,22 @@ export const PostStore = signalStore(
             )
           }))
       ),
+      validPost: rxMethod<number>(
+        pipe(tap(()=> updateState(store, '[valid Post] loading: true', {loading: true})),
+          switchMap((postId: number) => {
+            return infra.validPost(postId).pipe(
+              tapResponse({
+                next: (post) => updateState(store, '[valid Post] valid post', {
+                  post: store.post()?.map(p => p.id === post.id ? post : p),
+                  loading: false
+                }),
+                error: (err) => {
+                  patchState(store,{ loading: false, error: err})
+                  console.log(err)
+                }
+              })
+            )
+          }))
+      ),
   }))
 )
