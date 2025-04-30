@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {createClient, PostgrestError, SupabaseClient} from "@supabase/supabase-js";
-import {environment} from "../../../../../../../../environment";
-import {Post} from "../../../../types/post";
+import {environment} from "../../../../../../environment";
+import {Post} from "../../types/post";
 import {Observable, of} from "rxjs";
 
 export interface AuthResponse {

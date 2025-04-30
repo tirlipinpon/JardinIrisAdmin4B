@@ -5,7 +5,7 @@ import { OpenaiApiService } from "../openai-api/openai-api.service";
 import { PerplexityApiService } from "../perplexity-api/perplexity-api.service";
 import { GetPromptsService } from "../get-prompts/get-prompts.service";
 import { UnsplashImageService } from "../unsplash-image/unsplash-image.service";
-import { SupabaseService } from "../supabase/supabase.service";
+import { SupabaseService } from "../../../../shared/supabase/supabase.service";
 import {extractByPositionH4Title, extractJSONBlock, extractSecondSpanContent} from "../../../../utils/cleanJsonObject";
 
 /**

@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 import { map } from 'rxjs/operators';
-import {SupabaseService} from "../../searchBar/services/supabase/supabase.service";
+import {SupabaseService} from "../../../shared/supabase/supabase.service";
 
 export interface Credentials {
   email: string;

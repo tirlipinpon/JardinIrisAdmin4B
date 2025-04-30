@@ -38,7 +38,6 @@ export class OpenaiApiService {
         response_format: "b64_json"
       });
     return image.data[0].b64_json
-
   }
 
 }

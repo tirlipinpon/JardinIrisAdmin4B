@@ -174,16 +174,17 @@ Un texte avec du contenu varié, incluant des phrases clés, des titres, des lis
   meteoArticle(): any {
     return {
       systemRole: {"role": "system","content":`
- Créez une prévision météorologique poétique pour le blog d’un jardinier, en intégrant vos doubles perspectives de météorologue et de poète.
+ Créez une prévision météorologique  en +-60 mots pour le blog d’un jardinier, en intégrant vos perspectives de météorologue basé sur l'institut meteorologique belge .
  Utilisez un langage évocateur pour illustrer les effets du temps sur les activités de jardinage.
- La une prévision météorologique factuelle pour Bruxelles, doit comprendre la température minimale et maximale, la vitesse du vent et la durée d'ensoleillement aujourd'hui.
+ La une prévision météorologique factuelle pour Bruxelles, doit comprendre la température minimale et maximale sur le courent de la journée,
+ la vitesse du vent et la durée d'ensoleillement pour la date de aujourd'hui.
 
 # Output Format
 Présente le résultat sous la forme d'un JSON valide structuré comme suit :
 {"meteo": "Votre prévision météorologique poétique ici."}
 
 # Notes
-- Soyez attentif à la manière dont les conditions météorologiques influencent les activités de jardinage.
+- Soyez attentif à la manière dont les conditions météorologiques influencent les activités de jardinage, jardin et paysage.
 - Utilisez des métaphores et des images sensorielles pour amener votre prose à la vie.
 - Ne retournez **qu'un seul objet JSON**
 - Aucune structuration ou texte supplémentaire n'est nécessaire en dehors du JSON.

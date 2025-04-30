@@ -8,7 +8,7 @@ import {OpenaiApiService} from "../openai-api/openai-api.service";
 import {GetPromptsService} from "../get-prompts/get-prompts.service";
 import {PerplexityApiService} from "../perplexity-api/perplexity-api.service";
 import {extractJSONBlock, parseJsonSafe} from "../../../../utils/cleanJsonObject";
-import {SupabaseService} from "../supabase/supabase.service";
+import {SupabaseService} from "../../../../shared/supabase/supabase.service";
 import {map} from "rxjs/operators";
 import {Post} from "../../../../types/post";
 import {AddImagesToChaptersService} from "../add-image-to-chapters/add-images-to-chapters.service";
@@ -255,12 +255,9 @@ export class SearchInfrastructure {
   }
 
   setPost(post: Post): Observable<Post> {
-    if(!this.isLocalhost()) {
-      return of(
-        post
-      );
+    if(this.isLocalhost()) {
+      return of( post );
     } else {
-
       return from(this.supabaseService.updatePostByPostForm(post)).pipe(
         map(data => {
           if (data && data.length > 0) {
@@ -381,10 +378,6 @@ export class SearchInfrastructure {
 
   getPostWithComments(id?: number | null, orderBySelected?: string | null): Observable<Post[]> {
       return from(this.supabaseService.getPostWithComments(id, orderBySelected));
-  }
-
-  getAllComments() {
-    return from(this.supabaseService.getAllComments());
   }
 
   deletePost(id: number) {
