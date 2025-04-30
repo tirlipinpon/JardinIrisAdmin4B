@@ -1,8 +1,19 @@
 <div>
-  <input #postIdInput [value]="editPostId() ? editPostId() : ''"
-         [placeholder]="editPostId() ? editPostId() : 'ID du post à éditer'" size="15" type="number">
-  <a [routerLink]="['/home/edit', editPostId() ? editPostId() : postIdInput.value]">edit</a>
+  <input #postIdInput
+         [value]="editPostId()"
+         (input)="postIdInput.value"
+         [placeholder]="editPostId() || 'ID du post à éditer'"
+         size="15"
+         type="number" />
+
+  <a
+    [routerLink]="canNavigate(postIdInput.value) ? ['/home/edit', editPostId() || postIdInput.value] : null"
+    [style.pointer-events]="canNavigate(postIdInput.value) ? 'auto' : 'none'"
+    [style.color]="canNavigate(postIdInput.value) ? 'blue' : 'gray'">
+    edit
+  </a>
 </div>
+
 
 <section>
   <div>

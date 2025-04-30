@@ -20,6 +20,10 @@ export const routes: Routes = [
   {
     path: 'home/edit/:id',
     loadComponent: () => import('../app/features/edit/edit.component').then(m => m.EditComponent)
+  },
+  {
+    path: 'home/all',
+    loadComponent: () => import('../app/features/all/all.component').then(m => m.AllComponent)
   }
 
 ];

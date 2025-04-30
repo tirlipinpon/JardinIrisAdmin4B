@@ -24,7 +24,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
   url_post = "";
   isLoading =  this.application.isSearching;
   selectedOption: string = 'all';
-  editPostId= this.application.getPostId;
+  editPostId = this.application.getPostId;
 
   onOptionChange() {
     if(this.selectedOption === 'article') {
@@ -92,4 +92,8 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
      }
   }
 
+
+  canNavigate(input: string): boolean {
+    return !!(this.editPostId() || input && !isNaN(Number(input)));
+  }
 }
