@@ -23,12 +23,12 @@ export const PostStore = signalStore(
   { providedIn: 'root' },
   withDevtools('post'),
   withState(initialPostState),
-  withMethods((store, getOnePost = inject(SearchInfrastructure)) => ({
+  withMethods((store, infra = inject(SearchInfrastructure)) => ({
     getOnePost: rxMethod<number>(
       pipe(
         tap(()=> patchState(store, {loading: true})),
         switchMap((postId) => { // get = switch et push = concat
-          return getOnePost.getOneOrManyPostForm(postId).pipe(
+          return infra.getOneOrManyPostForm(postId).pipe(
             tapResponse({
               next: (post) => patchState(store, {post, loading: false}),
               error: (err) => {
@@ -39,6 +39,22 @@ export const PostStore = signalStore(
           )
         })
       )
-    )
+    ),
+    setOnePost: rxMethod<Post>(
+      pipe(
+        tap(()=> patchState(store, {loading: true})),
+        switchMap((post: Post) => { // get = switch et push = concat
+          return infra.setPost(post).pipe(
+            tapResponse({
+              next: (post) => patchState(store, {loading: false}),
+              error: (err) => {
+                patchState(store,{ loading: false, error: err})
+                console.log(err)
+              }
+            })
+          )
+        })
+      )
+    ),
   }))
 )

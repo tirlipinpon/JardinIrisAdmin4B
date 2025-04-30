@@ -254,6 +254,24 @@ export class SearchInfrastructure {
     }
   }
 
+  setPost(post: Post): Observable<Post> {
+    if(!this.isLocalhost()) {
+      return of(
+        post
+      );
+    } else {
+
+      return from(this.supabaseService.updatePostByPostForm(post)).pipe(
+        map(data => {
+          if (data && data.length > 0) {
+            return data[0]; // Retourne le premier élément du tableau
+          }
+          throw new Error('Aucune donnée retournée après l insertion');
+        })
+      );
+    }
+  }
+
   savePost(post: Post, getMeteo: string, getArticleHtml: string, image_url: string, video: string | null, isArticleValid: boolean | null): Observable<Post> {
     if(this.isLocalhost()) {
       return of(
@@ -360,5 +378,7 @@ export class SearchInfrastructure {
   getOneOrManyPostForm(postId?: number): Observable<Post[]> {
     return from(this.supabaseService.getOneOrManyPostForm(postId));
   }
+
+
 
 }

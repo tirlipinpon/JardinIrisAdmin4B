@@ -6,7 +6,7 @@ import {Post} from "../../types/post";
 import {SupabaseService} from "../searchBar/services/supabase/supabase.service";
 import {Editor, NgxEditorModule, Toolbar} from "ngx-editor";
 import {NgForOf, NgIf} from "@angular/common";
-import {MatFormField, MatFormFieldModule} from "@angular/material/form-field";
+import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {CathegoriesBlog} from "../../types/cathegoriesBlog";
 import {MatInputModule} from "@angular/material/input";
@@ -20,8 +20,8 @@ import {MatInputModule} from "@angular/material/input";
   styleUrl: './edit.component.css'
 })
 export class EditComponent implements OnInit {
-    cathegoriesBlog = CathegoriesBlog; // si besoin dans le template
-    categoryList = Object.values(this.cathegoriesBlog); // Tableau utilisable dans le *ngFor
+    cathegoriesBlog = CathegoriesBlog;
+    categoryList = Object.values(this.cathegoriesBlog);
     id = input<number>();
     private readonly store = inject(PostStore);
     private readonly formBuilder = inject(FormBuilder);
@@ -29,7 +29,7 @@ export class EditComponent implements OnInit {
     private readonly supabaseService = inject(SupabaseService);
     isLoading = this.store.loading;
     post: Post[] | null = null;
-    postForm!: FormGroup;
+    postForm: FormGroup = this.formBuilder.group({});
     editor!: Editor;
     toolbar: Toolbar = [
       // default value
@@ -43,9 +43,26 @@ export class EditComponent implements OnInit {
       ["align_left", "align_center", "align_right", "align_justify"],
     ];
     isEditorTextON: boolean = false;
+
+  ngOnInit(): void {
+    this.editor = new Editor();
+    const id = this.id();
+    if(id) {
+      this.store.getOnePost(id);
+    }
+  }
+
+
     postFromSignal = computed(() => {
-       this.post = this.store.post()
+      this.post = this.store.post()
       if(this.post) {
+        const group: any = {};
+        const copyPost = this.post[0];
+        Object.keys(copyPost).forEach(key => {
+          group[key] = [(copyPost as Record<string, any>)[key] ?? ''];
+        });
+        this.postForm = this.formBuilder.group(group);
+        this.postForm.patchValue(this.post, { emitEvent: false });
         return this.formBuilder.group({
           id: this.post[0].id,
           created_at: this.post[0].created_at,
@@ -62,26 +79,20 @@ export class EditComponent implements OnInit {
           valid: this.post[0].valid,
           deleted: this.post[0].deleted,
           video: this.post[0].video,
-        })
+        });
+
       }
       return undefined;
     })
-
-    ngOnInit(): void {
-      this.editor = new Editor();
-      const id = this.id();
-      if(id) {
-        this.store.getOnePost(id);
-      }
-    }
 
   get createdAtFormatted() {
     const createdAt = this.post && this.post[0] ? this.post[0].created_at : null;
     return createdAt ? new Date(createdAt).toLocaleDateString('fr-FR') : '';
   }
   onSubmit() {
-    if (this.post && this.post[0] && this.post[0].valid && this.postForm) {
-      this.store.getOnePost(this.postForm.value)
+      console.log(this.postForm.value);
+    if (this.postForm.valid) {
+      this.store.setOnePost(this.postForm.value);
     }
   }
 
@@ -89,7 +100,4 @@ export class EditComponent implements OnInit {
     this.isEditorTextON = !this.isEditorTextON;
     event.preventDefault();
   }
-
-
-  protected readonly CathegoriesBlog = CathegoriesBlog;
 }

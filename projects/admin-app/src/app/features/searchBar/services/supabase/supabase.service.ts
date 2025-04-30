@@ -285,7 +285,8 @@ export class SupabaseService {
       const { data, error } = await this.supabase
         .from('post')
         .update(dataPost)
-        .eq('id', dataPost.id);
+        .eq('id', dataPost.id)
+        .select();
 
       if (error) {
         throw error;
