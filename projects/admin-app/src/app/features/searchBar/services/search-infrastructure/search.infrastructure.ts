@@ -387,6 +387,10 @@ export class SearchInfrastructure {
     return from(this.supabaseService.getAllComments());
   }
 
+  deletePost(id: number) {
+    return from(this.supabaseService.deletePostByIdForm(id));
+  }
+
 
 
 }

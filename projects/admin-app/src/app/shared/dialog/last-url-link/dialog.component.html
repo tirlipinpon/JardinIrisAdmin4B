@@ -1,0 +1,11 @@
+<h2 mat-dialog-title>Acceder au dernier post ajouté (attention doit être validé d'abord)</h2>
+<mat-dialog-content>
+<mat-dialog-actions>
+  {{data.link}}
+  <button (click)="redirectTo(data.link)" mat-button mat-dialog-close> Valider le post  </button>
+</mat-dialog-actions>
+
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>fermer cette fenêtre</button>
+</mat-dialog-actions>

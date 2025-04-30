@@ -26,8 +26,7 @@ export const PostStore = signalStore(
   withMethods((store, infra = inject(SearchInfrastructure)) =>
     ({
     getOneOrManyPostForm: rxMethod<number | undefined>(
-      pipe(
-        tap(()=> updateState(store, '[get One Or Many Post Form] loading: true', {loading: true})),
+      pipe(tap(()=> updateState(store, '[get One Or Many Post Form] loading: true', {loading: true})),
         switchMap((postId: number | undefined) => { // get = switch et push = concat
           return infra.getOneOrManyPostForm(postId).pipe(
             tapResponse({
@@ -38,12 +37,10 @@ export const PostStore = signalStore(
               }
             })
           )
-        })
-      )
+        }))
     ),
     getPostWithComments: rxMethod<{id?: number | null, orderBySelected?: string | null}>(
-      pipe(
-        tap(()=> updateState(store, '[get Post With Comments] loading: true', {loading: true})),
+      pipe(tap(()=> updateState(store, '[get Post With Comments] loading: true', {loading: true})),
         switchMap((params = {}) => { // get = switch et push = concat
           const { id, orderBySelected } = params;
           return infra.getPostWithComments(id, orderBySelected
@@ -57,12 +54,10 @@ export const PostStore = signalStore(
               }
             })
           )
-        })
-      )
+        }))
     ),
     setOnePost: rxMethod<Post>(
-      pipe(
-        tap(()=> updateState(store, '[set One Post] loading: true', {loading: true})),
+      pipe(tap(()=> updateState(store, '[set One Post] loading: true', {loading: true})),
         switchMap((post: Post) => { // get = switch et push = concat
           return infra.setPost(post).pipe(
             tapResponse({
@@ -76,8 +71,24 @@ export const PostStore = signalStore(
               }
             })
           )
-        })
-      )
+        }))
     ),
+      deletePost: rxMethod<number>(
+        pipe(tap(()=> updateState(store, '[delete Post] loading: true', {loading: true})),
+          switchMap((postId: number) => {
+            return infra.deletePost(postId).pipe(
+              tapResponse({
+                next: (post) => updateState(store, '[delete Post] delete post', {
+                  post: store.post()?.map(p => p.id === post.id ? post : p),
+                  loading: false
+                }),
+                error: (err) => {
+                  patchState(store,{ loading: false, error: err})
+                  console.log(err)
+                }
+              })
+            )
+          }))
+      ),
   }))
 )
