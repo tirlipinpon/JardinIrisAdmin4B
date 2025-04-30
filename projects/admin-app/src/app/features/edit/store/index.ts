@@ -6,6 +6,7 @@ import {SearchInfrastructure} from "../../searchBar/services/search-infrastructu
 import {pipe, switchMap, tap} from "rxjs";
 import {rxMethod} from "@ngrx/signals/rxjs-interop";
 import {tapResponse} from "@ngrx/operators";
+import {Comment} from "../../../types/comment";
 
 export interface PostState  {
   post: Post[] | null;
@@ -97,6 +98,46 @@ export const PostStore = signalStore(
               tapResponse({
                 next: (post) => updateState(store, '[valid Post] valid post', {
                   post: store.post()?.map(p => p.id === post.id ? post : p),
+                  loading: false
+                }),
+                error: (err) => {
+                  patchState(store,{ loading: false, error: err})
+                  console.log(err)
+                }
+              })
+            )
+          }))
+      ),
+      deleteComment: rxMethod<number>(
+        pipe(tap(()=> updateState(store, '[delete Comment] loading: true', {loading: true})),
+          switchMap((id: number) => {
+            return infra.deleteComment(id).pipe(
+              tapResponse({
+                next: (comment: Comment) => updateState(store, '[delete Post] delete comment', {
+                  post: store.post()?.map(p => p.id === comment.fk_post ? {
+                    ...p,
+                    comments: p.comments?.map(c => c.id === comment.id ? comment : c)
+                  } : p),
+                  loading: false
+                }),
+                error: (err) => {
+                  patchState(store,{ loading: false, error: err})
+                  console.log(err)
+                }
+              })
+            )
+          }))
+      ),
+      validComment: rxMethod<number>(
+        pipe(tap(()=> updateState(store, '[valid Comment] loading: true', {loading: true})),
+          switchMap((id: number) => {
+            return infra.validComment(id).pipe(
+              tapResponse({
+                next: (comment: Comment) => updateState(store, '[valid Post] valid comment', {
+                  post: store.post()?.map(p => p.id === comment.fk_post ? {
+                    ...p,
+                    comments: p.comments?.map(c => c.id === comment.id ? comment : c)
+                  } : p),
                   loading: false
                 }),
                 error: (err) => {

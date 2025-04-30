@@ -93,13 +93,9 @@ export class AllComponent implements OnInit, AfterViewChecked {
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.callDeleteCommentAndRefreshPosts(comment.id)
+        this.store.deleteComment(comment.id)
       }
     });
-  }
-
-  callDeleteCommentAndRefreshPosts(commentId: number) {
-
   }
 
   openDialogDeletePost(post: Post) {
@@ -125,13 +121,15 @@ export class AllComponent implements OnInit, AfterViewChecked {
     this.store.validPost(id)
   }
 
-  getValidCommentsCount(post: any) {
-    return "";
+  getValidCommentsCount(comments: any) {
+    return comments ? comments.filter((comment: Comment) => comment.valide).length : 0;
   }
 
-  deleteCommentById(comment: any) {
+  deleteCommentById(comment: Comment) {
+    this.openDialogDeleteComment(comment)
   }
 
   valideCommentById(comment: any) {
+    this.store.validComment(comment.id)
   }
 }

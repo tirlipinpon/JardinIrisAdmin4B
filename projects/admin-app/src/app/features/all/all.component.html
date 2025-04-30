@@ -44,7 +44,7 @@
           <!--      comments blok    -->
           <div>
 
-            <button *ngIf="post?.comments?.length" class="accordionComments">{{post?.comments?.length}} commentaire dont {{ getValidCommentsCount(post) }}  commentaire valide</button>
+            <button *ngIf="post?.comments?.length" class="accordionComments">{{post?.comments?.length}} commentaire dont {{ getValidCommentsCount(post.comments) }}  commentaire valide</button>
 
             <div class="panelComments col-lg-12 col-md-12 col-sm-12 review-block">
               <div class="customer-review">

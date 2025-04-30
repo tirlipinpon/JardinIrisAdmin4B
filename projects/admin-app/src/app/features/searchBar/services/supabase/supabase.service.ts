@@ -309,11 +309,12 @@ export class SupabaseService {
         .from('comments')
         .update({valide: 'false'})
         .eq('id', id)
+        .select();
 
       if (error) {
         throw error;
       }
-      return data;
+      return data[0];
     } catch (error) {
       throw error;
     }
@@ -325,11 +326,12 @@ export class SupabaseService {
         .from('comments')
         .update({valide: 'true'})
         .eq('id', id)
+        .select()
 
       if (error) {
         throw error;
       }
-      return data;
+      return data[0];
     } catch (error) {
       throw error;
     }

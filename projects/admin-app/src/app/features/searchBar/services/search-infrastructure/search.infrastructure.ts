@@ -395,6 +395,14 @@ export class SearchInfrastructure {
     return from(this.supabaseService.updateValidPostByIdForm(id));
   }
 
+  deleteComment(id: number) {
+    return from(this.supabaseService.deleteCommentById(id));
+  }
+
+  validComment(id: number) {
+    return from(this.supabaseService.valideCommentById(id));
+  }
+
 
 
 }
