@@ -1,5 +1,5 @@
 import {Component, computed, inject, input, OnInit} from '@angular/core';
-import {RouterLink, RouterOutlet} from "@angular/router";
+import {Router, RouterLink, RouterOutlet} from "@angular/router";
 import {PostStore} from "./store";
 import {FormBuilder, ReactiveFormsModule} from "@angular/forms";
 import {Post} from "../../types/post";
@@ -25,6 +25,7 @@ export class EditComponent implements OnInit {
     categoryList = Object.values(this.cathegoriesBlog);
     private readonly store = inject(PostStore);
     private readonly formBuilder = inject(FormBuilder);
+    private readonly router = inject(Router);
     isLoading = this.store.loading;
     post: Post[] | null = null;
     editor!: Editor;
@@ -83,6 +84,7 @@ export class EditComponent implements OnInit {
     if (postForm && postForm.valid) {
       const { comments, ...postDataWithoutComments } = postForm.value;
       this.store.setOnePost(postDataWithoutComments as Post);
+      this.router.navigate(['/home/all']); // Navigate to /home/all
 
     }
   }
