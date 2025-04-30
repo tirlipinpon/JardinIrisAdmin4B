@@ -4,11 +4,12 @@ import {PostStore} from "../edit/store";
 import {Post} from "../../types/post";
 import {FormBuilder} from "@angular/forms";
 import { CommonModule } from '@angular/common';
-import {Comment} from "../../types/comment";
+import {MatFormField} from "@angular/material/form-field";
+import {MatOption, MatSelect} from "@angular/material/select";
 
 @Component({
   selector: 'app-all',
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink, CommonModule, MatFormField, MatSelect, MatOption],
   templateUrl: './all.component.html',
   styleUrl: './all.component.css'
 })
@@ -17,6 +18,8 @@ export class AllComponent implements OnInit, AfterViewChecked {
   post: Post[] | null = null;
   private readonly formBuilder = inject(FormBuilder);
   isLoading = this.store.loading;
+  matSelectedOption: string = "";
+
   constructor() { }
 
   postFromSignal = computed(() => {
@@ -25,12 +28,18 @@ export class AllComponent implements OnInit, AfterViewChecked {
 
 
   ngOnInit(): void {
-      this.store.getPostWithComments(undefined);
+      this.store.getPostWithComments({id: null, orderBySelected: 'created_at'});
   }
 
   ngAfterViewChecked() {
     this.addClickEventAccordionArticle('accordion')
     this.addClickEventAccordionArticle('accordionComments')
+  }
+
+  triggerSelectChange(valueSelected: any) {
+    this.matSelectedOption = valueSelected.value;
+    this.store.getPostWithComments({id: null, orderBySelected: valueSelected.value}
+    );
   }
 
   getPostStatusClass(post: any): string {

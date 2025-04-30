@@ -62,7 +62,7 @@ export class SupabaseService {
 
   async setNewPostForm(value: Post): Promise<Post[]> {
     try {
-      const { data, error } = await this.supabase
+      const {data, error} = await this.supabase
         .from('post')
         .insert([value])
         .select();
@@ -78,7 +78,7 @@ export class SupabaseService {
 
   async setNewFaq(value: any): Promise<any> {
     try {
-      const { data, error } = await this.supabase
+      const {data, error} = await this.supabase
         .from('faq')
         .insert([value]);
       return data;
@@ -87,14 +87,17 @@ export class SupabaseService {
     }
   }
 
-  async getFirstIdeaPostByMonth(month: number, year: number): Promise<{ id: number | null, "description": string | null } | PostgrestError>  {
-    const { data, error } = await this.supabase
+  async getFirstIdeaPostByMonth(month: number, year: number): Promise<{
+    id: number | null,
+    "description": string | null
+  } | PostgrestError> {
+    const {data, error} = await this.supabase
       .from('ideaPost')
       .select('id, description')
       .gte('created_at', `${year}-${month.toString().padStart(2, '0')}-01`) // Ajout de padStart pour le format
       .lt('created_at', `${year}-${(month + 1).toString().padStart(2, '0')}-01`) // Gestion du mois suivant
       .eq('deleted', false)
-      .order('created_at', { ascending: false })
+      .order('created_at', {ascending: false})
       .limit(1);
 
     if (error) {
@@ -102,13 +105,13 @@ export class SupabaseService {
       return error
     } else {
       console.log("getFirstIdeaPostByMonth = " + JSON.stringify(data, null, 2))
-      return data.length > 0 ? data[0] : { id: null, description: null };
+      return data.length > 0 ? data[0] : {id: null, description: null};
     }
   }
 
   async updateIdeaPostById(id: number, fk_idPost: number) {
     try {
-      const { error } = await this.supabase
+      const {error} = await this.supabase
         .from('ideaPost')
         .update({
           deleted: true,
@@ -125,9 +128,9 @@ export class SupabaseService {
 
   async updateImageUrlPostByIdForm(idPost: number, json64: string) {
     try {
-      const { data, error } = await this.supabase
+      const {data, error} = await this.supabase
         .from('post')
-        .update({ image_url: json64 })
+        .update({image_url: json64})
         .eq('id', idPost)
         .select()
 
@@ -147,11 +150,11 @@ export class SupabaseService {
         .select('id, titre')
         .eq('valid', true)
         .eq('deleted', false)
-        .order('created_at', { ascending: false })
+        .order('created_at', {ascending: false})
         .limit(20)
 
 
-      const { data, error } = await query;
+      const {data, error} = await query;
 
       if (error) {
         throw error;
@@ -164,7 +167,7 @@ export class SupabaseService {
 
   async setNewUrlImagesChapitres(url: string, chapitreId: number, postId: number, chapitreKeyWord: string, chapitreExplanationWord: string, chapitreExplanationImage: string): Promise<any> {
     try {
-      const { data, error } = await this.supabase
+      const {data, error} = await this.supabase
         .from('urlImagesChapitres')
         .insert([
           {
@@ -198,26 +201,26 @@ export class SupabaseService {
         .from('post')
         .select('*')
 
-      if (idPost && idPost>0) {
+      if (idPost && idPost > 0) {
         query = query.eq('id', idPost);
       }
 
       if (orderBySelected) {
-        if(orderBySelected==='valid') {
-          query = query.order(orderBySelected, { ascending: true });
-        } else if(orderBySelected==='original') {
+        if (orderBySelected === 'valid') {
+          query = query.order(orderBySelected, {ascending: true});
+        } else if (orderBySelected === 'original') {
           query = query
             .eq('valid', true)
             .eq('deleted', false)
-            .order('created_at', { ascending: false });
+            .order('created_at', {ascending: false});
         } else {
-          query = query.order(orderBySelected, { ascending: false });
+          query = query.order(orderBySelected, {ascending: false});
         }
       } else {
-        query = query.order('created_at', { ascending: false });
+        query = query.order('created_at', {ascending: false});
       }
 
-      const { data, error } = await query;
+      const {data, error} = await query;
 
       if (error) {
         throw error;
@@ -233,9 +236,9 @@ export class SupabaseService {
       let query = this.supabase
         .from('comments')
         .select('*')
-        .order('id', { ascending: true });
+        .order('id', {ascending: true});
 
-      const { data, error } = await query;
+      const {data, error} = await query;
 
       if (error) {
         throw error;
@@ -248,9 +251,9 @@ export class SupabaseService {
 
   async deletePostByIdForm(idPost: number) {
     try {
-      const { data, error } = await this.supabase
+      const {data, error} = await this.supabase
         .from('post')
-        .update({ deleted: 'true' })
+        .update({deleted: 'true'})
         .eq('id', idPost)
 
       if (error) {
@@ -265,9 +268,9 @@ export class SupabaseService {
 
   async updateValidPostByIdForm(idPost: number) {
     try {
-      const { data, error } = await this.supabase
+      const {data, error} = await this.supabase
         .from('post')
-        .update({ valid: 'true' })
+        .update({valid: 'true'})
         .eq('id', idPost)
 
       if (error) {
@@ -282,7 +285,7 @@ export class SupabaseService {
 
   async updatePostByPostForm(dataPost: Post) {
     try {
-      const { data, error } = await this.supabase
+      const {data, error} = await this.supabase
         .from('post')
         .update(dataPost)
         .eq('id', dataPost.id)
@@ -300,9 +303,9 @@ export class SupabaseService {
 
   async deleteCommentById(id: number) {
     try {
-      const { data, error } = await this.supabase
+      const {data, error} = await this.supabase
         .from('comments')
-        .update({ valide: 'false' })
+        .update({valide: 'false'})
         .eq('id', id)
 
       if (error) {
@@ -316,9 +319,9 @@ export class SupabaseService {
 
   async valideCommentById(id: number) {
     try {
-      const { data, error } = await this.supabase
+      const {data, error} = await this.supabase
         .from('comments')
-        .update({ valide: 'true' })
+        .update({valide: 'true'})
         .eq('id', id)
 
       if (error) {
@@ -330,17 +333,29 @@ export class SupabaseService {
     }
   }
 
-  async getPostWithComments() {
+  async getPostWithComments(id?: number | null, orderBySelected?: string | null) {
     try {
-      const { data, error } = await this.supabase.rpc('get_posts_with_comments_all')
+      // Si 'id' est undefined, on le remplace par NULL pour PostgreSQL
+      const idPost = id ?? null;  // Si 'id' est undefined, idPost sera null
+
+      // Si 'orderBySelected' est undefined, on le remplace par NULL pour PostgreSQL
+      const orderBy = orderBySelected ?? null;  // Si 'orderBySelected' est undefined, orderBy sera null
+
+      // Appel à la fonction RPC de Supabase avec les paramètres
+      const { data, error } = await this.supabase.rpc('get_posts_with_comments_all_with_params', {
+        idpost: idPost,       // Passer 'idPost' à la fonction
+        orderbyselected: orderBy   // Passer 'orderBy' à la fonction
+      });
+
       if (error) {
-        console.error('Erreur lors de l’appel de la fonction :', error)
-        return error
+        console.error('Erreur lors de l’appel de la fonction :', error);
+        return error;
       } else {
-        return data
+        return data;
       }
     } catch (error) {
-        throw error;
-   }
+      throw error;
+    }
   }
+
 }

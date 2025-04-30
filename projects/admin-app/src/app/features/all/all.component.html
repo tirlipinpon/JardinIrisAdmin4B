@@ -1,6 +1,15 @@
 <a [routerLink]="['/home']">Create</a>
 
-<p>all works!</p>
+<mat-form-field>
+  <mat-select [(value)]="matSelectedOption" (selectionChange)="triggerSelectChange($event)">
+    <mat-option value="original">comme sur le site</mat-option>
+    <mat-option value="created_at">date (recent en premier)</mat-option>
+    <mat-option value="valid">posts à valider</mat-option>
+    <mat-option value="visite">vues</mat-option>
+    <mat-option value="deleted">posts supprimé</mat-option>
+    <mat-option value="id">id</mat-option>
+  </mat-select>
+</mat-form-field>
 
 @let postDataWithComments = postFromSignal();
 

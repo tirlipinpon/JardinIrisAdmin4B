@@ -1,6 +1,6 @@
 import {Post} from "../../../types/post";
 import {patchState, signalStore, withMethods, withState} from "@ngrx/signals";
-import {withDevtools} from "@angular-architects/ngrx-toolkit";
+import {updateState, withDevtools} from "@angular-architects/ngrx-toolkit";
 import {inject} from "@angular/core";
 import {SearchInfrastructure} from "../../searchBar/services/search-infrastructure/search.infrastructure";
 import {pipe, switchMap, tap} from "rxjs";
@@ -23,10 +23,11 @@ export const PostStore = signalStore(
   { providedIn: 'root' },
   withDevtools('post'),
   withState(initialPostState),
-  withMethods((store, infra = inject(SearchInfrastructure)) => ({
+  withMethods((store, infra = inject(SearchInfrastructure)) =>
+    ({
     getOneOrManyPostForm: rxMethod<number | undefined>(
       pipe(
-        tap(()=> patchState(store, {loading: true})),
+        tap(()=> updateState(store, '[get One Or Many Post Form] loading: true', {loading: true})),
         switchMap((postId: number | undefined) => { // get = switch et push = concat
           return infra.getOneOrManyPostForm(postId).pipe(
             tapResponse({
@@ -40,11 +41,13 @@ export const PostStore = signalStore(
         })
       )
     ),
-    getPostWithComments: rxMethod<void>(
+    getPostWithComments: rxMethod<{id?: number | null, orderBySelected?: string | null}>(
       pipe(
-        tap(()=> patchState(store, {loading: true})),
-        switchMap(() => { // get = switch et push = concat
-          return infra.getPostWithComments().pipe(
+        tap(()=> updateState(store, '[get Post With Comments] loading: true', {loading: true})),
+        switchMap((params = {}) => { // get = switch et push = concat
+          const { id, orderBySelected } = params;
+          return infra.getPostWithComments(id, orderBySelected
+          ).pipe(
             tapResponse({
               next: (postsWithComments) => patchState(store, {
                 post: postsWithComments, loading: false }),
@@ -59,11 +62,11 @@ export const PostStore = signalStore(
     ),
     setOnePost: rxMethod<Post>(
       pipe(
-        tap(()=> patchState(store, {loading: true})),
+        tap(()=> updateState(store, '[set One Post] loading: true', {loading: true})),
         switchMap((post: Post) => { // get = switch et push = concat
           return infra.setPost(post).pipe(
             tapResponse({
-              next: (post) => patchState(store, {
+              next: (post) => updateState(store, '[set One Post] update post', {
                 post: store.post()?.map(p => p.id === post.id ? post : p),
                 loading: false
               }),
