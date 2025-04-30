@@ -11,6 +11,10 @@
   z-index: 99999 !important;
 }
 
+.container {
+  max-width: 100%!important;
+}
+
 .accordion {
   cursor: pointer;
   padding: 10px;
