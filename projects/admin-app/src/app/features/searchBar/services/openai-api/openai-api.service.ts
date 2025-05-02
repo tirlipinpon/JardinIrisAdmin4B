@@ -37,7 +37,10 @@ export class OpenaiApiService {
         size:"1024x1024",
         response_format: "b64_json"
       });
-    return image.data[0].b64_json
+    if (!image.data || image.data.length === 0) {
+      throw new Error("Aucune image n'a été générée");
+    }
+    return image.data[0].b64_json;
   }
 
 }

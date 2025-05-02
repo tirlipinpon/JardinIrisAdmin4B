@@ -68,3 +68,25 @@ export function base64ToBlob(base64: any, mimeType: any) {
   return new Blob([ab], { type: mimeType });
 }
 
+export function compressBase64Image(base64: string, width: number, height: number, quality: number): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return reject("Canvas context non disponible");
+
+      ctx.drawImage(img, 0, 0, width, height);
+      const compressedBase64 = canvas.toDataURL('image/jpeg', quality); // qualité entre 0.0 et 1.0
+      resolve(compressedBase64.replace(/^data:image\/jpeg;base64,/, "")); // retourne uniquement le contenu base64
+    };
+
+    img.onerror = (err) => reject(err);
+    img.src = `data:image/png;base64,${base64}`;
+  });
+}
+
+
