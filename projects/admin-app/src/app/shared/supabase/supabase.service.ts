@@ -346,7 +346,7 @@ export class SupabaseService {
       const orderBy = orderBySelected ?? null;  // Si 'orderBySelected' est undefined, orderBy sera null
 
       // Appel à la fonction RPC de Supabase avec les paramètres
-      const { data, error } = await this.supabase.rpc('get_posts_with_comments_all_with_params', {
+      const { data, error } = await this.supabase.rpc('get_posts_with_comments_and_image', {
         idpost: idPost,       // Passer 'idPost' à la fonction
         orderbyselected: orderBy   // Passer 'orderBy' à la fonction
       });

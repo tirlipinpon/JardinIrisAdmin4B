@@ -16,6 +16,7 @@ export interface Post {
   valid?: boolean;
   deleted?: boolean;
   video?: string | null;
+  images_chapitres?: any[];
 }
 
 /*
