@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EditImageChapitreConfirmComponent } from './edit-image-chapitre-confirm.component';
+import { DialogEditVideoConfirmComponent } from './dialog-edit-video-confirm.component';
 
 describe('DialogComponent', () => {
-  let component: EditImageChapitreConfirmComponent;
-  let fixture: ComponentFixture<EditImageChapitreConfirmComponent>;
+  let component: DialogEditVideoConfirmComponent;
+  let fixture: ComponentFixture<DialogEditVideoConfirmComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EditImageChapitreConfirmComponent]
+      imports: [DialogEditVideoConfirmComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(EditImageChapitreConfirmComponent);
+    fixture = TestBed.createComponent(DialogEditVideoConfirmComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

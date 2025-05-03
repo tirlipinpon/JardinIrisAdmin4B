@@ -25,14 +25,14 @@ export class GoogleSearchService {
   constructor(private http: HttpClient) { }
 
   searchFrenchVideo(keyWords: string): Observable<VideoInfo[]> {
-    const regions = ['FR', 'BE']; // Liste des régions à tester
+    const regions = ['FR', 'BE', '']; // Liste des régions à tester
     const requests = regions.map(region => {
       const params = {
         part: 'snippet',
         q: keyWords,
         type: 'video',
         maxResults: '5',
-        order: 'date', // Trier par nombre de vues
+        order: 'relevance', // Trier par nombre de vues
         // regionCode: region, // Région à utiliser pour chaque appel
         key: this.apiKey
       };

@@ -7,7 +7,6 @@ import {
   MatDialogContent,
   MatDialogTitle
 } from "@angular/material/dialog";
-import {DatePipe, NgIf} from "@angular/common";
 import {getFormattedFullDateTime} from "../../../utils/getFormattedDate";
 
 @Component({

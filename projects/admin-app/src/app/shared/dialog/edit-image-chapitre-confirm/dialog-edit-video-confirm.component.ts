@@ -16,8 +16,8 @@ import {CommonModule} from "@angular/common";
 import {DomSanitizer, SafeResourceUrl} from "@angular/platform-browser";
 
 @Component({
-  selector: 'app-dialog-edit-image-chapitre-confirm',
-  templateUrl: 'edit-image-chapitre-confirm.component.html',
+  selector: 'app-dialog-edit-video-confirm',
+  templateUrl: 'dialog-edit-video-confirm.component.html',
   styles: [
     `
       .selected-card {
@@ -55,7 +55,7 @@ import {DomSanitizer, SafeResourceUrl} from "@angular/platform-browser";
     MatCardActions],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditImageChapitreConfirmComponent {
+export class DialogEditVideoConfirmComponent {
   data: any = inject(MAT_DIALOG_DATA);
   googleSearchService: any = inject(GoogleSearchService);
   rawVideos: any[] = [];

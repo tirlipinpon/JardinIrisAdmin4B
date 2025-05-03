@@ -14,10 +14,8 @@ import {Comment} from "../../types/comment";
 import {
   DialogDeletePostConfirmComponent
 } from "../../shared/dialog/delete-post-confirm/dialog-delete-post-confirm.component";
-import {DomSanitizer} from "@angular/platform-browser";
-import {
-  EditImageChapitreConfirmComponent
-} from "../../shared/dialog/edit-image-chapitre-confirm/edit-image-chapitre-confirm.component";
+import {DomSanitizer, SafeResourceUrl} from "@angular/platform-browser";
+import {DialogEditVideoConfirmComponent} from "../../shared/dialog/edit-image-chapitre-confirm/dialog-edit-video-confirm.component";
 
 @Component({
   selector: 'app-all',
@@ -33,6 +31,9 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy {
   matSelectedOption: string = "";
   readonly dialogDeleteConfirm = inject(MatDialog);
   clickListener: any;
+  // Map pour suivre l'état d'affichage de chaque vidéo (par ID de post)
+  videoVisibilityMap = new Map<string | number, boolean>();
+
 
   constructor(private sanitizer: DomSanitizer) { }
 
@@ -42,9 +43,9 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy {
 
 
   ngOnInit(): void {
-      this.store.getPostWithComments({id: null, orderBySelected: 'created_at'});
+    this.store.getPostWithComments({id: null, orderBySelected: 'created_at'});
     // Ajouter un écouteur d'événement global pour les clics sur les images
-    this.clickListener = this.handleImageClick.bind(this);
+    this.clickListener = this.handleVideoClick.bind(this);
     document.addEventListener('click', this.clickListener)
   }
 
@@ -57,6 +58,22 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy {
     // Nettoyer l'écouteur d'événement lors de la destruction du composant
     document.removeEventListener('click', this.clickListener);
   }
+
+  // Méthode pour basculer l'affichage d'une vidéo spécifique
+  toggleVideoDisplay(postId: string | number | undefined): void {
+    if (postId === undefined) return;
+    const currentValue = this.videoVisibilityMap.get(postId) || false;
+    this.videoVisibilityMap.set(postId, !currentValue);
+  }
+
+
+// Méthode pour vérifier si une vidéo est visible
+  isVideoVisible(postId: string | number | undefined): boolean {
+    if (postId === undefined) return false;
+    return this.videoVisibilityMap.get(postId) || false;
+  }
+
+
 
   triggerSelectChange(valueSelected: any) {
     this.matSelectedOption = valueSelected.value;
@@ -125,10 +142,11 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy {
     });
   }
 
-  openDialogEditImageById(id: number) {
-    const dialogRef = this.dialogDeleteConfirm.open(EditImageChapitreConfirmComponent, {
+  openDialogEditVideoById(id: number, url: string | null) {
+    const dialogRef = this.dialogDeleteConfirm.open(DialogEditVideoConfirmComponent, {
       data: {
-        imageId: id,
+        id: id,
+        url: url,
       },
     });
     dialogRef.afterClosed().subscribe(result => {
@@ -199,23 +217,43 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy {
         }
       }
     });
-
     return this.sanitizer.bypassSecurityTrustHtml(tempDiv.innerHTML);
   }
 
-  handleImageClick(event: Event) {
+  handleVideoClick(event: Event) {
     const target = event.target as HTMLElement;
 
     // Vérifier si l'élément cliqué est une image avec notre classe spéciale
-    if (target.tagName === 'IMG' && target.classList.contains('clickable-image')) {
+    if (target.tagName === 'BUTTON' && target.classList.contains('clickable-video')) {
       // Récupérer l'ID de l'image depuis l'attribut data
-      const imageId = target.getAttribute('data-image-id');
+      const postId = target.getAttribute('data-post-id');
+      const videoUrl = target.getAttribute('data-video-url');
 
-      if (imageId) {
+      if (postId) {
         // Appeler votre fonction avec l'ID de l'image
-        this.openDialogEditImageById(parseInt(imageId));
+        this.openDialogEditVideoById(parseInt(postId), videoUrl);
       }
     }
   }
+
+  getSafeUrl(videoUrl: string | null | undefined): SafeResourceUrl {
+    if (!videoUrl) {
+      return this.sanitizer.bypassSecurityTrustResourceUrl('');
+    }
+    let videoId = '';
+    // Gérer les formats d'URL YouTube comme:
+    // https://www.youtube.com/watch?v=n7lUCZYx-6U
+    // https://youtu.be/n7lUCZYx-6U
+    if (videoUrl.includes('youtube.com/watch?v=')) {
+      const urlParams = new URLSearchParams(videoUrl.split('?')[1]);
+      videoId = urlParams.get('v') || '';
+    } else if (videoUrl.includes('youtu.be/')) {
+      videoId = videoUrl.split('youtu.be/')[1].split('?')[0];
+    } else {
+      videoId = videoUrl;
+    }
+    return this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + videoId);
+  }
+
 
 }
