@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { SearchWithFormComponent } from './search-with-form.component';
 import { of } from 'rxjs';
-import { SearchInfrastructure } from "../../services/search-infrastructure/search.infrastructure";
+import { SearchInfrastructure } from "../../../../shared/search-infrastructure/search.infrastructure";
 
 describe('SearchWithFormComponent', () => {
   let component: SearchWithFormComponent;

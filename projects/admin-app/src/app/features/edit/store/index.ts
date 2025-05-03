@@ -2,7 +2,7 @@ import {Post} from "../../../types/post";
 import {patchState, signalStore, withMethods, withState} from "@ngrx/signals";
 import {updateState, withDevtools} from "@angular-architects/ngrx-toolkit";
 import {inject} from "@angular/core";
-import {SearchInfrastructure} from "../../searchBar/services/search-infrastructure/search.infrastructure";
+import {SearchInfrastructure} from "../../../shared/search-infrastructure/search.infrastructure";
 import {pipe, switchMap, tap} from "rxjs";
 import {rxMethod} from "@ngrx/signals/rxjs-interop";
 import {tapResponse} from "@ngrx/operators";

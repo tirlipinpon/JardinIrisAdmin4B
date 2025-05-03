@@ -1,4 +1,4 @@
-import {AfterViewChecked, Component, computed, inject, OnInit} from '@angular/core';
+import {AfterViewChecked, Component, computed, inject, OnDestroy, OnInit} from '@angular/core';
 import {RouterLink} from "@angular/router";
 import {PostStore} from "../edit/store";
 import {Post} from "../../types/post";
@@ -15,6 +15,9 @@ import {
   DialogDeletePostConfirmComponent
 } from "../../shared/dialog/delete-post-confirm/dialog-delete-post-confirm.component";
 import {DomSanitizer} from "@angular/platform-browser";
+import {
+  EditImageChapitreConfirmComponent
+} from "../../shared/dialog/edit-image-chapitre-confirm/edit-image-chapitre-confirm.component";
 
 @Component({
   selector: 'app-all',
@@ -22,13 +25,14 @@ import {DomSanitizer} from "@angular/platform-browser";
   templateUrl: './all.component.html',
   styleUrl: './all.component.css'
 })
-export class AllComponent implements OnInit, AfterViewChecked {
+export class AllComponent implements OnInit, AfterViewChecked, OnDestroy {
   private readonly store = inject(PostStore);
   post: Post[] | null = null;
   private readonly formBuilder = inject(FormBuilder);
   isLoading = this.store.loading;
   matSelectedOption: string = "";
   readonly dialogDeleteConfirm = inject(MatDialog);
+  clickListener: any;
 
   constructor(private sanitizer: DomSanitizer) { }
 
@@ -39,11 +43,19 @@ export class AllComponent implements OnInit, AfterViewChecked {
 
   ngOnInit(): void {
       this.store.getPostWithComments({id: null, orderBySelected: 'created_at'});
+    // Ajouter un écouteur d'événement global pour les clics sur les images
+    this.clickListener = this.handleImageClick.bind(this);
+    document.addEventListener('click', this.clickListener)
   }
 
   ngAfterViewChecked() {
     this.addClickEventAccordionArticle('accordion')
     this.addClickEventAccordionArticle('accordionComments')
+  }
+
+  ngOnDestroy() {
+    // Nettoyer l'écouteur d'événement lors de la destruction du composant
+    document.removeEventListener('click', this.clickListener);
   }
 
   triggerSelectChange(valueSelected: any) {
@@ -113,6 +125,19 @@ export class AllComponent implements OnInit, AfterViewChecked {
     });
   }
 
+  openDialogEditImageById(id: number) {
+    const dialogRef = this.dialogDeleteConfirm.open(EditImageChapitreConfirmComponent, {
+      data: {
+        imageId: id,
+      },
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+      if (result && id) {
+        // this.store.updateImageChapitre(id, url)
+      }
+    });
+  }
 
   deletePost(post: Post) {
     this.openDialogDeletePost(post)
@@ -134,8 +159,9 @@ export class AllComponent implements OnInit, AfterViewChecked {
     this.store.validComment(comment.id)
   }
 
-  processedArticleHtml(id: number, article: string, images: any[]) {
+  processedArticleHtml(id: number | undefined, article: string, images: any[]) {
     if (id === undefined) return '';
+
     // Créer un élément DOM temporaire pour manipuler le HTML
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = article;
@@ -162,8 +188,11 @@ export class AllComponent implements OnInit, AfterViewChecked {
           const imgElement = document.createElement('img');
           imgElement.src = matchingImage.url_Image;
           imgElement.alt = matchingImage.chapitre_key_word || '';
-          imgElement.className = 'randomCropImage';
-          imgElement.style.cssText = 'width: 100%; height: 200px; object-fit: cover; border: 3px solid grey; padding: 1px; margin: 0px 0px 30px;';
+          imgElement.className = 'randomCropImage clickable-image'; // Ajout d'une classe pour cibler plus facilement
+          imgElement.style.cssText = 'width: 100%; height: 200px; object-fit: cover; border: 3px solid grey; padding: 1px; margin: 0px 0px 30px; cursor: pointer;'; // Ajout du cursor: pointer
+
+          // Stocker l'ID de l'image comme attribut data
+          imgElement.setAttribute('data-image-id', matchingImage.id.toString());
 
           // Insérer l'image après le h4
           h4.insertAdjacentElement('afterend', imgElement);
@@ -171,8 +200,22 @@ export class AllComponent implements OnInit, AfterViewChecked {
       }
     });
 
-    // Sanitize le HTML modifié pour éviter les problèmes de sécurité
     return this.sanitizer.bypassSecurityTrustHtml(tempDiv.innerHTML);
+  }
+
+  handleImageClick(event: Event) {
+    const target = event.target as HTMLElement;
+
+    // Vérifier si l'élément cliqué est une image avec notre classe spéciale
+    if (target.tagName === 'IMG' && target.classList.contains('clickable-image')) {
+      // Récupérer l'ID de l'image depuis l'attribut data
+      const imageId = target.getAttribute('data-image-id');
+
+      if (imageId) {
+        // Appeler votre fonction avec l'ID de l'image
+        this.openDialogEditImageById(parseInt(imageId));
+      }
+    }
   }
 
 }

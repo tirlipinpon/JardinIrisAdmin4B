@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {afficherCategories} from "../../../../utils/afficherCategories";
 import {formatCurrentDateUs} from "../../../../utils/getFormattedDate";
-import {VideoInfo} from "../google-search/google-search.service";
+import {VideoInfo} from "../../../../shared/google-search/google-search.service";
 
 @Injectable({
   providedIn: 'root'

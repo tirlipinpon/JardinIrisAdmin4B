@@ -1,0 +1,75 @@
+<h2 mat-dialog-title>Changement d image</h2>
+<mat-dialog-content>
+  <mat-dialog-actions>
+
+
+    <ng-container *ngFor="let video of rawVideos">
+      <mat-card
+        *ngIf="!selectedVideoId || selectedVideoId === video.videoId"
+        class="video-card"
+        appearance="outlined"
+        [ngClass]="{ 'selected-card': selectedVideoId === video.videoId }"
+      >
+        <!-- reste du contenu inchangé -->
+        <mat-card-header>
+          <mat-card-title>{{ video.channelTitle }}</mat-card-title>
+          <mat-card-subtitle>Video ID : {{ video.videoId }}</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="video-container">
+            <iframe
+              width="100%"
+              height="315"
+              [src]="getSafeUrl(video.videoId)"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen>
+            </iframe>
+          </div>
+        </mat-card-content>
+
+        <mat-card-actions>
+          <a mat-button color="primary" href="https://www.youtube.com/watch?v={{ video.videoId }}" target="_blank">
+            Voir sur YouTube
+          </a>
+          <button
+            mat-stroked-button
+            color="accent"
+            (click)="selectVideo(video.videoId)"
+            *ngIf="selectedVideoId !== video.videoId"
+          >
+            Sélectionner
+          </button>
+          <button
+            mat-stroked-button
+            color="warn"
+            (click)="clearSelection()"
+            *ngIf="selectedVideoId === video.videoId"
+          >
+            Annuler la sélection
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </ng-container>
+
+
+    <!-- Affichage du résultat en dessous -->
+    <div *ngIf="selectedVideoId" class="selection-info">
+      <p>🎯 Vidéo sélectionnée : <strong>{{ selectedVideoId }}</strong></p>
+    </div>
+
+
+
+  </mat-dialog-actions>
+</mat-dialog-content>
+<mat-form-field appearance="outline">
+  <input matInput [(ngModel)]="searchText" placeholder="Enter text">
+</mat-form-field>
+<button mat-button (click)="onSearch()">Search</button>
+
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button [mat-dialog-close]="true" cdkFocusInitial>Confirm</button>
+</mat-dialog-actions>

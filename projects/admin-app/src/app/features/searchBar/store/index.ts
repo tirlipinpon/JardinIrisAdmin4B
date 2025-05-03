@@ -4,7 +4,7 @@ import {computed, inject} from "@angular/core";
 import {rxMethod} from "@ngrx/signals/rxjs-interop";
 import {concatMap, EMPTY, from, pipe, switchMap, tap} from "rxjs";
 import {tapResponse} from "@ngrx/operators";
-import {SearchInfrastructure} from "../services/search-infrastructure/search.infrastructure";
+import {SearchInfrastructure} from "../../../shared/search-infrastructure/search.infrastructure";
 import {Post} from "../../../types/post";
 import {map} from "rxjs/operators";
 

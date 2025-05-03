@@ -3,17 +3,17 @@ import {
   from,
   Observable, of, switchMap
 } from "rxjs";
-import {TheNewsApiService} from "../the-news-api.service";
-import {OpenaiApiService} from "../openai-api/openai-api.service";
-import {GetPromptsService} from "../get-prompts/get-prompts.service";
-import {PerplexityApiService} from "../perplexity-api/perplexity-api.service";
-import {extractJSONBlock, parseJsonSafe} from "../../../../utils/cleanJsonObject";
-import {SupabaseService} from "../../../../shared/supabase/supabase.service";
+import {TheNewsApiService} from "../../features/searchBar/services/the-news-api.service";
+import {OpenaiApiService} from "../../features/searchBar/services/openai-api/openai-api.service";
+import {GetPromptsService} from "../../features/searchBar/services/get-prompts/get-prompts.service";
+import {PerplexityApiService} from "../../features/searchBar/services/perplexity-api/perplexity-api.service";
+import {extractJSONBlock, parseJsonSafe} from "../../utils/cleanJsonObject";
+import {SupabaseService} from "../supabase/supabase.service";
 import {map} from "rxjs/operators";
-import {Post} from "../../../../types/post";
-import {AddImagesToChaptersService} from "../add-image-to-chapters/add-images-to-chapters.service";
-import {FormatInStructureService} from "../format-in-structure/format-in-structure.service";
-import {compressImage} from "../../../../utils/resizeB64JsonIMage";
+import {Post} from "../../types/post";
+import {AddImagesToChaptersService} from "../../features/searchBar/services/add-image-to-chapters/add-images-to-chapters.service";
+import {FormatInStructureService} from "../../features/searchBar/services/format-in-structure/format-in-structure.service";
+import {compressImage} from "../../utils/resizeB64JsonIMage";
 import {GoogleSearchService} from "../google-search/google-search.service";
 
 @Injectable({
@@ -222,7 +222,7 @@ export class SearchInfrastructure {
   }
 
   addVideo(postTitle: string): Observable<any> {
-    if(this.isLocalhost()) {
+    if(!this.isLocalhost()) {
       return new Observable<string>(subscriber => {
         const mock = `
         http://www.youtube.com/watch?v=exempleVideo

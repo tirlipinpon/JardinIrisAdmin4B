@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {forkJoin, Observable, of, switchMap} from "rxjs";
-import {environment} from "../../../../../../../../environment";
+import {environment} from "../../../../../../environment";
 import {map} from "rxjs/operators";
 export interface VideoInfo {
   videoId: string;
@@ -32,8 +32,8 @@ export class GoogleSearchService {
         q: keyWords,
         type: 'video',
         maxResults: '5',
-        order: 'relevance', // Trier par nombre de vues
-        regionCode: region, // Région à utiliser pour chaque appel
+        order: 'date', // Trier par nombre de vues
+        // regionCode: region, // Région à utiliser pour chaque appel
         key: this.apiKey
       };
       return this.http.get<any>(this.searchUrl, { params });
@@ -72,5 +72,7 @@ export class GoogleSearchService {
       })
     );
   }
+
+
 
 }

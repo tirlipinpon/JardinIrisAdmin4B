@@ -3,7 +3,7 @@ import { HomeComponent } from './home.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { TheNewsApiService } from '../../features/searchBar/services/the-news-api.service';
-import {SearchInfrastructure} from "../../features/searchBar/services/search-infrastructure/search.infrastructure";
+import {SearchInfrastructure} from "../../shared/search-infrastructure/search.infrastructure";
 import {SearchApplication} from "../../features/searchBar/services/search.application";
 
 describe('HomeComponent', () => {
