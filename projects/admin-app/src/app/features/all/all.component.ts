@@ -43,8 +43,8 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy {
 
 
   ngOnInit(): void {
-    this.store.getPostWithComments({id: null, orderBySelected: 'created_at'});
-    // Ajouter un écouteur d'événement global pour les clics sur les images
+    this.store.getPostWithCommentsAndImages({id: null, orderBySelected: 'created_at'});
+    // Ajouter un écouteur d'événement global pour les clics sur les videos
     this.clickListener = this.handleVideoClick.bind(this);
     document.addEventListener('click', this.clickListener)
   }
@@ -66,18 +66,15 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.videoVisibilityMap.set(postId, !currentValue);
   }
 
-
 // Méthode pour vérifier si une vidéo est visible
   isVideoVisible(postId: string | number | undefined): boolean {
     if (postId === undefined) return false;
     return this.videoVisibilityMap.get(postId) || false;
   }
 
-
-
   triggerSelectChange(valueSelected: any) {
     this.matSelectedOption = valueSelected.value;
-    this.store.getPostWithComments({id: null, orderBySelected: valueSelected.value}
+    this.store.getPostWithCommentsAndImages({id: null, orderBySelected: valueSelected.value}
     );
   }
 
@@ -151,8 +148,8 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy {
     });
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
-      if (result && id) {
-        // this.store.updateImageChapitre(id, url)
+      if (result.confirmed && id) {
+        this.store.editPostVideo({ id, idYoutube: result.idYoutube })
       }
     });
   }

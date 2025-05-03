@@ -337,7 +337,7 @@ export class SupabaseService {
     }
   }
 
-  async getPostWithComments(id?: number | null, orderBySelected?: string | null) {
+  async getPostWithCommentsAndImages(id?: number | null, orderBySelected?: string | null) {
     try {
       // Si 'id' est undefined, on le remplace par NULL pour PostgreSQL
       const idPost = id ?? null;  // Si 'id' est undefined, idPost sera null
@@ -357,6 +357,24 @@ export class SupabaseService {
       } else {
         return data;
       }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async editPostVideo(idPost: number, idYoutube: string) {
+    try {
+      const {data, error} = await this.supabase
+        .from('post')
+        .update({video: 'https://www.youtube.com/watch?v='+idYoutube})
+        .eq('id', idPost)
+        .select();
+
+      if (error) {
+        throw error;
+      }
+      console.log(data);
+      return data[0];
     } catch (error) {
       throw error;
     }

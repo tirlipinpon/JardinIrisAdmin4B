@@ -40,11 +40,11 @@ export const PostStore = signalStore(
           )
         }))
     ),
-    getPostWithComments: rxMethod<{id?: number | null, orderBySelected?: string | null}>(
+      getPostWithCommentsAndImages: rxMethod<{id?: number | null, orderBySelected?: string | null}>(
       pipe(tap(()=> updateState(store, '[get Post With Comments] loading: true', {loading: true})),
         switchMap((params = {}) => { // get = switch et push = concat
           const { id, orderBySelected } = params;
-          return infra.getPostWithComments(id, orderBySelected
+          return infra.getPostWithCommentsAndImages(id, orderBySelected
           ).pipe(
             tapResponse({
               next: (postsWithComments) => patchState(store, {
@@ -138,6 +138,23 @@ export const PostStore = signalStore(
                     ...p,
                     comments: p.comments?.map(c => c.id === comment.id ? comment : c)
                   } : p),
+                  loading: false
+                }),
+                error: (err) => {
+                  patchState(store,{ loading: false, error: err})
+                  console.log(err)
+                }
+              })
+            )
+          }))
+      ),
+      editPostVideo: rxMethod<{ id: number; idYoutube: string }>(
+        pipe(tap(()=> updateState(store, '[Edit Post Video] loading: true', {loading: true})),
+          switchMap(({ id, idYoutube }) => {
+            return infra.editPostVideo(id, idYoutube).pipe(
+              tapResponse({
+                next: (post: Post) => updateState(store, '[valid Post] valid comment', {
+                  post: store.post()?.map(p => p.id === post.id ? { ...p, video: post.video } : p ),
                   loading: false
                 }),
                 error: (err) => {

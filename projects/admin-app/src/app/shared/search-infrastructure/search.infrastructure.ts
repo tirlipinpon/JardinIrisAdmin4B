@@ -376,8 +376,8 @@ export class SearchInfrastructure {
     return from(this.supabaseService.getOneOrManyPostForm(postId));
   }
 
-  getPostWithComments(id?: number | null, orderBySelected?: string | null): Observable<Post[]> {
-      return from(this.supabaseService.getPostWithComments(id, orderBySelected));
+  getPostWithCommentsAndImages(id?: number | null, orderBySelected?: string | null): Observable<Post[]> {
+      return from(this.supabaseService.getPostWithCommentsAndImages(id, orderBySelected));
   }
 
   deletePost(id: number) {
@@ -396,6 +396,9 @@ export class SearchInfrastructure {
     return from(this.supabaseService.valideCommentById(id));
   }
 
+  editPostVideo(id: number, idYoutube: string) {
+    return from(this.supabaseService.editPostVideo(id, idYoutube));
+  }
 
 
 }
