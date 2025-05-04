@@ -54,8 +54,8 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           } else if (msg.action === MessageAction.INTERNAL_LINK_ADDED) {
             this.application.addImagesVegetal();
           } else if (msg.action === MessageAction.IMAGE_VEGETAL_ADDED) {
-            this.application.addScientificName();
-          } else if (msg.action === MessageAction.SCIENTIFIC_NAME_ADDED) {
+            this.application.addUrlFromScientificNameInHtml();
+          } else if (msg.action === MessageAction.SCIENTIFIC_URL_ADDED) {
             this.application.checkMeteo();
           } else if (msg.action === MessageAction.METEO) {
             this.application.savePost();

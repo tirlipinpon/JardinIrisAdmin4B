@@ -19,7 +19,7 @@ export const MessageAction = {
   IDEA_IMAGE_UPDATED: 'IdeaPostAndImageUpdated',
   INTERNAL_LINK_ADDED: 'InternalLinkAdded',
   IMAGE_VEGETAL_ADDED: 'ImageVegetalAdded',
-  SCIENTIFIC_NAME_ADDED: 'scientificNameAdded',
+  SCIENTIFIC_URL_ADDED: 'scientificUrlAdded',
 } as const;
 
 // Type pour les actions (utilisant typeof pour inférer automatiquement les valeurs)

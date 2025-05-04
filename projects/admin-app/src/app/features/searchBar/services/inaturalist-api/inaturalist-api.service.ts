@@ -25,9 +25,13 @@ export class InaturalistApiService {
     };
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
-      map(res => res.results.map((obs: any) => ({
+      map(res => (res.results || []).map((obs: any) => ({
         species: obs.taxon?.name || 'Non identifié',
-        photos: (obs.photos || []).map((p: any) => p.medium_url)
+        photos: (obs.photos || []).map((p: any) => {
+          const url = p.url || '';
+          // Remplacer 'square' par 'large' pour obtenir une image de meilleure qualité
+          return url.replace(/square\.(jpg|jpeg|png)/, 'large.$1');
+        })
       })))
     );
   }

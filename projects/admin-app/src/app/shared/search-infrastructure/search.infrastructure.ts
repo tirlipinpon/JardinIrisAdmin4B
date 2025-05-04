@@ -15,6 +15,9 @@ import {AddImagesToChaptersService} from "../../features/searchBar/services/add-
 import {FormatInStructureService} from "../../features/searchBar/services/format-in-structure/format-in-structure.service";
 import {compressImage} from "../../utils/resizeB64JsonIMage";
 import {GoogleSearchService} from "../google-search/google-search.service";
+import {
+  AddScientificNameService
+} from "../../features/searchBar/services/add-scientific-name/add-scientific-name.service";
 
 @Injectable({
   providedIn: 'root',
@@ -27,8 +30,11 @@ import {GoogleSearchService} from "../google-search/google-search.service";
     const addImagesToChaptersService = inject(AddImagesToChaptersService);
     const formatInStructureService = inject(FormatInStructureService);
     const googleSearchService = inject(GoogleSearchService);
+    const addScientificNameService = inject(AddScientificNameService);
+
     return new SearchInfrastructure(theNewsApiService, openaiApiService, perplexityApiService,
-      getPromptsService, supabaseService, addImagesToChaptersService, formatInStructureService, googleSearchService);
+      getPromptsService, supabaseService, addImagesToChaptersService, formatInStructureService, googleSearchService,
+      addScientificNameService);
   }
 })
 export class SearchInfrastructure {
@@ -41,7 +47,7 @@ export class SearchInfrastructure {
     , private addImagesToChaptersService: AddImagesToChaptersService
     , private formatInStructureService: FormatInStructureService
     , private googleSearchService: GoogleSearchService
-
+    , private addScientificNameService: AddScientificNameService
   ) {}
 
   isLocalhost(): boolean {
@@ -197,22 +203,30 @@ export class SearchInfrastructure {
           subscriber.complete();
         }, 1000);
       });
-    } else {
-      return this.formatInStructureService.formatInStructure(article, type, postTitreAndId);
-    }
-  }
-
-  addScientificName(article: string): Observable<string> {
-    if(this.isLocalhost()) {
+    } else if (this.isLocalhost() && type === 'VEGETAL') {
       return new Observable<string>(subscriber => {
-        const mock = article;
+        const mock = ' type=' + type + ' : ' + "<span id=\"paragraphe-1\"><h4>Le jardin de la biodiversité</h4><ul><li>Les pivoines sont des fleurs magnifiques qui attirent les abeilles.</li></ul><p>Le <span class=\"inat-vegetal\" data-taxon-name=\"Quercus\" data-paragraphe-id=\"1-1\">chêne<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Quercus\"/></div></span> majestueux est un arbre vieux de plusieurs siècles. Les hérissons se réfugient souvent sous ses racines. Le <span class=\"inat-vegetal\" data-taxon-name=\"Ocimum basilicum\" data-paragraphe-id=\"1-2\">basilic<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Ocimum basilicum\"/></div></span> pousse bien en été et parfume les plats méditerranéens.</p></span> <span id=\"paragraphe-2\"><h4>La vie sauvage autour du jardin</h4><ul><li>Les libellules volent autour des étangs, capturant les moustiques.</li></ul><p>Les <span class=\"inat-vegetal\" data-taxon-name=\"Prunus\" data-paragraphe-id=\"2-1\">cerisiers<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Prunus\"/></div></span> offrent des fruits délicieux au printemps. Le <span class=\"inat-vegetal\" data-taxon-name=\"Salix babylonica\" data-paragraphe-id=\"2-2\">saule pleureur<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Salix babylonica\"/></div></span> est souvent planté près des rivières pour ses racines profondes. Les lapins apprécient les jardins où ils peuvent se cacher dans les herbes hautes.</p></span> <span id=\"paragraphe-3\"><h4>Les plantes vivaces</h4><ul><li>Les lavandes sont idéales pour repousser les moustiques.</li></ul><p>Le <span class=\"inat-vegetal\" data-taxon-name=\"Ficus carica\" data-paragraphe-id=\"3-1\">figuier<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Ficus carica\"/></div></span> produit des fruits sucrés en fin d'été. Le <span class=\"inat-vegetal\" data-taxon-name=\"Rosa\" data-paragraphe-id=\"3-2\">rosier grimpant<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Rosa\"/></div></span> ajoute une touche romantique aux murs du jardin. Les oiseaux chantent souvent dans les arbres fruitiers comme les <span class=\"inat-vegetal\" data-taxon-name=\"Malus domestica\" data-paragraphe-id=\"3-3\">pommiers<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Malus domestica\"/></div></span> et les <span class=\"inat-vegetal\" data-taxon-name=\"Prunus domestica\" data-paragraphe-id=\"3-4\">pruniers<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Prunus domestica\"/></div></span>.</p></span> <span id=\"paragraphe-4\"><h4>Fleurs et insectes au jardin</h4><ul><li>Les tournesols suivent la trajectoire du soleil toute la journée.</li></ul><p>Les frelons peuvent être agressifs mais jouent un rôle dans la pollinisation. Les <span class=\"inat-vegetal\" data-taxon-name=\"Orchidaceae\" data-paragraphe-id=\"4-1\">orchidées<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Orchidaceae\"/></div></span> exotiques apportent une touche colorée aux espaces ombragés. Le <span class=\"inat-vegetal\" data-taxon-name=\"Thymus\" data-paragraphe-id=\"4-2\">thym<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Thymus\"/></div></span>, lorsqu'il fleurit, attire de nombreux pollinisateurs.</p></span> <span id=\"paragraphe-5\"><h4>Un jardin nourrissant</h4><ul><li>Les fraisiers produisent des fruits délicieux tout l'été.</li></ul><p>Les herbes de Provence, comme le <span class=\"inat-vegetal\" data-taxon-name=\"Rosmarinus officinalis\" data-paragraphe-id=\"5-1\">romarin<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Rosmarinus officinalis\"/></div></span>, parfument les plats d'été. Les <span class=\"inat-vegetal\" data-taxon-name=\"Malus domestica\" data-paragraphe-id=\"5-2\">pommiers<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Malus domestica\"/></div></span> offrent une abondance de fruits en automne. Les oiseaux de jardin, comme les mésanges, se nourrissent des graines et des baies des buissons.</p></span> <span id=\"paragraphe-6\"><h4>Un écosystème naturel</h4><ul><li>Les lys apportent des couleurs vives au jardin en été.</li></ul><p>Les écureuils collectent les noix sous les <span class=\"inat-vegetal\" data-taxon-name=\"Quercus\" data-paragraphe-id=\"6-1\">chênes<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Quercus\"/></div></span>. Les <span class=\"inat-vegetal\" data-taxon-name=\"Bambusoideae\" data-paragraphe-id=\"6-2\">bambous<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Bambusoideae\"/></div></span> créent une haie dense et résistante au vent. Les papillons trouvent refuge parmi les fleurs de <span class=\"inat-vegetal\" data-taxon-name=\"Lavandula\" data-paragraphe-id=\"6-3\">lavande<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Lavandula\"/></div></span> et de <span class=\"inat-vegetal\" data-taxon-name=\"Thymus\" data-paragraphe-id=\"6-4\">thym<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Thymus\"/></div></span>.</p></span>\n";
         setTimeout(() => {
           subscriber.next(mock);
           subscriber.complete();
         }, 1000);
       });
     } else {
-      return  from("")
+      return this.formatInStructureService.formatInStructure(article, type, postTitreAndId);
+    }
+  }
+
+  addUrlFromScientificNameInHtml(article: string): Observable<string> {
+    if(this.isLocalhost()) {
+      return new Observable<string>(subscriber => {
+        const mock = "<span id=\"paragraphe-1\"><h4>Le jardin de la biodiversité</h4><ul><li>Les pivoines sont des fleurs magnifiques qui attirent les abeilles.</li></ul><p>Le <span class=\"inat-vegetal\" data-taxon-name=\"Quercus\" data-photo-url=\"\" data-paragraphe-id=\"1-1\">chêne<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"\"/></div></span> majestueux est un arbre vieux de plusieurs siècles. Les hérissons se réfugient souvent sous ses racines. Le <span class=\"inat-vegetal\" data-taxon-name=\"Ocimum basilicum\" data-photo-url=\"\" data-paragraphe-id=\"1-2\">basilic<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"\"/></div></span> pousse bien en été et parfume les plats méditerranéens.</p></span> <span id=\"paragraphe-2\"><h4>La vie sauvage autour du jardin</h4><ul><li>Les libellules volent autour des étangs, capturant les moustiques.</li></ul><p>Les <span class=\"inat-vegetal\" data-taxon-name=\"Prunus\" data-photo-url=\"\" data-paragraphe-id=\"2-1\">cerisiers<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"\"/></div></span> offrent des fruits délicieux au printemps. Le <span class=\"inat-vegetal\" data-taxon-name=\"Salix babylonica\" data-photo-url=\"\" data-paragraphe-id=\"2-2\">saule pleureur<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"\"/></div></span> est souvent planté près des rivières pour ses racines profondes. Les lapins apprécient les jardins où ils peuvent se cacher dans les herbes hautes.</p></span> <span id=\"paragraphe-3\"><h4>Les plantes vivaces</h4><ul><li>Les lavandes sont idéales pour repousser les moustiques.</li></ul><p>Le <span class=\"inat-vegetal\" data-taxon-name=\"Ficus carica\" data-photo-url=\"\" data-paragraphe-id=\"3-1\">figuier<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"\"/></div></span> produit des fruits sucrés en fin d'été. Le <span class=\"inat-vegetal\" data-taxon-name=\"Rosa\" data-photo-url=\"\" data-paragraphe-id=\"3-2\">rosier grimpant<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"\"/></div></span> ajoute une touche romantique aux murs du jardin. Les oiseaux chantent souvent dans les arbres fruitiers comme les <span class=\"inat-vegetal\" data-taxon-name=\"Malus domestica\" data-photo-url=\"\" data-paragraphe-id=\"3-3\">pommiers<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"\"/></div></span> et les <span class=\"inat-vegetal\" data-taxon-name=\"Prunus domestica\" data-photo-url=\"\" data-paragraphe-id=\"3-4\">pruniers<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"\"/></div></span>.</p></span> <span id=\"paragraphe-4\"><h4>Fleurs et insectes au jardin</h4><ul><li>Les tournesols suivent la trajectoire du soleil toute la journée.</li></ul><p>Les frelons peuvent être agressifs mais jouent un rôle dans la pollinisation. Les <span class=\"inat-vegetal\" data-taxon-name=\"Orchidaceae\" data-photo-url=\"\" data-paragraphe-id=\"4-1\">orchidées<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"\"/></div></span> exotiques apportent une touche colorée aux espaces ombragés. Le <span class=\"inat-vegetal\" data-taxon-name=\"Thymus\" data-photo-url=\"\" data-paragraphe-id=\"4-2\">thym<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"\"/></div></span>, lorsqu'il fleurit, attire de nombreux pollinisateurs.</p></span> <span id=\"paragraphe-5\"><h4>Un jardin nourrissant</h4><ul><li>Les fraisiers produisent des fruits délicieux tout l'été.</li></ul><p>Les <span class=\"inat-vegetal\" data-taxon-name=\"Herbes de Provence\" data-photo-url=\"\" data-paragraphe-id=\"5-1\">herbes de Provence<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"\"/></div></span>, comme le <span class=\"inat-vegetal\" data-taxon-name=\"Rosmarinus officinalis\" data-photo-url=\"\" data-paragraphe-id=\"5-2\">romarin<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"\"/></div></span>, parfument les plats d'été. Les <span class=\"inat-vegetal\" data-taxon-name=\"Malus domestica\" data-photo-url=\"\" data-paragraphe-id=\"5-3\">pommiers<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"\"/></div></span> offrent une abondance de fruits en automne. Les oiseaux de jardin, comme les mésanges, se nourrissent des graines et des baies des buissons.</p></span> <span id=\"paragraphe-6\"><h4>Un écosystème naturel</h4><ul><li>Les lys apportent des couleurs vives au jardin en été.</li></ul><p>Les écureuils collectent les noix sous les <span class=\"inat-vegetal\" data-taxon-name=\"Quercus\" data-photo-url=\"\" data-paragraphe-id=\"6-1\">chênes<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"\"/></div></span>. Les <span class=\"inat-vegetal\" data-taxon-name=\"Bambusoideae\" data-photo-url=\"\" data-paragraphe-id=\"6-2\">bambous<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"\"/></div></span> créent une haie dense et résistante au vent. Les papillons trouvent refuge parmi les fleurs de <span class=\"inat-vegetal\" data-taxon-name=\"Lavandula\" data-photo-url=\"\" data-paragraphe-id=\"6-3\">lavande<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"\"/></div></span> et de <span class=\"inat-vegetal\" data-taxon-name=\"Thymus\" data-photo-url=\"\" data-paragraphe-id=\"6-4\">thym<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"\"/></div></span>.</p></span>";
+        setTimeout(() => {
+          subscriber.next(mock);
+          subscriber.complete();
+        }, 1000);
+      });
+    } else {
+      return  this.addScientificNameService.processAddUrlFromScientificNameInHtml(article);
     }
   }
 

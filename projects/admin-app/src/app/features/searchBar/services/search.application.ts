@@ -29,7 +29,7 @@ export class SearchApplication {
     this.isVideoEffect();
     this.isFaqEffect();
     this.isAddedImagesVegetalEffect();
-    this.isArticleScientificName();
+    this.isArticleScientificUrlEffect();
   }
 
   get isSearching(): Signal<boolean> {
@@ -125,14 +125,14 @@ export class SearchApplication {
   addImagesVegetal(): void {
     if(!this.store.isArticleImagesVegetal()) {
       this.messageService.sendMessage('Ajout d image vegetal en cours.');
-      this.store.addImagesVegetal();
+      this.store.addScientificNameFromVegetal();
     }
   }
 
-  addScientificName(): void {
-    if(!this.store.isArticleScientificName()) {
+  addUrlFromScientificNameInHtml(): void {
+    if(!this.store.isArticleScientificUrl()) {
       this.messageService.sendMessage('Ajout de nom scientific en cours.');
-      this.store.addScientificName();
+      this.store.addUrlFromScientificNameInHtml();
     }
   }
 
@@ -272,11 +272,11 @@ export class SearchApplication {
     });
   }
 
-  private isArticleScientificName(): void {
+  private isArticleScientificUrlEffect(): void {
     effect(() => {
-      if(this.store.getArticleScientificName()!==null) {
-        if(this.store.isArticleScientificName()) {
-          this.messageService.sendSuccess('Ajout de nom scientifique terminé.', MessageAction.SCIENTIFIC_NAME_ADDED);
+      if(this.store.getArticleScientificUrl()!==null) {
+        if(this.store.isArticleScientificUrl()) {
+          this.messageService.sendSuccess('Ajout de nom scientifique terminé.', MessageAction.SCIENTIFIC_URL_ADDED);
         } else {
           this.messageService.sendError('Ajout de nom scientifique a une erreur.');
         }

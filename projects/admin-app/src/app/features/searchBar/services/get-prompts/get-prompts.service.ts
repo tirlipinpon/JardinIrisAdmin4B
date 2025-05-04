@@ -8,8 +8,6 @@ import {VideoInfo} from "../../../../shared/google-search/google-search.service"
 })
 export class GetPromptsService {
 
-  // évaluer une liste d'articles provenant d'une API de news.
-  // retourne un objet avec des instructions pour analyser chaque article selon des critères spécifiques liés au jardinage en Belgique.
   selectArticle(newsApiData: any): any {
     return {
       systemRole: {
@@ -465,6 +463,7 @@ Fournir une description détaillée en texte décrivant visuellement l'image.
       }
     }
   }
+
   getPromptSystemAddInternalLinkInArticle() {
     return `
 Embed a specific hyperlink into an article using an HTML tag according to detailed guidelines, without altering the article's text or html beyond the insertion.
@@ -530,22 +529,22 @@ Ne retiens pas les mots trop vagues, courants ou génériques qui désignent sim
 Étapes
 Identifier les noms de plantes qui sont tous en français: Analyser le texte pour trouver les mots ou expressions qui correspondent à des noms de plantes.
 Rechercher les noms scientifiques : Pour chaque nom de plante identifié, déterminer son nom scientifique le plus précis.
-Format en HTML : Entourer chaque nom de plante identifié avec des balises <span> incluant les attributs class, data-taxon-name et data-photo-url.
-Remplacer les espaces réservés : Remplacer "NOM_SCIENTIFIQUE" dans l’attribut data-taxon-name par le nom scientifique précis et incrementer la valeur "X" de data-paragraphe-id="${paragrapheId}-X".
+Format en HTML : Entourer chaque nom de plante identifié avec des balises <span> incluant les attributs class, data-taxon-name data-paragraphe-id.
+Remplacer les espaces réservés : Remplacer "NOM_SCIENTIFIQUE" dans l’attribut data-taxon-name et alt par le nom scientifique précis et incrementer la valeur "X" de data-paragraphe-id="${paragrapheId}-X".
 Format de sortie
 Retourner dans un json valide {"upgraded": "TEXTE_MODIFIE" } le texte modifié avec tous les noms de plantes entourés par des balises span formatées :
 {
-"upgraded": "<span class="inat-vegetal" data-taxon-name="NOM_SCIENTIFIQUE" data-photo-url="" data-paragraphe-id="${paragrapheId}-X">MOT_CORRESPONDANCE<div class="inat-vegetal-tooltip"><img src="" alt=""/></div></span>"
+"upgraded": "<span class="inat-vegetal" data-taxon-name="NOM_SCIENTIFIQUE" data-paragraphe-id="${paragrapheId}-X">MOT_CORRESPONDANCE<div class="inat-vegetal-tooltip"><img src="" alt="NOM_SCIENTIFIQUE"/></div></span>"
 }
 Exemples
 Entrée :
 Le jardin de gazon est rempli de roses, de tulipes et de chênes majestueux.
 Sortie :
 {
-"upgraded": "Le jardin de gazon est rempli de <span class="inat-vegetal" data-taxon-name="Rosa" data-photo-url="">roses
-<div class="inat-vegetal-tooltip"><img src="" alt=""/></div></span>,
-de <span class="inat-vegetal" data-taxon-name="Tulipa" data-photo-url="" data-paragraphe-id="${paragrapheId}-1">tulipes<div class="inat-vegetal-tooltip"><img src="" alt=""/></div></span> en fleurs et de
-<span class="inat-vegetal" data-taxon-name="Quercus" data-photo-url="" data-paragraphe-id="${paragrapheId}-2">cerisiers<div class="inat-vegetal-tooltip"><img src="" alt=""/></div></span> majestueux."
+"upgraded": "Le jardin de gazon est rempli de
+<span class="inat-vegetal" data-taxon-name="Rosa" data-paragraphe-id="${paragrapheId}-1">roses<div class="inat-vegetal-tooltip"><img src="" alt="Rosa"/></div></span>, de
+<span class="inat-vegetal" data-taxon-name="Tulipa" data-paragraphe-id="${paragrapheId}-2">tulipes<div class="inat-vegetal-tooltip"><img src="" alt="Tulipa"/></div></span> en fleurs et de
+<span class="inat-vegetal" data-taxon-name="Quercus" data-paragraphe-id="${paragrapheId}-3">cerisiers<div class="inat-vegetal-tooltip"><img src="" alt="Quercus"/></div></span> majestueux."
 }
 (Real examples should ideally be longer, with various plant names correctly identified and formatted.)
         `

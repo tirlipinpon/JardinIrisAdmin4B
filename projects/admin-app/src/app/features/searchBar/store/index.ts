@@ -24,7 +24,7 @@ export interface SearchState {
   articleHtml: string | null;
   articleLinkAdded: string | null;
   articleImagesVegetal: string | null;
-  articleScientificName: string | null;
+  articleScientificUrl: string | null;
 }
 
 // valeur initiale
@@ -44,7 +44,7 @@ const initialValue: SearchState = {
   articleHtml: null,
   articleLinkAdded: null,
   articleImagesVegetal: null,
-  articleScientificName: null
+  articleScientificUrl: null
 }
 export const SearchStore= signalStore(
   { providedIn: 'root' },
@@ -128,8 +128,8 @@ export const SearchStore= signalStore(
       return articleImagesVegetal!==null && articleImagesVegetal.length > 0
     }),
 
-    getArticleScientificName: computed(() =>  store.articleScientificName()),
-    isArticleScientificName: computed(() =>  {  const articleScientificName = store.articleScientificName();
+    getArticleScientificUrl: computed(() =>  store.articleScientificUrl()),
+    isArticleScientificUrl: computed(() =>  {  const articleScientificName = store.articleScientificUrl();
       return articleScientificName!==null && articleScientificName.length > 0
     }),
 
@@ -331,7 +331,7 @@ export const SearchStore= signalStore(
           })
         )
       ),
-      addImagesVegetal: rxMethod<void>(
+      addScientificNameFromVegetal: rxMethod<void>(
         pipe(
           tap(() => updateState(store, '[addImagesVegetal] update loading', { isLoading: true })),
           switchMap(() => {
@@ -346,15 +346,15 @@ export const SearchStore= signalStore(
           })
         )
       ),
-      addScientificName: rxMethod<void>(
+      addUrlFromScientificNameInHtml: rxMethod<void>(
         pipe(
           tap(() => updateState(store, '[addScientificName] update loading', { isLoading: true })),
           switchMap(() => {
             const getArticleImagesVegetal = store.getArticleImagesVegetal();
             if (!getArticleImagesVegetal) { patchState(store, { isLoading: false }); return EMPTY; }
-            return infra.addScientificName(getArticleImagesVegetal).pipe(
+            return infra.addUrlFromScientificNameInHtml(getArticleImagesVegetal).pipe(
               tapResponse({
-                next: (data) => patchState(store, { articleScientificName: data, isLoading: false }),
+                next: (data) => patchState(store, { articleScientificUrl: data, isLoading: false }),
                 error: () => patchState(store, { isLoading: false }),
               })
             );
