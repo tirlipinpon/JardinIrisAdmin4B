@@ -23,6 +23,8 @@ export interface SearchState {
   articleUpgraded: string | null;
   articleHtml: string | null;
   articleLinkAdded: string | null;
+  articleImagesVegetal: string | null;
+  articleScientificName: string | null;
 }
 
 // valeur initiale
@@ -40,7 +42,9 @@ const initialValue: SearchState = {
   articleGenerated: null,
   articleUpgraded: null,
   articleHtml: null,
-  articleLinkAdded: null
+  articleLinkAdded: null,
+  articleImagesVegetal: null,
+  articleScientificName: null
 }
 export const SearchStore= signalStore(
   { providedIn: 'root' },
@@ -118,6 +122,17 @@ export const SearchStore= signalStore(
     isArticleLinkAdded: computed(() =>  {  const articleLinkAdded = store.articleLinkAdded();
       return articleLinkAdded!==null && articleLinkAdded.length > 0
     }),
+
+    getArticleImagesVegetal: computed(() =>  store.articleImagesVegetal()),
+    isArticleImagesVegetal: computed(() =>  {  const articleImagesVegetal = store.articleImagesVegetal();
+      return articleImagesVegetal!==null && articleImagesVegetal.length > 0
+    }),
+
+    getArticleScientificName: computed(() =>  store.articleScientificName()),
+    isArticleScientificName: computed(() =>  {  const articleScientificName = store.articleScientificName();
+      return articleScientificName!==null && articleScientificName.length > 0
+    }),
+
     getPostTitreAndId: computed(() =>  store.postTitreAndId()),
     isPostTitreAndId: computed(() =>  {  const postTitreAndId = store.postTitreAndId();
       return postTitreAndId!==null && postTitreAndId.length > 0
@@ -310,6 +325,36 @@ export const SearchStore= signalStore(
             return infra.formatInStructure(getArticleHtml, 'LINK', getPostTitreAndId).pipe(
               tapResponse({
                 next: (articleLinkAdded) => patchState(store, { articleLinkAdded: articleLinkAdded, isLoading: false }),
+                error: () => patchState(store, { isLoading: false }),
+              })
+            );
+          })
+        )
+      ),
+      addImagesVegetal: rxMethod<void>(
+        pipe(
+          tap(() => updateState(store, '[addImagesVegetal] update loading', { isLoading: true })),
+          switchMap(() => {
+            const getArticleLinkAdded = store.getArticleLinkAdded();
+            if (!getArticleLinkAdded) { patchState(store, { isLoading: false }); return EMPTY; }
+            return infra.formatInStructure(getArticleLinkAdded, 'VEGETAL').pipe(
+              tapResponse({
+                next: (data) => patchState(store, { articleImagesVegetal: data, isLoading: false }),
+                error: () => patchState(store, { isLoading: false }),
+              })
+            );
+          })
+        )
+      ),
+      addScientificName: rxMethod<void>(
+        pipe(
+          tap(() => updateState(store, '[addScientificName] update loading', { isLoading: true })),
+          switchMap(() => {
+            const getArticleImagesVegetal = store.getArticleImagesVegetal();
+            if (!getArticleImagesVegetal) { patchState(store, { isLoading: false }); return EMPTY; }
+            return infra.addScientificName(getArticleImagesVegetal).pipe(
+              tapResponse({
+                next: (data) => patchState(store, { articleScientificName: data, isLoading: false }),
                 error: () => patchState(store, { isLoading: false }),
               })
             );

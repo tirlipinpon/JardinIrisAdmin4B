@@ -28,6 +28,8 @@ export class SearchApplication {
     this.isAddedPostTitreAndIdEffect();
     this.isVideoEffect();
     this.isFaqEffect();
+    this.isAddedImagesVegetalEffect();
+    this.isArticleScientificName();
   }
 
   get isSearching(): Signal<boolean> {
@@ -104,7 +106,7 @@ export class SearchApplication {
   }
 
   addImagesInArticle(): void {
-    this.messageService.sendMessage('Ajout d images d article');
+    this.messageService.sendMessage('Ajout d images d article en cours.');
     this.store.addImagesInArticle();
   }
 
@@ -117,6 +119,20 @@ export class SearchApplication {
     if(!this.store.isArticleLinkAdded()) {
       this.messageService.sendMessage('Lien interne en cours.');
       this.store.addInternalLinkByChapter();
+    }
+  }
+
+  addImagesVegetal(): void {
+    if(!this.store.isArticleImagesVegetal()) {
+      this.messageService.sendMessage('Ajout d image vegetal en cours.');
+      this.store.addImagesVegetal();
+    }
+  }
+
+  addScientificName(): void {
+    if(!this.store.isArticleScientificName()) {
+      this.messageService.sendMessage('Ajout de nom scientific en cours.');
+      this.store.addScientificName();
     }
   }
 
@@ -239,6 +255,30 @@ export class SearchApplication {
           this.messageService.sendSuccess('Lien interne terminé.', MessageAction.INTERNAL_LINK_ADDED);
         } else {
           this.messageService.sendError('Lien interne a une erreur.');
+        }
+      }
+    });
+  }
+
+  private isAddedImagesVegetalEffect(): void {
+    effect(() => {
+      if(this.store.getArticleImagesVegetal()!==null) {
+        if(this.store.isArticleImagesVegetal()) {
+          this.messageService.sendSuccess('Ajout d image vegetal terminé.', MessageAction.IMAGE_VEGETAL_ADDED);
+        } else {
+          this.messageService.sendError('Ajout d image vegetal a une erreur.');
+        }
+      }
+    });
+  }
+
+  private isArticleScientificName(): void {
+    effect(() => {
+      if(this.store.getArticleScientificName()!==null) {
+        if(this.store.isArticleScientificName()) {
+          this.messageService.sendSuccess('Ajout de nom scientifique terminé.', MessageAction.SCIENTIFIC_NAME_ADDED);
+        } else {
+          this.messageService.sendError('Ajout de nom scientifique a une erreur.');
         }
       }
     });

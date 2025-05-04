@@ -110,7 +110,8 @@ Le résultat doit être un JSON strictement valide comme ceci:
   upgradeArticle(article: any): any {
     return {
       systemRole: {"role": "system","content":`
-Improve a segment of a landscaper's blog entry by adding additional information that complements the existing content. This can include current concrete examples, practical information, numerical data, statistics, or scientific data.
+Improve a segment of a landscaper's blog entry by adding additional information that complements the existing content.
+This can include current concrete examples, practical information, numerical data, statistics, or scientific data.
 
 # Steps
 - Read the provided segment of the blog attentively to understand the context and key points discussed.
@@ -512,6 +513,44 @@ Présentez le résultat comme suit:
     return `Voici un tableau JSON contenant des articles avec les champs 'titre' et 'id' : ${JSON.stringify(listTitreId)}.
     Voici l'article à traiter : ${JSON.stringify(article)}. Insérez le lien hypertexte conformément aux directives fournies, sans modifier le texte original
 `;
+  }
+
+  getPromptAddVegetalInArticle(article: string) {
+    return {
+      systemRole: {
+        role: "system",
+        content:  `
+Tu es un botaniste expert. Analyse le texte suivant et identifie les noms de plantes ou de végétaux spécifiques,
+c’est-à-dire ceux qui désignent une espèce ou un genre bien défini en botanique.
+Ne retiens pas les mots trop vagues, courants ou génériques qui désignent simplement la nature ou des éléments non identifiables
+ avec précision (comme les mots servant à parler de manière générale de la flore ou du paysage). Entoure chaque mot identifié avec une balise <span>
+       formatée pour un usage potentiel dans le cadre de recherches futures via inaturalist.org.
+       Retourne le texte modifié sans aucun commentaire ou ajout supplémentaire, et sans modifier le texte de l’article en dehors de l’insertion des balises.
+        Le but n'est pas de trouver tous les noms les plus commun comme herbe ou gazon mais d aider des lecteur qui ne connaitrait pas les noms de plantes ou arbre.
+Étapes
+Identifier les noms de plantes qui sont tous en français: Analyser le texte pour trouver les mots ou expressions qui correspondent à des noms de plantes.
+Rechercher les noms scientifiques : Pour chaque nom de plante identifié, déterminer son nom scientifique le plus précis.
+Format en HTML : Entourer chaque nom de plante identifié avec des balises <span> incluant les attributs class, data-taxon-name et data-photo-url.
+Remplacer les espaces réservés : Remplacer "NOM_SCIENTIFIQUE" dans l’attribut data-taxon-name par le nom scientifique précis.
+Format de sortie
+Retourner le texte modifié avec tous les noms de plantes entourés par des balises span formatées :
+<span class="inat-vegetal" data-taxon-name="NOM_SCIENTIFIQUE" data-photo-url="">MOT_CORRESPONDANCE<div class="inat-vegetal-tooltip"><img src="" alt=""/></div></span>
+Exemples
+Entrée :
+Le jardin est rempli de roses, de tulipes et de chênes majestueux.
+Sortie :
+{"upgraded": "Le jardin de gazon est rempli de <span class="inat-vegetal" data-taxon-name="Rosa" data-photo-url="">roses
+<div class="inat-vegetal-tooltip"><img src="" alt=""/></div></span>,
+de <span class="inat-vegetal" data-taxon-name="Tulipa" data-photo-url="">tulipes<div class="inat-vegetal-tooltip"><img src="" alt=""/></div></span> en fleurs et de
+<span class="inat-vegetal" data-taxon-name="Quercus" data-photo-url="">cerisiers<div class="inat-vegetal-tooltip"><img src="" alt=""/></div></span> majestueux."}
+(Real examples should ideally be longer, with various plant names correctly identified and formatted.)
+        `
+      },
+      userRole: {
+        role: "user",
+        content: `voici le texte dans lequel tu dois faire ce qui t es demandé : ${article}`
+      }
+    }
   }
 
 }
