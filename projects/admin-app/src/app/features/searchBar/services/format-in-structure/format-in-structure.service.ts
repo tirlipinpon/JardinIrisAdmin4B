@@ -40,7 +40,7 @@ export class FormatInStructureService {
       } else if (type === 'LINK') {
         prompt = this.getPromptsService.getPromptGenericAddInternalLinkInArticle(chapitreText, postTitreAndIdLocal);
       } else if (type === 'VEGETAL') {
-        prompt = this.getPromptsService.getPromptAddVegetalInArticle(chapitreText);
+        prompt = this.getPromptsService.getPromptAddVegetalInArticle(chapitreText, chapitreId);
       }
 
       // Convertir la Promise en Observable et traiter le résultat
