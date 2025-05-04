@@ -120,7 +120,7 @@ This can include current concrete examples, practical information, numerical dat
 - Add the new information in a seamless manner that maintains the original style and tone of the blog post.
 
 # Output Format
-Provide the enhanced blog segment in a valid JSON format as follows: {"upgraded": "Response upgraded chapitre..."} Ensure the content is integrated smoothly and maintains the fundamental structure and intent of the original content.
+Provide the enhanced blog segment in a valid JSON format as follows: {"upgraded": "Response upgraded paragraphe..."} Ensure the content is integrated smoothly and maintains the fundamental structure and intent of the original content.
 
 # Examples
 **Original Segment:**
@@ -236,17 +236,17 @@ La réponse doit être fournie au format JSON, contenant uniquement le lien YouT
   getPromptFaq(upgradedArticle: string): any {
     return {
       systemRole: {"role": "system","content":`
-Pour chaque article contenant des chapitres balisés, générez des questions et réponses pertinentes pour chaque chapitre, sous forme d'objet JSON.
+Pour chaque article contenant des paragraphes balisés, générez des questions et réponses pertinentes pour chaque paragraphe, sous forme d'objet JSON.
 
-1. **Identifier les chapitres**: Repérez les chapitres dans l'article à l'aide des balises \`<span id="paragraphe-#">...texte...</span>\`.
-2. **Formuler une question**: Pour chaque chapitre, posez une question d'environ 10 mots qui approfondit le contenu au-delà de ce qui est fourni.
+1. **Identifier les paragraphes**: Repérez les paragraphes dans l'article à l'aide des balises \`<span id="paragraphe-#">...texte...</span>\`.
+2. **Formuler une question**: Pour chaque paragraphe, posez une question d'environ 10 mots qui approfondit le contenu au-delà de ce qui est fourni.
 3. **Fournir une réponse**: Proposez une réponse avec des informations supplémentaires pertinentes à la question formulée.
 
 # Steps
 
-1. Parcourir l'article pour repérer les chapitres à l'aide des balises HTML spécifiques.
-2. Lire le contenu de chaque chapitre afin de comprendre les points clés.
-3. Formuler une question par chapitre qui irait plus loin dans le sujet abordé dans le texte.
+1. Parcourir l'article pour repérer les paragraphes à l'aide des balises HTML spécifiques.
+2. Lire le contenu de chaque paragraphe afin de comprendre les points clés.
+3. Formuler une question par paragraphe qui irait plus loin dans le sujet abordé dans le texte.
 4. Rédiger une réponse qui complète la question avec des détails ou informations supplémentaires.
 
 # Output Format
@@ -256,20 +256,20 @@ Présentez les questions et réponses sous forme d'un objet JSON structuré, san
 \`\`\`json
 [
   {
-    "question": "la question pour le chapitre 1",
-    "response": "la réponse pour le chapitre 1"
+    "question": "la question pour le paragraphe 1",
+    "response": "la réponse pour le paragraphe 1"
   },
   {
-    "question": "la question pour le chapitre 2",
-    "response": "la réponse pour le chapitre 2"
+    "question": "la question pour le paragraphe 2",
+    "response": "la réponse pour le paragraphe 2"
   }
-  // A continuer pour chaque chapitre
+  // A continuer pour chaque paragraphe
 ]
 \`\`\`
 
 # Notes
 
-- Assurez-vous que les questions et réponses fournies sont pertinentes et approfondissent le sujet discuté dans chaque chapitre.
+- Assurez-vous que les questions et réponses fournies sont pertinentes et approfondissent le sujet discuté dans chaque paragraphe.
 - Ne retournez que l'objet JSON attendu, sans inclusion de texte explicatif ou supplémentaire.
       `},
       userRole: { "role": "user", "content": `
@@ -316,7 +316,7 @@ La réponse doit être fournie dans un objet JSON contenant uniquement le lien Y
     }
   }
 
-  getPromptGenericSelectKeyWordsFromChapitresInArticle(titreArticle: string, chapitreKeyWordList: string[]) {
+  getPromptGenericSelectKeyWordsFromChapitresInArticle(titreArticle: string, paragrapheKeyWordList: string[]) {
     return {
       systemRole: {
         role: "system",
@@ -324,7 +324,7 @@ La réponse doit être fournie dans un objet JSON contenant uniquement le lien Y
       },
       userRole: {
         role: "user",
-        content: this.getPerplexityPromptUserSelectKeyWordsFromChapitresInArticle(titreArticle, chapitreKeyWordList)
+        content: this.getPerplexityPromptUserSelectKeyWordsFromChapitresInArticle(titreArticle, paragrapheKeyWordList)
       }
     }
   }
@@ -356,9 +356,9 @@ Extrait un seul mot-clé du titre du blog. Assure-toi que ce mot résume efficac
 - Le mot-clé choisi doit être suffisamment large pour couvrir un éventail d'images mais précis pour rester pertinent.`
   }
 
-  getPerplexityPromptUserSelectKeyWordsFromChapitresInArticle(titreArticle: string, chapitreKeyWordList: string[]){
+  getPerplexityPromptUserSelectKeyWordsFromChapitresInArticle(titreArticle: string, paragrapheKeyWordList: string[]){
     return `Voici le titre: ${titreArticle}.
-    Si la liste n'est pas vide : ( ${chapitreKeyWordList} ) , choisi un autre mot que ceux qui sont deja dans cette liste.`
+    Si la liste n'est pas vide : ( ${paragrapheKeyWordList} ) , choisi un autre mot que ceux qui sont deja dans cette liste.`
   }
 
   getPromptGenericSelectBestImageForChapitresInArticle(article: string, images: any) {
@@ -515,7 +515,7 @@ Présentez le résultat comme suit:
 `;
   }
 
-  getPromptAddVegetalInArticle(article: string, chapitreId: number) {
+  getPromptAddVegetalInArticle(article: string, paragrapheId: number) {
     return {
       systemRole: {
         role: "system",
@@ -531,11 +531,11 @@ Ne retiens pas les mots trop vagues, courants ou génériques qui désignent sim
 Identifier les noms de plantes qui sont tous en français: Analyser le texte pour trouver les mots ou expressions qui correspondent à des noms de plantes.
 Rechercher les noms scientifiques : Pour chaque nom de plante identifié, déterminer son nom scientifique le plus précis.
 Format en HTML : Entourer chaque nom de plante identifié avec des balises <span> incluant les attributs class, data-taxon-name et data-photo-url.
-Remplacer les espaces réservés : Remplacer "NOM_SCIENTIFIQUE" dans l’attribut data-taxon-name par le nom scientifique précis et incrementer la valeur "X" de data-chapitre-id="${chapitreId}-X".
+Remplacer les espaces réservés : Remplacer "NOM_SCIENTIFIQUE" dans l’attribut data-taxon-name par le nom scientifique précis et incrementer la valeur "X" de data-paragraphe-id="${paragrapheId}-X".
 Format de sortie
 Retourner dans un json valide {"upgraded": "TEXTE_MODIFIE" } le texte modifié avec tous les noms de plantes entourés par des balises span formatées :
 {
-"upgraded": "<span class="inat-vegetal" data-taxon-name="NOM_SCIENTIFIQUE" data-photo-url="" data-chapitre-id="${chapitreId}-X">MOT_CORRESPONDANCE<div class="inat-vegetal-tooltip"><img src="" alt=""/></div></span>"
+"upgraded": "<span class="inat-vegetal" data-taxon-name="NOM_SCIENTIFIQUE" data-photo-url="" data-paragraphe-id="${paragrapheId}-X">MOT_CORRESPONDANCE<div class="inat-vegetal-tooltip"><img src="" alt=""/></div></span>"
 }
 Exemples
 Entrée :
@@ -544,8 +544,8 @@ Sortie :
 {
 "upgraded": "Le jardin de gazon est rempli de <span class="inat-vegetal" data-taxon-name="Rosa" data-photo-url="">roses
 <div class="inat-vegetal-tooltip"><img src="" alt=""/></div></span>,
-de <span class="inat-vegetal" data-taxon-name="Tulipa" data-photo-url="" data-chapitre-id="${chapitreId}-1">tulipes<div class="inat-vegetal-tooltip"><img src="" alt=""/></div></span> en fleurs et de
-<span class="inat-vegetal" data-taxon-name="Quercus" data-photo-url="" data-chapitre-id="${chapitreId}-2">cerisiers<div class="inat-vegetal-tooltip"><img src="" alt=""/></div></span> majestueux."
+de <span class="inat-vegetal" data-taxon-name="Tulipa" data-photo-url="" data-paragraphe-id="${paragrapheId}-1">tulipes<div class="inat-vegetal-tooltip"><img src="" alt=""/></div></span> en fleurs et de
+<span class="inat-vegetal" data-taxon-name="Quercus" data-photo-url="" data-paragraphe-id="${paragrapheId}-2">cerisiers<div class="inat-vegetal-tooltip"><img src="" alt=""/></div></span> majestueux."
 }
 (Real examples should ideally be longer, with various plant names correctly identified and formatted.)
         `
