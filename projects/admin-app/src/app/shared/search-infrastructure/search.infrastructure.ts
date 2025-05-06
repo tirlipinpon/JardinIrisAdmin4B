@@ -289,11 +289,11 @@ export class SearchInfrastructure {
     }
   }
 
-  generateSeoNewHref(postTitre: string): Observable<string> {
+  generateSeoNewHref(postTitre: string, postId: number): Observable<string> {
     if(this.isLocalhost()) {
       return new Observable<string>(subscriber => {
         const mock = `
-        seo-article-blog-jardinier-paysagiste-bruxelles
+        blog-detail-jardinier-paysagiste-limace.html?post=669
         `;
         setTimeout(() => {
           subscriber.next(mock);
@@ -308,6 +308,7 @@ export class SearchInfrastructure {
             throw new Error('Problème dans generateSeoNewHref avec l\'API OpenAI');
           }
           const data: { url: string } = JSON.parse(extractJSONBlock(result))
+          this.supabaseService.updatePostNewUrl(postId, data.url);
           return data.url;
         })
       );
@@ -346,7 +347,8 @@ export class SearchInfrastructure {
           "categorie": isArticleValid ? 'actualité' : post.categorie,
           "visite": 1234,
           "valid": true,
-          "deleted": false}
+          "deleted": false,
+        }
       );
     } else {
       const updatedPost: Post = {
@@ -355,7 +357,7 @@ export class SearchInfrastructure {
         article: getArticleHtml,
         image_url: image_url,
         video: video,
-        categorie: isArticleValid ? 'actualité' : post.categorie
+        categorie: isArticleValid ? 'actualité' : post.categorie,
       };
       return from(this.supabaseService.setNewPostForm(updatedPost)).pipe(
         map(data => {

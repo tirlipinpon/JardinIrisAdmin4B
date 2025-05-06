@@ -373,7 +373,9 @@ export const SearchStore= signalStore(
           switchMap(() => {
             const getPost = store.getPost();
             if (!getPost || !getPost.titre) { patchState(store, { isLoading: false }); return EMPTY; }
-            return infra.generateSeoNewHref(getPost.titre).pipe(
+            const getPostId = store.getPostId();
+            if (!getPostId) { patchState(store, { isLoading: false }); return EMPTY; }
+            return infra.generateSeoNewHref(getPost.titre, getPostId).pipe(
               tapResponse({
                 next: (seoNewHref) => patchState(store, { articleNewHref: seoNewHref, isLoading: false }),
                 error: () => patchState(store, { isLoading: false }),

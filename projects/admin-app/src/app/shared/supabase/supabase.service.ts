@@ -380,4 +380,23 @@ export class SupabaseService {
     }
   }
 
+  async updatePostNewUrl(postId: number, url: string) {
+    try {
+      const {data, error} = await this.supabase
+        .from('post')
+        .update({new_href: url+'.html?post='+postId})
+        .eq('id', postId)
+        .select();
+
+      if (error) {
+        throw error;
+      }
+      console.log(data);
+      return data[0];
+    } catch (error) {
+      throw error;
+    }
+
+}
+
 }
