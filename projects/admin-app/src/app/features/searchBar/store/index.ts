@@ -25,6 +25,7 @@ export interface SearchState {
   articleLinkAdded: string | null;
   articleImagesVegetal: string | null;
   articleScientificUrl: string | null;
+  articleNewHref: string | null;
 }
 
 // valeur initiale
@@ -44,7 +45,8 @@ const initialValue: SearchState = {
   articleHtml: null,
   articleLinkAdded: null,
   articleImagesVegetal: null,
-  articleScientificUrl: null
+  articleScientificUrl: null,
+  articleNewHref: null
 }
 export const SearchStore= signalStore(
   { providedIn: 'root' },
@@ -131,6 +133,11 @@ export const SearchStore= signalStore(
     getArticleScientificUrl: computed(() =>  store.articleScientificUrl()),
     isArticleScientificUrl: computed(() =>  {  const articleScientificName = store.articleScientificUrl();
       return articleScientificName!==null && articleScientificName.length > 0
+    }),
+
+    getArticleNewHref: computed(() =>  store.articleNewHref()),
+    isArticleNewHref: computed(() =>  {  const articleNewHref = store.articleNewHref();
+      return articleNewHref!==null && articleNewHref.length > 0
     }),
 
     getPostTitreAndId: computed(() =>  store.postTitreAndId()),
@@ -224,7 +231,6 @@ export const SearchStore= signalStore(
           })
         )
       ),
-
       saveUrlPost: rxMethod<string>(
         pipe(
           tap(() => updateState(store, '[saveUrlPost] update loading', {isLoading: true})),
@@ -355,6 +361,21 @@ export const SearchStore= signalStore(
             return infra.addUrlFromScientificNameInHtml(getArticleImagesVegetal).pipe(
               tapResponse({
                 next: (data) => patchState(store, { articleScientificUrl: data, isLoading: false }),
+                error: () => patchState(store, { isLoading: false }),
+              })
+            );
+          })
+        )
+      ),
+      generateSeoNewHref: rxMethod<void>(
+        pipe(
+          tap(() => updateState(store, '[generateSeoNewHref] update loading', { isLoading: true })),
+          switchMap(() => {
+            const getPost = store.getPost();
+            if (!getPost || !getPost.titre) { patchState(store, { isLoading: false }); return EMPTY; }
+            return infra.generateSeoNewHref(getPost.titre).pipe(
+              tapResponse({
+                next: (seoNewHref) => patchState(store, { articleNewHref: seoNewHref, isLoading: false }),
                 error: () => patchState(store, { isLoading: false }),
               })
             );

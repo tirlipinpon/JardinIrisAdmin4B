@@ -30,6 +30,7 @@ export class SearchApplication {
     this.isFaqEffect();
     this.isAddedImagesVegetalEffect();
     this.isArticleScientificUrlEffect();
+    this.isGenerateSeoNewHrefEffect();
   }
 
   get isSearching(): Signal<boolean> {
@@ -134,6 +135,11 @@ export class SearchApplication {
       this.messageService.sendMessage('Ajout de nom scientific en cours.');
       this.store.addUrlFromScientificNameInHtml();
     }
+  }
+
+  generateSeoNewHref(): void {
+      this.messageService.sendMessage('Générer New Href en cours.');
+      this.store.generateSeoNewHref();
   }
 
   getPostTitreAndId(): void {
@@ -291,6 +297,18 @@ export class SearchApplication {
           this.messageService.sendSuccess('Format en HTML terminé.', MessageAction.FORMATED_IN_HTML_ARTICLE);
         } else {
           this.messageService.sendError('Format en HTML a une erreur.');
+        }
+      }
+    });
+  }
+
+  private isGenerateSeoNewHrefEffect(): void {
+    effect(() => {
+      if(this.store.getArticleNewHref() && this.store.getArticleNewHref()!==null) {
+        if(this.store.isArticleNewHref()) {
+          this.messageService.sendSuccess('New Href terminé.', MessageAction.SEO_NEW_HREF_ADDED);
+        } else {
+          this.messageService.sendError('New Href  a une erreur.');
         }
       }
     });

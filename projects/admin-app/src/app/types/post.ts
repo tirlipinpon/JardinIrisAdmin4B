@@ -17,6 +17,7 @@ export interface Post {
   deleted?: boolean;
   video?: string | null;
   images_chapitres?: any[];
+  new_href?: string | null;
 }
 
 /*
@@ -34,6 +35,7 @@ export interface Post {
   "categorie": "Météo",
   "visite": 1234,
   "valid": true,
-  "deleted": false
+  "deleted": false,
+  blog-detail-jardinier-paysagiste-limace-669
 }
 */

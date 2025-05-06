@@ -20,6 +20,7 @@ export const MessageAction = {
   INTERNAL_LINK_ADDED: 'InternalLinkAdded',
   IMAGE_VEGETAL_ADDED: 'ImageVegetalAdded',
   SCIENTIFIC_URL_ADDED: 'scientificUrlAdded',
+  SEO_NEW_HREF_ADDED: 'seoNewHrefAdded',
 } as const;
 
 // Type pour les actions (utilisant typeof pour inférer automatiquement les valeurs)

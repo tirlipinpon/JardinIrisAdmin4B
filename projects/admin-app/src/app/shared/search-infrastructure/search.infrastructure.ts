@@ -257,7 +257,7 @@ export class SearchInfrastructure {
   }
 
   addVideo(postTitle: string): Observable<any> {
-    if(!this.isLocalhost()) {
+    if(this.isLocalhost()) {
       return new Observable<string>(subscriber => {
         const mock = `
         http://www.youtube.com/watch?v=exempleVideo
@@ -287,6 +287,32 @@ export class SearchInfrastructure {
             })
         );
     }
+  }
+
+  generateSeoNewHref(postTitre: string): Observable<string> {
+    if(this.isLocalhost()) {
+      return new Observable<string>(subscriber => {
+        const mock = `
+        seo-article-blog-jardinier-paysagiste-bruxelles
+        `;
+        setTimeout(() => {
+          subscriber.next(mock);
+          subscriber.complete();
+        }, 1000);
+      });
+    } else {
+      const prompt = this.getPromptsService.getPromptSelectKeyWordsSeoUrl(postTitre);
+      return from(this.openaiApiService.fetchData(prompt, true)).pipe(
+        map(result => {
+          if (result === null) {
+            throw new Error('Problème dans generateSeoNewHref avec l\'API OpenAI');
+          }
+          const data: { url: string } = JSON.parse(extractJSONBlock(result))
+          return data.url;
+        })
+      );
+    }
+
   }
 
   setPost(post: Post): Observable<Post> {

@@ -58,6 +58,8 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
           } else if (msg.action === MessageAction.SCIENTIFIC_URL_ADDED) {
             this.application.checkMeteo();
           } else if (msg.action === MessageAction.METEO) {
+            this.application.generateSeoNewHref()
+          } else if (msg.action === MessageAction.SEO_NEW_HREF_ADDED) {
             this.application.savePost();
           } else if (msg.action === MessageAction.SAVED_POST) {
             this.application.updateIdeaPost();

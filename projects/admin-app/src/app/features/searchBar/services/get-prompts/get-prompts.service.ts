@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {afficherCategories} from "../../../../utils/afficherCategories";
 import {formatCurrentDateUs} from "../../../../utils/getFormattedDate";
 import {VideoInfo} from "../../../../shared/google-search/google-search.service";
+import {afficherRandomSeoKeyWords} from "../../../../utils/afficherRandomSeoKeyWords";
 
 @Injectable({
   providedIn: 'root'
@@ -59,8 +60,9 @@ Le résultat doit être un JSON strictement valide comme ceci:
     return {
       systemRole: {"role": "system","content":`
 
-       Tu es chargé de réécrire un article détaillé pour un blog de jardinage situé à Bruxelles,
-       en préservant un maximum de détails techniques et contextuels tout en intégrant de nouveaux éléments pertinents si nécessaire.
+       Tu es chargé de réécrire un article détaillé pour un blog de jardinage situé à Bruxelles en utilisant
+       les informations fournies et respectant les normes SEO pour ces mots clefs ${afficherRandomSeoKeyWords()},
+       en préservant un maximum de détails techniques récentes et contextuels tout en intégrant de nouveaux éléments pertinents.
        Inclue une touche d'humour subtilement. Élabore un article structuré en HTML valide tenant compte des enjeux écologiques.
        Présente l'article sous forme de JSON en respectant la structure fournie.
 
@@ -70,13 +72,13 @@ Le résultat doit être un JSON strictement valide comme ceci:
 - **Article**: Écris l'article en HTML valide, minifié sur une seule ligne avec des caractères spéciaux échappés, suivant cette structure :
   - 6 paragraphes, chaque paragraphe avec :
     - **Texte du paragraphe** sous forme <span id="paragraphe-{n}">
-    <h4>Ecris un titre accrocheur du paragraphe {n}</h4>
+    <h5>Ecris un titre accrocheur du paragraphe {n}</h5>
     <ul><li>Trouve une question en sous-titre du paragraphe {n} (environ 10 mots)</li></ul>
     <p>Rédige un texte du paragraphe {n} avec minimum 200 mots et pas moins !</p>
     </span>
     - **Citation**: Trouve et inclue une citation célèbre qui se rapporte au sujet traité.
     - **Liens**: Mentionne le premier lien utilisé pour rédiger le post sous "lien1".
-    - **Catégorie**: Choisis une catégorie adéquate parmi celles fournies par ${afficherCategories(', ')}.
+    - **Catégorie**: Choisis une catégorie adéquate parmi celles fournies par "${afficherCategories(', ')}", et exclisivement une seule de celle la.
 
   # Output Format
     Présente le résultat sous la forme d'un JSON valide structuré comme suit :
@@ -93,7 +95,7 @@ Le résultat doit être un JSON strictement valide comme ceci:
   "lien_url_article": {
     "lien1": "URL du premier lien utilisé."
   },
-  "categorie": "Catégorie choisie parmi proposées."
+  "categorie": "Catégorie choisie parmi celles proposées."
 }
 
   # Notes
@@ -101,7 +103,7 @@ Le résultat doit être un JSON strictement valide comme ceci:
     - Assure l'articulation logique et l'alignement du contenu avec le thème pour le lecteur cible.
     - Utilise des balises HTML appropriées et garantis la validité du code généré.
       `},
-      userRole: { "role": "user", "content": `utilise les informations contenu sur la page dont l 'url est la suivante:  ${article} pour remplir les infos.` }
+      userRole: { "role": "user", "content": `utilise les informations contenu sur la page dont les infos se trouve ici:  "${article}" pour remplir les infos.` }
     }
   }
 
@@ -189,6 +191,54 @@ Présente le résultat sous la forme d'un JSON valide structuré comme suit :
 - Aucune structuration ou texte supplémentaire n'est nécessaire en dehors du JSON.
       `},
       userRole: { "role": "user", "content": `Donne la meteo en date du ${formatCurrentDateUs()}. Pour Bruxelles` }
+    }
+  }
+
+  getPromptSelectKeyWordsSeoUrl(postTitre: string): any {
+    return {
+      systemRole: {"role": "system","content":`
+      Créer une URL SEO-friendly pour un article de blog de jardinage en utilisant un titre et des mots-clés fournis.
+
+Tu recevras un titre d'article de blog et des mots clés associés. Utilise ces directives pour créer une URL SEO-friendly:
+
+- Inclure le mot-clé principal.
+- Utiliser des tirets pour séparer les mots.
+- Éviter les caractères spéciaux tels que les accents, &, %, etc.
+- Supprimer les mots inutiles (par exemple, le, la, de, pour, etc., ).
+- Utiliser uniquement des minuscules.
+- Maintenir l'URL aussi courte que possible tout en restant claire.
+
+# Steps
+
+1. Identifier le mot-clé principal parmi les mots-clés fournis.
+2. Transformer les les mots-clés et titre de l'article de blog en un format URL.
+3. Supprimer les mots inutiles et les caractères spéciaux des mots.
+4. Séparer les mots avec des tirets et utiliser uniquement des lettres minuscules pour l'URL.
+5. Veiller à ce que l'URL soit concise tout en restant claire.
+
+# Output Format
+
+La réponse doit être fournie au format JSON:
+\`\`\`json
+{ "url": "Retourner l'URL sous forme de texte brut, sans guillemets" }
+\`\`\`
+
+# Examples
+
+**Entrée:**
+- Mots-clés: "jardinier", "paysagiste"
+- Titre de l'article: "Comment entretenir vos plantes d'intérieur facilement"
+
+**Sortie:**
+- { "url": "jardinier-paysagiste-entretien-plantes-interieur-facilement" }
+
+# Notes
+
+- Assurez-vous que l'URL est claire, concise, et respectueuse des bonnes pratiques SEO.
+- Ne pas inclure des caractères accentués ou des majuscules.
+- Le mot-clé principal doit être placé au début de l'URL.
+      `},
+      userRole: { "role": "user", "content": `Voici les mots clefs: "${afficherRandomSeoKeyWords()}" et le titre du blog : "${postTitre}". ` }
     }
   }
 
