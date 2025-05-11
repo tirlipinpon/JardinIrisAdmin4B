@@ -61,7 +61,7 @@ Le résultat doit être un JSON strictement valide comme ceci:
       systemRole: {"role": "system","content":`
 
        Tu es chargé de réécrire un article détaillé pour un blog de jardinage situé à Bruxelles en utilisant
-       les informations fournies et respectant les normes SEO pour ces mots clefs ${afficherRandomSeoKeyWords()},
+       les informations fournies et respectant les normes SEO pour ces mots clefs: "${afficherRandomSeoKeyWords()}",
        en préservant un maximum de détails techniques récentes et contextuels tout en intégrant de nouveaux éléments pertinents.
        Inclue une touche d'humour subtilement. Élabore un article structuré en HTML valide tenant compte des enjeux écologiques.
        Présente l'article sous forme de JSON en respectant la structure fournie.
@@ -501,11 +501,11 @@ Fournir une description détaillée en texte décrivant visuellement l'image.
 - Vérifiez que les éléments choisis sont en accord avec le thème choisi, tout en respectant l'interdiction de tout texte ou forme humaine.`
   }
 
-  getPromptGenericAddInternalLinkInArticle(article: any, listTitreId: any): any {
+  getPromptGenericAddInternalLinkInArticle(article: any, listTitreId: any, newHref: any): any {
     return {
       systemRole: {
         role: "system",
-        content: this.getPromptSystemAddInternalLinkInArticle()
+        content: this.getPromptSystemAddInternalLinkInArticle(newHref)
       },
       userRole: {
         role: "user",
@@ -514,7 +514,7 @@ Fournir une description détaillée en texte décrivant visuellement l'image.
     }
   }
 
-  getPromptSystemAddInternalLinkInArticle() {
+  getPromptSystemAddInternalLinkInArticle(newHref: string) {
     return `
 Embed a specific hyperlink into an article using an HTML tag according to detailed guidelines, without altering the article's text or html beyond the insertion.
 
@@ -531,7 +531,7 @@ Embed a specific hyperlink into an article using an HTML tag according to detail
    - Parcourez les titres spécifiés dans le JSON et le contenu de l'article pour détecter un lien entre un mot-clé et un titre de la liste.
 
 2. **Insérer la Balise de Lien Hypertexte**:
-   - Suivez ce format : \`<a class="myTooltip" href="https://jardin-iris.be/blog-detail.html?post={id}" id="{id}" title="{titre}">{mots_clés}<span class="myTooltiptext">{titre}</span></a>\`
+   - Suivez ce format : \`<a class="myTooltip" href="https://jardin-iris.be/jardinier-paysagiste-belgique-blog/${newHref}.html?post={id}" title="{titre}">{mots_clés}<span class="myTooltiptext">{titre}</span></a>\`
    - Remplacez les éléments par :
      - {id} : l'identifiant unique de l'article référencé dans le JSON.
      - {titre} : le titre exact de l'article tel que fourni par le JSON.

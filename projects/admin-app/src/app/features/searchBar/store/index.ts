@@ -326,9 +326,11 @@ export const SearchStore= signalStore(
           switchMap(() => {
             const getArticleHtml = store.getArticleHtml();
             if (!getArticleHtml) { patchState(store, { isLoading: false }); return EMPTY; }
+            const getArticleNewHref = store.getArticleNewHref();
+            if (!getArticleNewHref) { patchState(store, { isLoading: false }); return EMPTY; }
             const getPostTitreAndId = store.getPostTitreAndId();
             if (!getPostTitreAndId) { patchState(store, { isLoading: false }); return EMPTY; }
-            return infra.formatInStructure(getArticleHtml, 'LINK', getPostTitreAndId).pipe(
+            return infra.formatInStructure(getArticleHtml, 'LINK', getArticleNewHref,  getPostTitreAndId).pipe(
               tapResponse({
                 next: (articleLinkAdded) => patchState(store, { articleLinkAdded: articleLinkAdded, isLoading: false }),
                 error: () => patchState(store, { isLoading: false }),
@@ -373,9 +375,7 @@ export const SearchStore= signalStore(
           switchMap(() => {
             const getPost = store.getPost();
             if (!getPost || !getPost.titre) { patchState(store, { isLoading: false }); return EMPTY; }
-            const getPostId = store.getPostId();
-            if (!getPostId) { patchState(store, { isLoading: false }); return EMPTY; }
-            return infra.generateSeoNewHref(getPost.titre, getPostId).pipe(
+            return infra.generateSeoNewHref(getPost.titre).pipe(
               tapResponse({
                 next: (seoNewHref) => patchState(store, { articleNewHref: seoNewHref, isLoading: false }),
                 error: () => patchState(store, { isLoading: false }),

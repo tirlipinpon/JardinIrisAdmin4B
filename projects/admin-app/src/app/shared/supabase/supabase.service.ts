@@ -384,7 +384,7 @@ export class SupabaseService {
     try {
       const {data, error} = await this.supabase
         .from('post')
-        .update({new_href: url+'.html?post='+postId})
+        .update({new_href: url})
         .eq('id', postId)
         .select();
 

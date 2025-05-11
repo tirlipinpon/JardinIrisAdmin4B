@@ -194,7 +194,7 @@ export class SearchInfrastructure {
 
   }
 
-  formatInStructure(article: string, type: string, postTitreAndId?:{titre: string, id: number}[]): Observable<string> {
+  formatInStructure(article: string, type: string, newHref?: string, postTitreAndId?:{titre: string, id: number}[]): Observable<string> {
     if(this.isLocalhost() && type !== 'VEGETAL') {
       return new Observable<string>(subscriber => {
         const mock = ' type=' + type + ' : ' + article;
@@ -212,7 +212,7 @@ export class SearchInfrastructure {
         }, 1000);
       });
     } else {
-      return this.formatInStructureService.formatInStructure(article, type, postTitreAndId);
+      return this.formatInStructureService.formatInStructure(article, type, newHref, postTitreAndId);
     }
   }
 
@@ -289,11 +289,11 @@ export class SearchInfrastructure {
     }
   }
 
-  generateSeoNewHref(postTitre: string, postId: number): Observable<string> {
+  generateSeoNewHref(postTitre: string): Observable<string> {
     if(this.isLocalhost()) {
       return new Observable<string>(subscriber => {
         const mock = `
-        blog-detail-jardinier-paysagiste-limace.html?post=669
+        blog-detail-jardinier-paysagiste-limace
         `;
         setTimeout(() => {
           subscriber.next(mock);
@@ -308,7 +308,6 @@ export class SearchInfrastructure {
             throw new Error('Problème dans generateSeoNewHref avec l\'API OpenAI');
           }
           const data: { url: string } = JSON.parse(extractJSONBlock(result))
-          this.supabaseService.updatePostNewUrl(postId, data.url);
           return data.url;
         })
       );
@@ -419,9 +418,9 @@ export class SearchInfrastructure {
     if(this.isLocalhost()) {
       return of({success: true});
     } else {
-      let image_url = await this.openaiApiService.imageGenerartor(this.getPromptsService.getOpenAiPromptImageGenerator(description));
-      image_url = await compressImage(image_url, 500, 300)
-      await this.supabaseService.updateImageUrlPostByIdForm(postId, image_url);
+      // let image_url = await this.openaiApiService.imageGenerartor(this.getPromptsService.getOpenAiPromptImageGenerator(description));
+      // image_url = await compressImage(image_url, 500, 300)
+      // await this.supabaseService.updateImageUrlPostByIdForm(postId, image_url);
       return of({success: true});
     }
   }

@@ -20,7 +20,7 @@ export class FormatInStructureService {
   constructor(private openaiApiService: OpenaiApiService
     , private getPromptsService: GetPromptsService) { }
 
-  formatInStructure(article: string, type: string, postTitreAndId?: {titre: string, id: number}[]): Observable<string> {
+  formatInStructure(article: string, type: string, newHref?: string, postTitreAndId?: {titre: string, id: number}[]): Observable<string> {
     // Identifier les chapitres à traiter
     const chapitreIds = [1,2,3,4,5,6];
     // Copie locale de postTitreAndId pour pouvoir la modifier
@@ -38,7 +38,7 @@ export class FormatInStructureService {
       } else if (type === 'UPGRADE') {
         prompt = this.getPromptsService.upgradeArticle(chapitreText);
       } else if (type === 'LINK') {
-        prompt = this.getPromptsService.getPromptGenericAddInternalLinkInArticle(chapitreText, postTitreAndIdLocal);
+        prompt = this.getPromptsService.getPromptGenericAddInternalLinkInArticle(chapitreText, postTitreAndIdLocal, newHref);
       } else if (type === 'VEGETAL') {
         prompt = this.getPromptsService.getPromptAddVegetalInArticle(chapitreText, chapitreId);
       }
