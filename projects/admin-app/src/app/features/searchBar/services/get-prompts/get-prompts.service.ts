@@ -501,65 +501,63 @@ Fournir une description détaillée en texte décrivant visuellement l'image.
 - Vérifiez que les éléments choisis sont en accord avec le thème choisi, tout en respectant l'interdiction de tout texte ou forme humaine.`
   }
 
-  getPromptGenericAddInternalLinkInArticle(article: any, listTitreId: any, newHref: any): any {
+  getPromptGenericAddInternalLinkInArticle(article: any, listTitreIdHref: any): any {
     return {
       systemRole: {
         role: "system",
-        content: this.getPromptSystemAddInternalLinkInArticle(newHref)
+        content: this.getPromptSystemAddInternalLinkInArticle(listTitreIdHref)
       },
       userRole: {
         role: "user",
-        content: this.getPromptUserAddInternalLinkInArticle(article, listTitreId)
+        content: this.getPromptUserAddInternalLinkInArticle(article, listTitreIdHref)
       }
     }
   }
 
   getPromptSystemAddInternalLinkInArticle(newHref: string) {
     return `
-Embed a specific hyperlink into an article using an HTML tag according to detailed guidelines, without altering the article's text or html beyond the insertion.
+Embed a specific hyperlink into an article using an HTML tag, following the detailed guidelines without altering any text or HTML beyond the insertion.
 
 ## Détails de la Tâche
-
-- **Source des Liens**: Utilisez un fichier JSON contenant une liste d'articles, chacun avec un 'id' et un 'titre'.
-- **Insertion du Lien**: Faites un lien judicieux entre un des titres du JSON et le texte de l'article en intégrant une balise de lien hypertexte.
-- **Règles de Placement**: Un seul lien doit être inséré par article, en priorité sur les occurrences les plus spécifiques du titre.
-- **Exactitude**: Ne pas modifier le texte d'origine ni du HTML déjà présent, sauf pour l'insertion du lien.
+- **Source des Liens**: Utilisez un fichier JSON contenant une liste d'articles avec des champs 'id', 'titre', et 'new_href'.
+- **Insertion du Lien**: Identifiez un titre correspondant dans le texte de l'article et insérez une balise de lien hypertexte.
+- **Règles de Placement**: Insérez un seul lien par article en privilégiant les occurrences les plus spécifiques du titre.
+- **Exactitude**: Ne modifiez pas le texte d'origine ou le HTML existant, sauf pour la balise de lien.
 
 # Steps
-
 1. **Identifier le Titre**:
-   - Parcourez les titres spécifiés dans le JSON et le contenu de l'article pour détecter un lien entre un mot-clé et un titre de la liste.
+   - Analysez les titres dans le JSON et le contenu de l'article pour identifier une correspondance avec les mots-clés dans le texte.
 
 2. **Insérer la Balise de Lien Hypertexte**:
-   - Suivez ce format : \`<a class="myTooltip" href="https://jardin-iris.be/jardinier-paysagiste-belgique-blog/${newHref}.html?post={id}" title="{titre}">{mots_clés}<span class="myTooltiptext">{titre}</span></a>\`
-   - Remplacez les éléments par :
-     - {id} : l'identifiant unique de l'article référencé dans le JSON.
-     - {titre} : le titre exact de l'article tel que fourni par le JSON.
-     - {mots_clés} : le texte exact de l'article qui coïncide avec le titre.
+   - Si {new_href} existe: '<a class="myTooltip" href="https://jardin-iris.be/jardinier-paysagiste-belgique-blog/${newHref}.html?post={id}" title="{titre}">{mots_clés}<span class="myTooltiptext">{titre}</span></a>'
+   - Sinon : '<a class="myTooltip" href="https://jardin-iris.be/blog-detail.html?post={id}" title="{titre}">{mots_clés}<span class="myTooltiptext">{titre}</span></a>'
+   - Remplacez:
+     - {id} : identifiant de l'article.
+     - {titre} : titre de l'article.
+     - {mots_clés} : texte dans l'article correspondant au titre.
+     - {new_href} : valeur du lien si existante.
 
 3. **Assurez-vous de la Précision**:
-   - Confirmez que le lien est correctement inséré sans altérer le texte original.
+   - Confirmez l'insertion correcte sans altération du texte original.
 
 # Output Format
+Présentez le résultat dans ce format:
 
-Présentez le résultat comme suit:
+JSON
+    {
+      "upgraded": "<html_content_here>",
+      "idToRemove": "id"
+    }
 
-\`\`\`JSON
-{
-  "upgraded": "<html_content_here>",
-  "idToRemove": "id"
-}
-\`\`\`
 
 # Notes
-
-- Assurez une correspondance minimum entre le mot-clé dans le texte et les titres du JSON.
-- Veillez à n'insérer qu'un seul lien par article pour éviter toute redondance.
+- Assurez-vous d'une correspondance minimale entre le mot-clé et les titres du JSON.
+- Insérez un seul lien par article pour éviter des redondances.
 `;
   }
 
-  getPromptUserAddInternalLinkInArticle(article: string, listTitreId: any): string {
-    return `Voici un tableau JSON contenant des articles avec les champs 'titre' et 'id' : ${JSON.stringify(listTitreId)}.
+  getPromptUserAddInternalLinkInArticle(article: string, listTitreIdHref: any): string {
+    return `Voici un tableau JSON contenant des articles avec les champs 'titre' et 'id' 'new_href' : ${JSON.stringify(listTitreIdHref)}.
     Voici l'article à traiter : ${JSON.stringify(article)}. Insérez le lien hypertexte conformément aux directives fournies, sans modifier le texte original
 `;
   }

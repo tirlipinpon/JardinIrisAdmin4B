@@ -194,7 +194,7 @@ export class SearchInfrastructure {
 
   }
 
-  formatInStructure(article: string, type: string, newHref?: string, postTitreAndId?:{titre: string, id: number}[]): Observable<string> {
+  formatInStructure(article: string, type: string, postTitreIdNewHref?:{titre: string, id: number, new_href: string}[]): Observable<string> {
     if(this.isLocalhost() && type !== 'VEGETAL') {
       return new Observable<string>(subscriber => {
         const mock = ' type=' + type + ' : ' + article;
@@ -212,7 +212,7 @@ export class SearchInfrastructure {
         }, 1000);
       });
     } else {
-      return this.formatInStructureService.formatInStructure(article, type, newHref, postTitreAndId);
+      return this.formatInStructureService.formatInStructure(article, type, postTitreIdNewHref);
     }
   }
 
@@ -425,9 +425,9 @@ export class SearchInfrastructure {
     }
   }
 
-  getPostTitreAndId(): Observable<{ titre: string; id: number }[]>  {
+  getPostTitreAndId(): Observable<{ titre: string; id: number; new_href: string}[]>  {
     if(this.isLocalhost()) {
-      return of([{titre: 'dummy', id: 1}]);
+      return of([{titre: 'dummy', id: 1, new_href: 'dummy-jardinier-paysagiste'}]);
     } else {
       return from(this.supabaseService.getPostTitreAndId())
     }

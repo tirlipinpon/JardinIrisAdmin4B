@@ -147,7 +147,7 @@ export class SupabaseService {
     try {
       let query = this.supabase
         .from('post')
-        .select('id, titre')
+        .select('id, titre, new_href')
         .eq('valid', true)
         .eq('deleted', false)
         .order('created_at', {ascending: false})

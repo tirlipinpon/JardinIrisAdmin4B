@@ -17,7 +17,7 @@ export interface SearchState {
   meteo: string | null;
   postId: number | null;
   video: string | null;
-  postTitreAndId: {titre: string; id: number}[] | null;
+  postTitreAndId: {titre: string; id: number, new_href: string}[] | null;
   faq: {question: string; response: string}[] | null;
   articleGenerated: string | null;
   articleUpgraded: string | null;
@@ -326,11 +326,9 @@ export const SearchStore= signalStore(
           switchMap(() => {
             const getArticleHtml = store.getArticleHtml();
             if (!getArticleHtml) { patchState(store, { isLoading: false }); return EMPTY; }
-            const getArticleNewHref = store.getArticleNewHref();
-            if (!getArticleNewHref) { patchState(store, { isLoading: false }); return EMPTY; }
             const getPostTitreAndId = store.getPostTitreAndId();
             if (!getPostTitreAndId) { patchState(store, { isLoading: false }); return EMPTY; }
-            return infra.formatInStructure(getArticleHtml, 'LINK', getArticleNewHref,  getPostTitreAndId).pipe(
+            return infra.formatInStructure(getArticleHtml, 'LINK',  getPostTitreAndId).pipe(
               tapResponse({
                 next: (articleLinkAdded) => patchState(store, { articleLinkAdded: articleLinkAdded, isLoading: false }),
                 error: () => patchState(store, { isLoading: false }),
