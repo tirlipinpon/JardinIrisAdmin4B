@@ -175,22 +175,22 @@ Un texte avec du contenu varié, incluant des phrases clés, des titres, des lis
   meteoArticle(): any {
     return {
       systemRole: {"role": "system","content":`
- Créez une prévision météorologique  en +-60 mots pour le blog d’un jardinier, en intégrant vos perspectives de météorologue basé sur l'institut meteorologique belge .
+ Créez une prévision météorologique  en +-60 mots pour le blog d’un jardinier, en intégrant vos perspectives de météorologue basé sur l'institut météorologique Belge .
  Utilisez un langage évocateur pour illustrer les effets du temps sur les activités de jardinage.
- La une prévision météorologique factuelle pour Bruxelles, doit comprendre la température minimale et maximale sur le courent de la journée,
+ Une prévision météorologique factuelle pour Bruxelles, doit comprendre la température minimale et maximale sur le courent de la journée,
  la vitesse du vent et la durée d'ensoleillement pour la date de aujourd'hui.
+ Ajouter icones qui illustre le texte.
 
 # Output Format
 Présente le résultat sous la forme d'un JSON valide structuré comme suit :
-{"meteo": "Votre prévision météorologique poétique ici."}
+{"meteo": "Votre prévision météorologique ici"}
 
 # Notes
 - Soyez attentif à la manière dont les conditions météorologiques influencent les activités de jardinage, jardin et paysage.
-- Utilisez des métaphores et des images sensorielles pour amener votre prose à la vie.
 - Ne retournez **qu'un seul objet JSON**
 - Aucune structuration ou texte supplémentaire n'est nécessaire en dehors du JSON.
       `},
-      userRole: { "role": "user", "content": `Donne la meteo en date du ${formatCurrentDateUs()}. Pour Bruxelles` }
+      userRole: { "role": "user", "content": `Donne la météo en date du ${formatCurrentDateUs()}. Pour Bruxelles` }
     }
   }
 
@@ -529,7 +529,7 @@ Embed a specific hyperlink into an article using an HTML tag, following the deta
    - Analysez les titres dans le JSON et le contenu de l'article pour identifier une correspondance avec les mots-clés dans le texte.
 
 2. **Insérer la Balise de Lien Hypertexte**:
-   - Si {new_href} existe: '<a class="myTooltip" href="https://jardin-iris.be/jardinier-paysagiste-belgique-blog/${newHref}.html?post={id}" title="{titre}">{mots_clés}<span class="myTooltiptext">{titre}</span></a>'
+   - Si {new_href} existe and not NUll : '<a class="myTooltip" href="https://jardin-iris.be/jardinier-paysagiste-belgique-blog/${newHref}.html?post={id}" title="{titre}">{mots_clés}<span class="myTooltiptext">{titre}</span></a>'
    - Sinon : '<a class="myTooltip" href="https://jardin-iris.be/blog-detail.html?post={id}" title="{titre}">{mots_clés}<span class="myTooltiptext">{titre}</span></a>'
    - Remplacez:
      - {id} : identifiant de l'article.

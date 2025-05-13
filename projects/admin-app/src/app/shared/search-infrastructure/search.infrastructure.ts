@@ -195,7 +195,7 @@ export class SearchInfrastructure {
   }
 
   formatInStructure(article: string, type: string, postTitreIdNewHref?:{titre: string, id: number, new_href: string}[]): Observable<string> {
-    if(this.isLocalhost() && type !== 'VEGETAL') {
+    if(this.isLocalhost() && type !== 'LINK') {
       return new Observable<string>(subscriber => {
         const mock = ' type=' + type + ' : ' + article;
         setTimeout(() => {
@@ -330,7 +330,7 @@ export class SearchInfrastructure {
     }
   }
 
-  savePost(post: Post, getMeteo: string, getArticleHtml: string, image_url: string, video: string | null, isArticleValid: boolean | null): Observable<Post> {
+  savePost(post: Post, getMeteo: string, getArticleHtml: string, image_url: string, video: string | null, isArticleValid: boolean | null, new_href: string): Observable<Post> {
     if(this.isLocalhost()) {
       return of(
         {  "id": 644,
@@ -347,6 +347,7 @@ export class SearchInfrastructure {
           "visite": 1234,
           "valid": true,
           "deleted": false,
+          "new_href": "dummy-new-href",
         }
       );
     } else {
@@ -357,6 +358,7 @@ export class SearchInfrastructure {
         image_url: image_url,
         video: video,
         categorie: isArticleValid ? 'actualité' : post.categorie,
+        new_href: new_href
       };
       return from(this.supabaseService.setNewPostForm(updatedPost)).pipe(
         map(data => {

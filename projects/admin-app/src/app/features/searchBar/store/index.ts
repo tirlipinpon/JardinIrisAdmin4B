@@ -413,7 +413,9 @@ export const SearchStore= signalStore(
             if (!getMeteo) { patchState(store, { isLoading: false }); return EMPTY; }
             const getArticleScientificUrl = store.getArticleScientificUrl();
             if (!getArticleScientificUrl) { patchState(store, { isLoading: false }); return EMPTY; }
-            return infra.savePost(getPost, getMeteo, getArticleScientificUrl, imageUrl, getVideo, store.isArticleValid()).pipe(
+            const getArticleNewHref = store.getArticleNewHref();
+            if (!getArticleNewHref) { patchState(store, { isLoading: false }); return EMPTY; }
+            return infra.savePost(getPost, getMeteo, getArticleScientificUrl, imageUrl, getVideo, store.isArticleValid(), getArticleNewHref).pipe(
               tapResponse({
                 next: post => patchState(store, { postId: post.id, isLoading: false }),
                 error: error => patchState(store, {isLoading: false})
