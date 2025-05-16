@@ -399,4 +399,119 @@ export class SupabaseService {
 
 }
 
+  async uploadImageFromUrlToBucket(postId: number, originalImageUrl: string): Promise<string | null> {
+    try {
+      // Construire l'URL de ta fonction Edge Supabase avec le paramètre imageUrl
+      const proxyFunctionUrl = `https://zmgfaiprgbawcernymqa.supabase.co/functions/v1/fetch-image?imageUrl=${encodeURIComponent(originalImageUrl)}`;
+
+      // Télécharger l'image via la fonction Edge (proxy qui gère CORS)
+      const response = await fetch(proxyFunctionUrl, {
+        headers: {
+          Authorization: `Bearer ${environment.supabaseAnonKey}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur lors du téléchargement proxy de l'image : ${response.statusText}`);
+      }
+
+      const blob = await response.blob();
+      console.log('Blob size:', blob.size, 'Type:', blob.type);
+
+      // Uploader le fichier dans Supabase Storage
+      const { data, error } = await this.supabase.storage.from(environment.supabaseBucket).upload(`${postId}.png`, blob, {
+        contentType: blob.type,
+        upsert: true, // optionnel : écrase si fichier déjà présent
+      });
+
+      if (error) {
+        throw new Error(`Erreur d'upload : ${error.message}`);
+      }
+
+      // Récupérer l'URL publique
+      const { data: publicUrlData } = this.supabase.storage.from(environment.supabaseBucket).getPublicUrl(`${postId}.png`);
+
+      return publicUrlData?.publicUrl || '';
+    } catch (error) {
+      console.error('Erreur uploadImageFromUrl:', error);
+      return null;
+    }
+  }
+
+  async testAccess() {
+    try {
+      const { data, error } = await this.supabase.storage
+        .from('jardin-iris-images-post')
+        .list('');
+
+      if (error) {
+        console.error('Erreur accès bucket :', error);
+      } else {
+        console.log('Accès au bucket réussi :', data);
+      }
+    } catch (err) {
+      console.error('Erreur critique :', err);
+    }
+  }
+
+
+  async testUpload() {
+    console.log('testUpload aleatoire :', Math.floor(Math.random() * 1000) + 1);
+    const testBlob = new Blob(['Hello worldscscscscscscs'], { type: 'text/plain' });
+
+    try {
+      const { data, error } = await this.supabase.storage
+        .from('jardin-iris-images-post')
+        .upload('test-upload-2-.png', testBlob, {
+          upsert: true,
+        });
+
+      if (error) {
+        console.error('Erreur lors de l\'upload :', error);
+      } else {
+        console.log('Fichier uploadé avec succès :', data);
+      }
+    } catch (err) {
+      console.error('Erreur critique :', err);
+    }
+  }
+
+
+  async testDeleteAndUpload() {
+    const fileName = 'test-upload-2-3.png';
+
+    try {
+      // Supprimer le fichier s'il existe
+      const { error: deleteError } = await this.supabase.storage
+        .from('jardin-iris-images-post')
+        .remove([fileName]);
+
+      if (deleteError) {
+        console.error('Erreur lors de la suppression :', deleteError);
+      } else {
+        console.log('Fichier supprimé avec succès ou inexistant.');
+      }
+
+      // Créer un fichier de test
+      const testBlob = new Blob(['Nouveau contenu'], { type: 'text/plain' });
+
+      // Upload le fichier
+      const { data, error } = await this.supabase.storage
+        .from('jardin-iris-images-post')
+        .upload(fileName, testBlob, { upsert: true });
+
+      if (error) {
+        console.error('Erreur lors de l\'upload :', error);
+      } else {
+        console.log('Fichier uploadé avec succès :', data);
+      }
+    } catch (err) {
+      console.error('Erreur critique :', err);
+    }
+  }
+
+
+
+
+
 }
