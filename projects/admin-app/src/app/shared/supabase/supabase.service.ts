@@ -421,7 +421,10 @@ export class SupabaseService {
       // Uploader le fichier dans Supabase Storage
       const { data, error } = await this.supabase.storage.from(environment.supabaseBucket).upload(`${postId}.png`, blob, {
         contentType: blob.type,
-        upsert: true, // optionnel : écrase si fichier déjà présent
+        upsert: true,
+        headers: {
+          Authorization: `Bearer ${environment.supabaseAnonKey}`
+        }
       });
 
       if (error) {
