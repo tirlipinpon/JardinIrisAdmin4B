@@ -7,5 +7,7 @@ export enum CathegoriesBlog {
   PLANTE = "plante",
   POTAGER = "potager",
   FAUNE = "faune",
-  ACTUALITE = "actualité"
+  ACTUALITE = "actualité",
+  TECHNOLOGIE = "technologie",
+  CUISINE = "cuisine"
 }

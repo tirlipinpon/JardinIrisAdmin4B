@@ -62,12 +62,12 @@ Le résultat doit être un JSON strictement valide comme ceci:
 
        Tu es chargé de réécrire un article détaillé pour un blog de jardinage situé à Bruxelles en utilisant
        les informations fournies et respectant les normes SEO pour ces mots clefs: "${afficherRandomSeoKeyWords()}",
-       en préservant un maximum de détails techniques récentes et contextuels tout en intégrant de nouveaux éléments pertinents.
+       en préservant un maximum de détails techniques récentes et contextuels tout en intégrant de nouveaux éléments pertinents avec exemples et conseils.
        Inclue une touche d'humour subtilement. Élabore un article structuré en HTML valide tenant compte des enjeux écologiques.
        Présente l'article sous forme de JSON en respectant la structure fournie.
 
 # Instructions
-- **Titre**: Crée un titre court et pertinent pour l'article.
+- **Titre**: Crée un titre court et pertinent pour l'article qui succite la lecture.
 - **Phrase accroche**: Rédige une phrase accrocheuse d'environ 45 mots pour encourager la lecture.
 - **Article**: Écris l'article en HTML valide, minifié sur une seule ligne avec des caractères spéciaux échappés, suivant cette structure :
   - 6 paragraphes, chaque paragraphe avec :
@@ -573,7 +573,7 @@ Ne retiens pas les mots trop vagues, courants ou génériques qui désignent sim
  avec précision (comme les mots servant à parler de manière générale de la flore ou du paysage). Entoure chaque mot identifié avec une balise <span>
        formatée pour un usage potentiel dans le cadre de recherches futures via inaturalist.org.
        Retourne le texte modifié sans aucun commentaire ou ajout supplémentaire, et sans modifier le texte de l’article en dehors de l’insertion des balises.
-        Le but n'est pas de trouver tous les noms les plus communs comme herbe ou gazon mais d aider des lecteurs qui ne connaitrait pas les noms de plantes ou arbre.
+        Le but n'est pas de trouver tous les noms les plus communs comme herbe ou gazon branche haie... mais d aider des lecteurs qui ne connaitraient pas.
 Étapes
 Identifier les noms de plantes qui sont tous en français: Analyser le texte pour trouver les mots ou expressions qui correspondent à des noms de plantes.
 Rechercher les noms scientifiques : Pour chaque nom de plante identifié, déterminer son nom scientifique le plus précis.
@@ -589,7 +589,7 @@ Entrée :
 Le jardin de gazon est rempli de roses, de tulipes et de chênes majestueux.
 Sortie :
 {
-"upgraded": "Le jardin de gazon est rempli de
+"upgraded": "Le jardin de gazon et d'arbres est rempli de
 <span class="inat-vegetal" data-taxon-name="Rosa" data-paragraphe-id="${paragrapheId}-1">roses<div class="inat-vegetal-tooltip"><img src="" alt="Rosa"/></div></span>, de
 <span class="inat-vegetal" data-taxon-name="Tulipa" data-paragraphe-id="${paragrapheId}-2">tulipes<div class="inat-vegetal-tooltip"><img src="" alt="Tulipa"/></div></span> en fleurs et de
 <span class="inat-vegetal" data-taxon-name="Quercus" data-paragraphe-id="${paragrapheId}-3">cerisiers<div class="inat-vegetal-tooltip"><img src="" alt="Quercus"/></div></span> majestueux."
