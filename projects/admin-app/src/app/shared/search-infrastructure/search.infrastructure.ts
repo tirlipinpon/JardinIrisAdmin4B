@@ -174,7 +174,8 @@ export class SearchInfrastructure {
             "lien_url_article": {
               "lien1": "https://www.eco-jardinage.com/amenager-un-jardin-sur-le-toit-en-milieu-urbain/"
             },
-          "categorie": "jardin"
+          "categorie": "jardin",
+          "new_href": "jardin-potager-blog"
         };
 
         setTimeout(() => {
