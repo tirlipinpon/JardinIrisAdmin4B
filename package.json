@@ -1,10 +1,10 @@
 {
   "name": "jardin-iris-admin4-b",
-  "version": "0.0.0",
+  "version": "0.0.02",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --configuration production --base-href /admin/",
+    "build": "node increment-version.js && ng build --configuration production --base-href /admin/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:coverage": "ng test --code-coverage"
