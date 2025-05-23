@@ -361,7 +361,10 @@ export const SearchStore= signalStore(
             return infra.addUrlFromScientificNameInHtml(getArticleImagesVegetal).pipe(
               tapResponse({
                 next: (data) => patchState(store, { articleScientificUrl: data, isLoading: false }),
-                error: () => patchState(store, { isLoading: false }),
+                error: (err) => {
+                  console.error('Error during addUrlFromScientificNameInHtml:', err);
+                  patchState(store, { isLoading: false });
+                },
               })
             );
           })
