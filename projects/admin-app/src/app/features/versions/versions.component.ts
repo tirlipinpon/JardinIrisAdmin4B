@@ -7,7 +7,6 @@ import {VERSION} from "../../shared/version";
   standalone: true,
   template: `
     <div class="version-info">
-      <h3>Informations de version</h3>
       <p><strong>Build #:</strong> {{ version.buildNumber }}</p>
       <p><strong>Date de build:</strong> {{ formatDate(version.buildDate) }}</p>
       <p><strong>Timestamp:</strong> {{ version.buildTimestamp }}</p>

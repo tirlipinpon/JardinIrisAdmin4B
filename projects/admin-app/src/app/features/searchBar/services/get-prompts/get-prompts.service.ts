@@ -72,9 +72,9 @@ Le résultat doit être un JSON strictement valide comme ceci:
 - **Article**: Écris l'article en HTML valide, minifié sur une seule ligne avec des caractères spéciaux échappés, suivant cette structure :
   - 6 paragraphes, chaque paragraphe avec :
     - **Texte du paragraphe** sous forme <span id="paragraphe-{n}">
-    <h5>Ecris un titre accrocheur du paragraphe {n}</h5>
+    <h4>Ecris un titre accrocheur du paragraphe {n}</h4>
     <ul><li>Trouve une question en sous-titre du paragraphe {n} (environ 10 mots)</li></ul>
-    <p>Rédige un texte du paragraphe {n} avec minimum 200 mots et pas moins !</p>
+    <article>Rédige un texte du paragraphe {n} avec minimum 200 mots et pas moins !</article>
     </span>
     - **Citation**: Trouve et inclue une citation célèbre qui se rapporte au sujet traité, (sans double guillemets dans le texte).
     - **Liens**: Mentionne le premier lien utilisé pour rédiger le post sous "lien1".
@@ -89,7 +89,7 @@ Le résultat doit être un JSON strictement valide comme ceci:
   <span id="paragraphe-1">
   <h4>Ecris un titre accrocheur du paragraphe 1</h4>
   <ul><li>Trouve une question en sous-titre du paragraphe 1 (environ 10 mots)</li></ul>
-  Rédige un texte du paragraphe 1 avec minimum 200 mots et pas moins !
+  <article>Rédige un texte du paragraphe 1 avec minimum 200 mots et pas moins !</article>
   </span> (Continuer ainsi pour tous les paragraphes avec minimum 200 mots et pas moins par paragraphe !, minifié sur une seule ligne).",
   "citation": "Citation célèbre pertinente avec son auteur si connu.",
   "lien_url_article": {

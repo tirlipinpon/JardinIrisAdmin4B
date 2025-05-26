@@ -60,7 +60,7 @@ export class DialogEditVideoConfirmComponent {
   googleSearchService: any = inject(GoogleSearchService);
   rawVideos: any[] = [];
   selectedVideoId: string | null = null;
-  searchText: string = 'voiture porche rouge';
+  searchText: string = '';
 
   constructor(private sanitizer: DomSanitizer) {}
 
