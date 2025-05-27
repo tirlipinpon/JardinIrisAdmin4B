@@ -15,6 +15,11 @@ export class AddScientificNameService {
     const entries = this.extractInatEntries(html);
     console.log('Extracted entries:', entries);
 
+    if (entries.length === 0) {
+      console.log('Aucune entrée trouvée, retour de l\'HTML original.');
+      return of(html); // Ne rien modifier
+    }
+
     const apiCalls = entries.map(entry =>
       this.inaturalistApiService.getObservations(entry.taxonName).pipe(
         map(results => {
@@ -49,8 +54,9 @@ export class AddScientificNameService {
   private extractInatEntries(html: string): { taxonName: string, paragrapheId: string, url: string }[] {
     console.log('Extracting inat entries from HTML...');
     const matches = [...html.matchAll(
-      /<span\b[^>]*\bclass\s*=\s*["']?inat-vegetal["']?[^>]*\bdata-taxon-name\s*=\s*["']([^"']+)["'][^>]*\bdata-paragraphe-id\s*=\s*["']([^"']+)["'][^>]*>/gi
+      /<span\b[^>]*class=["'][^"']*inat-vegetal[^"']*["'][^>]*data-taxon-name=["']([^"']+)["'][^>]*data-paragraphe-id=["']([^"']+)["'][^>]*>/gi
     )];
+
 
     const entries = matches.map(match => ({
       taxonName: match[1],
