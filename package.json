@@ -1,6 +1,6 @@
 {
   "name": "jardin-iris-admin4-b",
-  "version": "0.0.09",
+  "version": "0.0.10",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

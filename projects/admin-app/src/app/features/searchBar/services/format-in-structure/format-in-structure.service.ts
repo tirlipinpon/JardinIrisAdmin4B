@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {catchError, from, mergeMap, Observable, of, toArray} from "rxjs";
+import {BehaviorSubject, catchError, from, mergeMap, Observable, of, switchMap, take, toArray} from "rxjs";
 import {extractChapitreById, replaceChapitreById} from "../../../../utils/exctractChapitreById";
 import {map} from "rxjs/operators";
 import {extractJSONBlock, parseJsonSafe} from "../../../../utils/cleanJsonObject";
@@ -24,27 +24,27 @@ export class FormatInStructureService {
              ,private insertInternalLinkService: InsertInternalLinkService) { }
 
   formatInStructure(article: string, type: string, postTitreAndId?: {titre: string, id: number, new_href: string}[]): Observable<string> {
-    // Identifier les chapitres à traiter
-    const chapitreIds = [1,2,3,4,5,6];
-    // Copie locale de postTitreAndId pour pouvoir la modifier
-    let postTitreAndIdLocal = postTitreAndId ? [...postTitreAndId] : undefined;
+    const chapitreIds = [1, 2, 3, 4, 5, 6];
+    const postTitreAndId$ = new BehaviorSubject(postTitreAndId ? [...postTitreAndId] : []);
 
     // Créer un Observable pour chaque traitement de chapitre
     const chapitreObservables = chapitreIds.map(chapitreId => {
       // Extraire le chapitre actuel
       const chapitreText = extractChapitreById(article, chapitreId);
 
-      // Sélectionner le prompt approprié selon le type
-      let prompt: any;
-      if (type === 'HTML') {
-        prompt = this.getPromptsService.formatInHtmlArticle(chapitreText);
-      } else if (type === 'UPGRADE') {
-        prompt = this.getPromptsService.upgradeArticle(chapitreText);
-      } else if (type === 'LINK') {
-        prompt = this.getPromptsService.getPromptGenericAddInternalLinkInArticle(chapitreText, postTitreAndIdLocal);
-      } else if (type === 'VEGETAL') {
-        prompt = this.getPromptsService.getPromptAddVegetalInArticle(chapitreText, chapitreId);
-      }
+      return postTitreAndId$.pipe(
+        take(1),
+        switchMap(postTitreAndIdLocal => {
+          let prompt: any;
+          if (type === 'HTML') {
+            prompt = this.getPromptsService.formatInHtmlArticle(chapitreText);
+          } else if (type === 'UPGRADE') {
+            prompt = this.getPromptsService.upgradeArticle(chapitreText);
+          } else if (type === 'LINK') {
+            prompt = this.getPromptsService.getPromptGenericAddInternalLinkInArticle(chapitreText, postTitreAndIdLocal);
+          } else if (type === 'VEGETAL') {
+            prompt = this.getPromptsService.getPromptAddVegetalInArticle(chapitreText, chapitreId);
+          }
 
       // Convertir la Promise en Observable et traiter le résultat
       return from(this.openaiApiService.fetchData(prompt, true)).pipe(
@@ -60,32 +60,34 @@ export class FormatInStructureService {
             const upgradedTextJson: {upgraded: string,idToRemove?: number} = JSON.parse(extractJSONBlock(upgradedText));
             let upgradedTextJsonObject = upgradedTextJson.upgraded;
 
-            // Mettre à jour postTitreAndIdLocal si nécessaire
-            if (type === 'LINK' && postTitreAndIdLocal && upgradedTextJson.idToRemove) {
-              const idToRemove = Number(upgradedTextJson.idToRemove);
-              postTitreAndIdLocal = postTitreAndIdLocal.filter((item) => item.id !== idToRemove);
-            } else if (type === 'HTML' && chapitreId === 3) {
-              upgradedTextJsonObject = this.insertInternalLinkService.addLink(upgradedTextJsonObject)
-            }
+                if (type === 'LINK' && upgradedTextJson.idToRemove) {
+                  const idToRemove = Number(upgradedTextJson.idToRemove);
+                  const updatedList = postTitreAndIdLocal.filter(item => item.id !== idToRemove);
+                  postTitreAndId$.next(updatedList);
+                } else if (type === 'HTML' && chapitreId === 3) {
+                  upgradedTextJsonObject = this.insertInternalLinkService.addLink(upgradedTextJsonObject);
+                }
 
-            return {
-              id: chapitreId,
-              nouveauContenu: upgradedTextJsonObject
-            };
-          } catch (error) {
-            console.error(`Erreur lors du traitement de la réponse pour le chapitre ${chapitreId}:`, error);
-            return {
-              id: chapitreId,
-              nouveauContenu: chapitreText
-            };
-          }
-        }),
-        catchError(error => {
-          console.error(`Erreur lors de l'appel API pour le chapitre ${chapitreId}:`, error);
-          return of({
-            id: chapitreId,
-            nouveauContenu: chapitreText
-          });
+                return {
+                  id: chapitreId,
+                  nouveauContenu: upgradedTextJsonObject
+                };
+              } catch (error) {
+                console.error(`Erreur lors du traitement de la réponse pour le chapitre ${chapitreId}:`, error);
+                return {
+                  id: chapitreId,
+                  nouveauContenu: chapitreText
+                };
+              }
+            }),
+            catchError(error => {
+              console.error(`Erreur lors de l'appel API pour le chapitre ${chapitreId}:`, error);
+              return of({
+                id: chapitreId,
+                nouveauContenu: chapitreText
+              });
+            })
+          );
         })
       );
     });
