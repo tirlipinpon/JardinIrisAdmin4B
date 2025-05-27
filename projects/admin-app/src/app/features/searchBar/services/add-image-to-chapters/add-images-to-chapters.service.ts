@@ -24,7 +24,7 @@ export class AddImagesToChaptersService {
     private unsplashImageService: UnsplashImageService,
     private supabaseService: SupabaseService
   ) {
-    console.log("AddImagesToChaptersService initialisé avec services:", {
+    console.log("AddImagesToChaptersService initialisé avec add-internal-link:", {
       perplexityApiService: !!perplexityApiService,
       getPromptsService: !!getPromptsService,
       unsplashImageService: !!unsplashImageService,

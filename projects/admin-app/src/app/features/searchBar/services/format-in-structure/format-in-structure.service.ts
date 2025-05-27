@@ -5,20 +5,23 @@ import {map} from "rxjs/operators";
 import {extractJSONBlock, parseJsonSafe} from "../../../../utils/cleanJsonObject";
 import {OpenaiApiService} from "../openai-api/openai-api.service";
 import {GetPromptsService} from "../get-prompts/get-prompts.service";
+import {InsertInternalLinkService} from "../add-internal-link/insert-internal-link.service";
 
 @Injectable({
   providedIn: 'root',
   useFactory: () => {
     const openaiApiService = inject(OpenaiApiService);
     const getPromptsService = inject(GetPromptsService);
+    const insertInternalLinkService = inject(InsertInternalLinkService);
 
-    return new FormatInStructureService(openaiApiService, getPromptsService);
+    return new FormatInStructureService(openaiApiService, getPromptsService, insertInternalLinkService);
   }
 })
 export class FormatInStructureService {
 
   constructor(private openaiApiService: OpenaiApiService
-    , private getPromptsService: GetPromptsService) { }
+             ,private getPromptsService: GetPromptsService
+             ,private insertInternalLinkService: InsertInternalLinkService) { }
 
   formatInStructure(article: string, type: string, postTitreAndId?: {titre: string, id: number, new_href: string}[]): Observable<string> {
     // Identifier les chapitres à traiter
@@ -55,12 +58,14 @@ export class FormatInStructureService {
 
           try {
             const upgradedTextJson: {upgraded: string,idToRemove?: number} = JSON.parse(extractJSONBlock(upgradedText));
-            const upgradedTextJsonObject = upgradedTextJson.upgraded;
+            let upgradedTextJsonObject = upgradedTextJson.upgraded;
 
             // Mettre à jour postTitreAndIdLocal si nécessaire
             if (type === 'LINK' && postTitreAndIdLocal && upgradedTextJson.idToRemove) {
               const idToRemove = Number(upgradedTextJson.idToRemove);
               postTitreAndIdLocal = postTitreAndIdLocal.filter((item) => item.id !== idToRemove);
+            } else if (type === 'HTML' && chapitreId === 3) {
+              upgradedTextJsonObject = this.insertInternalLinkService.addLink(upgradedTextJsonObject)
             }
 
             return {

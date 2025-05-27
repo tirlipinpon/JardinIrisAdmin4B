@@ -1,6 +1,6 @@
 // Ce fichier est généré automatiquement
 export const VERSION = {
-  buildNumber: '0.0.03',
-  buildDate: '2025-05-23T08:21:03.034Z',
-  buildTimestamp: 1747988463034
+  buildNumber: '0.0.04',
+  buildDate: '2025-05-27T10:01:48.806Z',
+  buildTimestamp: 1748340108806
 };
