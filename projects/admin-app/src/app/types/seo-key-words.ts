@@ -1,8 +1,8 @@
 export enum SeoKeyWords {
-  paysagisteBruxelles = "paysagiste Bruxelles",
   jardinierBruxelles = "jardinier Bruxelles",
-  jardinageBruxelles = "jardinage Bruxelles",
-  entretienJardin = "entretien jardin",
   jardinierPaysagisteBruxelles = "jardinier paysagiste Bruxelles",
-  entrepriseJardinageBruxelles = "entreprise jardinage Bruxelles"
+  // jardinageBruxelles = "jardinage Bruxelles",
+  // entretienJardin = "entretien jardin",
+  // paysagisteBruxelles = "paysagiste Bruxelles",
+  // entrepriseJardinageBruxelles = "entreprise jardinage Bruxelles"
 }
