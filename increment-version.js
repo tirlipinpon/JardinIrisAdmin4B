@@ -64,8 +64,7 @@ try {
   const versionContent = `// Ce fichier est généré automatiquement
 export const VERSION = {
   buildNumber: '${newVersion}',
-  buildDate: '${new Date().toISOString()}',
-  buildTimestamp: ${Date.now()}
+  buildDate: '${new Date().toISOString()}'
 };
 `;
 

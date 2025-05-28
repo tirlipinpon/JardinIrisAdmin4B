@@ -16,10 +16,6 @@ export class VersionService {
     return this.versionInfo.buildDate;
   }
 
-  getBuildTimestamp(): number {
-    return this.versionInfo.buildTimestamp;
-  }
-
   getFullVersionInfo() {
     return { ...this.versionInfo };
   }
@@ -29,7 +25,6 @@ export class VersionService {
     console.group('🔧 Version Info');
     console.log('Build Number:', this.versionInfo.buildNumber);
     console.log('Build Date:', new Date(this.versionInfo.buildDate).toLocaleString());
-    console.log('Timestamp:', this.versionInfo.buildTimestamp);
     console.groupEnd();
   }
 
