@@ -382,7 +382,7 @@ Extrait un seul mot-clé du titre du blog. Assure-toi que ce mot résume efficac
 # Steps
 1. **Analyse du Titre**: Lis attentivement le titre du blog et les concepts clés et le thème principal.
 2. **Sélection du Mot-clé**: Choisis un mot unique qui encapsule le sujet principal ou l'atmosphère globale du titre et traduis le en anglais.
-2. **Explication du Mot-clé**: Explique pourquoi ce mot clefs.
+2. **Explication du Mot-clé**: Explique pourquoi ce mot clefs a été choisis.
 3. **Vérification**: Assure-toi que le mot-clé choisi est général et suffisamment représentatif pour être utilisé efficacement dans une recherche d'image.
 # Output Format
 - Fournis un seul mot en résultat, représentant le mot-clé choisi sous cette forme json {"keyWord":"Mots choisis", "explanation":""}.
@@ -390,8 +390,8 @@ Extrait un seul mot-clé du titre du blog. Assure-toi que ce mot résume efficac
 **Input**: "Exploration des merveilles de l'océan: secrets des abysses"
 **Reasoning**:
 - Le titre parle de l'océan et des secrets cachés sous l'eau.
-- Le mot "océan" capture bien le sujet principal.
-**Output**: "{"keyWord":"ocean", "explanation":"Le mot océan capture bien le sujet principal"} et rien d 'autre, ne rajoute pas de texte ou d explication dans la réponse !
+- Le mot "océan" est choisis parce que... .
+**Output**: "{"keyWord":"ocean", "explanation":"Le mot océan est choisis parce que..."} et rien d 'autre, ne rajoute pas de texte ou d explication dans la réponse !
 ---
 **Input**: "Les charmes hivernaux des montagnes enneigées"
 **Reasoning**:
@@ -434,7 +434,7 @@ You are given a text, and a list of image URLs. Your task is to extract key them
 
 3. **Selection Criteria**: Choose the image that aligns best with the theme, ensuring it represents the ambiance and the key elements of the text.
 
-4. **Explanation**: Provide reasoning for the selection of the chosen image and explanations for why other images were not selected.
+4. **Explanation**: Provide what you see on the image.
 
 # Output Format
 
@@ -442,7 +442,7 @@ Provide the output in JSON format as follows:
 \`\`\`json
     {
       "imageUrl": "url",
-      "explanation": "explication de la première image en francais"
+      "explanation": "explication de ce qui est présent sur l image"
     }
     \`\`\`
 
@@ -461,14 +461,10 @@ Provide the output in JSON format as follows:
 \`\`\`JSON
     {
       "imageUrl": "https://example.com/image1.jpg",
-      "explanation": "Choisi pour la raison suivante..."
+      "explanation": "Je vois sur l image : ..."
     }
     \`\`\`
-
-# Notes
-
-- The decoding process should emphasize the image's relevance to the gardening context.
-- Ensure clarity and relevance in each explanation provided for image choices.`
+    `
   }
 
   getPerplexityPromptUserSelectBestImageForChapitresInArticle(article: string, images: any){

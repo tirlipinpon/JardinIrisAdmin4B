@@ -253,45 +253,36 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy, AfterV
     this.store.validComment(comment.id)
   }
 
-  processedArticleHtml(id: number | undefined, article: string, images: any[]) {
+  addImagesChapitreArticleHtml(id: number | undefined, article: string, images: any[]) {
     if (id === undefined) return '';
 
     // Créer un élément DOM temporaire pour manipuler le HTML
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = article;
-
     // Trouver tous les spans avec ID paragraphe-X
     const paragraphs = tempDiv.querySelectorAll('span[id^="paragraphe-"]');
-
     paragraphs.forEach(paragraph => {
       // Extraire le numéro du paragraphe
       const paragraphId = paragraph.id;
       const paragraphNumber = parseInt(paragraphId.split('-')[1]);
-
       // Trouver l'image correspondante
       const matchingImage = images.find(img =>
         img.chapitre_id === paragraphNumber
       );
-
-      if (matchingImage) {
         // Trouver le premier h4 dans ce paragraphe
         const h4 = paragraph.querySelector('h4');
-
         if (h4) {
           // Créer l'élément image
           const imgElement = document.createElement('img');
-          imgElement.src = matchingImage.url_Image;
-          imgElement.alt = matchingImage.chapitre_key_word || '';
+          imgElement.src = matchingImage.url_Image ||  "https://www.picturethisai.com/fr/care/Aloe_polyphylla.html";
+          imgElement.alt = matchingImage.chapitre_key_word || 'jardin iris jardinier paysagiste Bruxelles';
           imgElement.className = 'randomCropImage clickable-image'; // Ajout d'une classe pour cibler plus facilement
           imgElement.style.cssText = 'width: 100%; height: 200px; object-fit: cover; border: 3px solid grey; padding: 1px; margin: 0px 0px 30px; cursor: pointer;'; // Ajout du cursor: pointer
-
           // Stocker l'ID de l'image comme attribut data
           imgElement.setAttribute('data-image-id', matchingImage.id.toString());
-
           // Insérer l'image après le h4
           h4.insertAdjacentElement('afterend', imgElement);
         }
-      }
     });
     return this.sanitizer.bypassSecurityTrustHtml(tempDiv.innerHTML);
   }

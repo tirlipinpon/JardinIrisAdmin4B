@@ -60,7 +60,7 @@ export class AddImagesToChaptersService {
                 let test2 = extractJSONBlock(keyWord[0])
                 respKeyword = JSON.parse(test2);
                 chapitreKeyWord = respKeyword.keyWord;
-                chapitreExplanationWord = respKeyword.explanation;
+                chapitreExplanationWord = extractedTitle + "= " + respKeyword.explanation;
               }
               }
             } catch (parseError) {
