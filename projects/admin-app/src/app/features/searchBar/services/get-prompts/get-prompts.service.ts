@@ -164,6 +164,7 @@ Un texte avec du contenu varié, incluant des phrases clés, des titres, des lis
 }
 *Note: Les phrases clés, listes, et contenus tabulaires dans la réponse réelle doivent correspondre à ce qui est fourni dans le texte original.*
 # Notes
+- Ne pas utiliser les balise <p></p>
 - Le JSON doit strictement contenir les balises HTML requises ou déjà présentes, sans aucun texte ou formatage non essentiel au-delà de celles spécifiées.
 - Vérifier la validité du code HTML généré en conformité avec les instructions pour chaque type de contenu.
       `},
