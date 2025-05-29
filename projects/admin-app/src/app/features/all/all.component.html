@@ -35,7 +35,8 @@
           <li style="margin: 0 0 10px 0;border: 1px solid gray;">{{ post.description_meteo }}</li>
           <li style="margin: 0 0 10px 0;border: 1px solid gray;" [innerHTML]="post.phrase_accroche"></li>
           <button class="accordion">Voir l'article</button>
-          <li class="panel" style="margin: 0 0 10px 0;"
+          <li style="margin: 0 0 10px 0;"
+              class="panel article-container" #articleContainer
               [innerHTML]="post.id !== undefined && post.article && post.images_chapitres !== undefined && post.images_chapitres !== null ? processedArticleHtml(post.id, post.article, post.images_chapitres): 'pas de post.id!'"></li>
           <li style="margin: 0 0 10px 0;background-color: aliceblue; padding: 3px;">{{ post.citation }}</li>
           <li style="margin: 0 0 10px 0;"> <a [href]="post.lien_url_article" aria-label="lien vers article complet"

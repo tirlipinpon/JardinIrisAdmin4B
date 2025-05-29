@@ -1,4 +1,13 @@
-import {AfterViewChecked, Component, computed, inject, OnDestroy, OnInit} from '@angular/core';
+import {
+  AfterViewChecked,
+  AfterViewInit,
+  Component,
+  computed, ElementRef,
+  inject,
+  OnDestroy,
+  OnInit, Renderer2,
+  ViewEncapsulation
+} from '@angular/core';
 import {RouterLink} from "@angular/router";
 import {PostStore} from "../edit/store";
 import {Post} from "../../types/post";
@@ -21,9 +30,10 @@ import {DialogEditVideoConfirmComponent} from "../../shared/dialog/edit-image-ch
   selector: 'app-all',
   imports: [RouterLink, CommonModule, MatFormField, MatSelect, MatOption],
   templateUrl: './all.component.html',
-  styleUrl: './all.component.css'
+  styleUrl: './all.component.css',
+  encapsulation: ViewEncapsulation.None
 })
-export class AllComponent implements OnInit, AfterViewChecked, OnDestroy {
+export class AllComponent implements OnInit, AfterViewChecked, OnDestroy, AfterViewInit {
   private readonly store = inject(PostStore);
   post: Post[] | null = null;
   private readonly formBuilder = inject(FormBuilder);
@@ -35,7 +45,7 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy {
   videoVisibilityMap = new Map<string | number, boolean>();
 
 
-  constructor(private sanitizer: DomSanitizer) { }
+  constructor(private sanitizer: DomSanitizer, private renderer: Renderer2) { }
 
   postFromSignal = computed(() => {
     return this.store.post()
@@ -54,9 +64,78 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.addClickEventAccordionArticle('accordionComments')
   }
 
+  ngAfterViewInit(): void {
+    this.initializeVegetalElements();
+  }
+
   ngOnDestroy() {
     // Nettoyer l'écouteur d'événement lors de la destruction du composant
     document.removeEventListener('click', this.clickListener);
+  }
+
+  private initializeVegetalElements(): void {
+    const vegeElements = document.querySelectorAll('.inat-vegetal');
+
+    if (vegeElements.length === 0) {
+      console.log("Pas encore d'éléments .inat-vegetal, nouvelle tentative dans 500ms");
+      setTimeout(() => this.initializeVegetalElements(), 500);
+      return;
+    }
+
+    console.log(`${vegeElements.length} éléments .inat-vegetal trouvés, initialisation...`);
+
+    vegeElements.forEach((element: any) => {
+      const tooltip = element.querySelector('.inat-vegetal-tooltip') as HTMLElement;
+      const img = tooltip?.querySelector('img');
+      if (!tooltip || !img) return;
+
+      if (!tooltip.querySelector('.taxon-name')) {
+        const taxonName = element.getAttribute('data-taxon-name') || img.alt || 'Nom inconnu';
+        const nameBox = this.renderer.createElement('div');
+        this.renderer.addClass(nameBox, 'taxon-name');
+        nameBox.textContent = taxonName;
+        this.renderer.appendChild(tooltip, nameBox);
+      }
+
+      const adjustTooltipPosition = () => {
+        const rect = element.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        if (rect.bottom > windowHeight / 1.5) {
+          tooltip.classList.add('inat-vegetal-tooltip-above');
+        } else {
+          tooltip.classList.remove('inat-vegetal-tooltip-above');
+        }
+      };
+
+      adjustTooltipPosition();
+      window.addEventListener('scroll', adjustTooltipPosition);
+
+      element.addEventListener('mouseenter', () => {
+        if (window.innerWidth >= 768) {
+          tooltip.style.display = 'block';
+        }
+      });
+
+      element.addEventListener('mouseleave', () => {
+        if (window.innerWidth >= 768) {
+          tooltip.style.display = 'none';
+        }
+      });
+
+      element.addEventListener('click', (e: MouseEvent) => {
+        if (window.innerWidth < 768) {
+          e.preventDefault();
+          element.classList.toggle('active');
+        }
+      });
+    });
+
+    document.addEventListener('click', (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest('.inat-vegetal')) {
+        document.querySelectorAll('.inat-vegetal.active')
+          .forEach((el: any) => el.classList.remove('active'));
+      }
+    });
   }
 
   // Méthode pour basculer l'affichage d'une vidéo spécifique

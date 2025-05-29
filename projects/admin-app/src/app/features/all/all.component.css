@@ -1,5 +1,5 @@
 .post-card {
-  width: 32%; /* Par défaut pour les écrans larges */
+  width: 45%; /* Par défaut pour les écrans larges */
 }
 
 @media (max-width: 768px) { /* Ajustez la largeur pour les petits écrans */
@@ -67,5 +67,263 @@
 
 .post-normal {
   border: 6px solid black;
+}
+
+
+
+
+
+.heart-active {
+  color: green; /* Couleur verte pour les éléments marqués */
+  font-weight: 700;
+}
+
+
+/* Styles pour l'animation de l'icône */
+.heart-clicked {
+  animation: heartGrow 0.3s ease-in-out;
+}
+
+/* Définition de l'animation */
+@keyframes heartGrow {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.8);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.tab-btns .active-btn {
+  font-weight: bold;
+}
+
+@keyframes halo-effect {
+  0% {
+    box-shadow: 0 0 0 0 rgba(6, 140, 6, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 50px 25px rgba(0, 129, 0, 0);
+  }
+}
+
+.icon-box i.animated-like {
+  animation: halo-effect 0.2s ease-out;
+  border-radius: 50%;
+}
+
+/* Style pour les balises <h4> spécifiques */
+.lower-content h4 {
+  margin: 25px 0 10px 0;
+  font-style: italic;
+}
+
+/* Style pour les <ul><li> juste en dessous des <h4> */
+.lower-content h4 + ul li {
+  list-style-type: disc;
+  margin-left: 20px; /* Pour indenter un peu la liste */
+  font-weight: 600;
+}
+
+/* Si vous avez besoin de mettre des marges spécifiques à certains paragraphes et éléments similaires */
+.lower-content p {
+  margin-bottom: 20px;
+}
+
+.lower-content ul li {
+  margin-bottom: 8px;
+}
+
+/* Tooltip container */
+.myTooltip {
+  color: #25509f;
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.myTooltip .myTooltiptext {
+  visibility: hidden;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+  /* Position the tooltip text - see examples below! */
+  position: absolute !important;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.myTooltip:hover .myTooltiptext {
+  visibility: visible;
+}
+
+/*  autocomplete infinite */
+.autocomplete-container-infinite {
+  position: relative;
+  width: 100%;
+}
+
+
+.autocomplete-item-infinite {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.autocomplete-item-infinite:hover {
+  background-color: #f1f1f1;
+}
+
+/* phylactere search field infinite  */
+/* Style pour le phylactère */
+
+.phylactere::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #333 transparent;
+}
+
+.phylactere {
+  position: absolute;
+  max-width: 400px;
+  width: 400px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  line-height: 1;
+  white-space: normal;
+  word-wrap: break-word;
+  z-index: 1000;
+  display: none;
+}
+
+/* Style pour que le dropdown occupe toute la hauteur de la page */
+.autocomplete-dropdown-infinite {
+  position: absolute;
+  top: 100%; /* Position en-dessous de l'input */
+  left: 0;
+  right: 0;
+  max-height: calc(100vh - 50px); /* Ajuste la hauteur pour qu'il occupe presque tout l'écran */
+  overflow-y: auto; /* Permet un défilement si le contenu dépasse la hauteur de l'écran */
+  z-index: 1000;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  box-sizing: border-box;
+}
+.news-block-one .inner-box {
+  overflow: visible!important
+}
+
+
+
+/* Surligner le texte avec du jaune et ajouter une icône à gauche */
+.inat-vegetal {
+  position: relative;
+  display: inline-block;
+  padding-left: 25px; /* L'espace pour l'icône */
+  background-color: rgba(255, 255, 0, 0.13); /* Surlignement jaune */
+  cursor: pointer; /* Pour indiquer que l'élément est cliquable */
+  font-weight: bold;
+  vertical-align: middle; /* Assurer que le texte et l'icône sont alignés correctement */
+}
+
+.inat-vegetal::before {
+  content: "🌿"; /* L'emoji que tu souhaites afficher */
+  position: absolute;
+  left: 0px; /* Décalage à gauche */
+  top: 50%;
+  transform: translateY(-50%); /* Centrage vertical */
+  font-size: 1em; /* Ajuste la taille de l'icône */
+}
+
+/* Style de l'infobulle (tooltip) */
+.inat-vegetal-tooltip {
+  position: absolute;
+  top: 100%; /* Par défaut, positionner en dessous */
+  left: 0;
+  width: 300px;
+  max-width: 300px;
+  height: auto;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  display: none; /* Par défaut caché */
+  z-index: 1000;
+  border-radius: 5px;
+  text-align: center;
+  overflow: hidden;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+/* Tooltip qui s'affiche au-dessus de l'élément */
+.inat-vegetal-tooltip-above {
+  top: auto; /* L'infobulle ne sera pas en dessous, mais au-dessus */
+  bottom: 100%; /* Positionner au-dessus de l'élément */
+}
+
+
+/* Centrer l'image à l'intérieur du tooltip */
+.inat-vegetal-tooltip img {
+  max-width: 300px; /* Limite la largeur à 200px */
+  width: 100%; /* Prend toute la largeur disponible dans le conteneur sans déborder */
+  height: auto; /* Garde la proportion de l'image */
+  display: block; /* Assurer que l'image est affichée en bloc */
+  margin-left: auto; /* Centrer l'image horizontalement */
+  margin-right: auto;
+  margin-top: 10px; /* Marge entre l'image et le texte */
+  object-fit: contain; /* Préserve les proportions de l'image sans la couper */
+}
+
+/* Ajout du texte du nom dans le coin supérieur gauche du tooltip */
+.inat-vegetal-tooltip .taxon-name {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 5px;
+  border-radius: 3px;
+  z-index: 2000;
+  white-space: nowrap;
+}
+
+/* Affichage du tooltip au survol sur desktop */
+@media (min-width: 768px) {
+  .inat-vegetal:hover .inat-vegetal-tooltip {
+    display: block;
+  }
+}
+
+/* Sur mobile, gestion du toggle de l'infobulle */
+@media (max-width: 767px) {
+  .inat-vegetal.active .inat-vegetal-tooltip {
+    display: block;
+  }
+}
+
+.inat-vegetal .plant-icon {
+  font-size: 0.9em;
+  margin-right: 0.3em;
 }
 
