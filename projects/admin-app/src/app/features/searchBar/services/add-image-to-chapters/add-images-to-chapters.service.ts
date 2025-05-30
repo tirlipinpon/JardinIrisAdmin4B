@@ -78,7 +78,7 @@ export class AddImagesToChaptersService {
           }
           // Sélection de la meilleure image pour le chapitre
           const bestImagePrompt = this.getPromptsService.getPromptGenericSelectBestImageForChapitresInArticle(extractedParagraphe, respImagesUrl.regularUrls);
-          const bestImageResponse = await this.openaiApiService.fetchData(bestImagePrompt, true);
+          const bestImageResponse = await this.openaiApiService.fetchData(bestImagePrompt, false);
           // Vérification et parsing de la réponse pour la meilleure image
           let dataUrl;
           try {

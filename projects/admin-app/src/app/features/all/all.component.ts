@@ -274,12 +274,12 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy, AfterV
         if (h4) {
           // Créer l'élément image
           const imgElement = document.createElement('img');
-          imgElement.src = matchingImage.url_Image ||  "https://www.picturethisai.com/fr/care/Aloe_polyphylla.html";
-          imgElement.alt = matchingImage.chapitre_key_word || 'jardin iris jardinier paysagiste Bruxelles';
+          imgElement.src = matchingImage?.url_Image ||  "https://www.picturethisai.com/fr/care/Aloe_polyphylla.html";
+          imgElement.alt = matchingImage?.chapitre_key_word || 'jardin iris jardinier paysagiste Bruxelles';
           imgElement.className = 'randomCropImage clickable-image'; // Ajout d'une classe pour cibler plus facilement
           imgElement.style.cssText = 'width: 100%; height: 200px; object-fit: cover; border: 3px solid grey; padding: 1px; margin: 0px 0px 30px; cursor: pointer;'; // Ajout du cursor: pointer
           // Stocker l'ID de l'image comme attribut data
-          imgElement.setAttribute('data-image-id', matchingImage.id.toString());
+          imgElement.setAttribute('data-image-id', matchingImage?.id.toString());
           // Insérer l'image après le h4
           h4.insertAdjacentElement('afterend', imgElement);
         }
