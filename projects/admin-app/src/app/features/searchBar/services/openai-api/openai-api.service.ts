@@ -34,6 +34,29 @@ export class OpenaiApiService {
     return completion.choices[0].message.content
   }
 
+  async fetchDataImage(prompt: any, regularUrls: string[]) {
+    const completion = await this.openai.chat.completions.create({
+      model: "gpt-4.1-mini",
+      messages: [
+        prompt.systemRole,
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: prompt.userRole.content,
+            },
+            ...regularUrls.map((url) => ({
+              type: "image_url",
+              image_url: { url },
+            })),
+          ],
+        }],
+    });
+    // console.log('completion.choices[0]= '+ JSON.stringify(completion.choices[0]));
+    return completion.choices[0].message.content
+  }
+
   async imageGenerator_b64_json(promptText: any) {
     const image =
       await this.openai.images.generate({

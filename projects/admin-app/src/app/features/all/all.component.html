@@ -39,7 +39,7 @@
               class="panel article-container" #articleContainer
               [innerHTML]="post.id !== undefined && post.article && post.images_chapitres !== undefined && post.images_chapitres !== null
               ? addImagesChapitreArticleHtml(post.id, post.article, post.images_chapitres)
-              : 'pas de post.id!'"></li>
+              : post.article"></li>
           <li style="margin: 0 0 10px 0;background-color: aliceblue; padding: 3px;">{{ post.citation }}</li>
           <li style="margin: 0 0 10px 0;"> <a [href]="post.lien_url_article" aria-label="lien vers article complet"
                                               target="_blank" style="color: #28a745;">{{ post.lien_url_article }}</a></li>

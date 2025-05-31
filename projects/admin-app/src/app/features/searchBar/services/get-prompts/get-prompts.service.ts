@@ -408,21 +408,11 @@ Extrait un seul mot-clé du titre du blog. Assure-toi que ce mot résume efficac
     Si la liste n'est pas vide : ( ${paragrapheKeyWordList} ) , choisi un autre mot que ceux qui sont deja dans cette liste.`
   }
 
-  getPromptGenericSelectBestImageForChapitresInArticle(article: string, images: any) {
+  getPromptGenericSelectBestImageForChapitresInArticleWithVision(article: string, images: string[]) {
     return {
       systemRole: {
         role: "system",
-        content: this.getPerplexityPromptSystemcSelectBestImageForChapitresInArticle()
-      },
-      userRole: {
-        role: "user",
-        content: this.getPerplexityPromptUserSelectBestImageForChapitresInArticle(article, images)
-      }
-    }
-  }
-
-  getPerplexityPromptSystemcSelectBestImageForChapitresInArticle(){
-    return `Analyse the provided text to identify the main themes and concepts, then select the most representative image from the provided list for a gardening blog post.
+        content:  `Analyse the provided text to identify the main themes and concepts, then select the most representative image from the provided list for a gardening blog post.
 
 You are given a text, and a list of image URLs. Your task is to extract key themes and concepts from the text and choose one image from the list that best represents these elements for inclusion in a blog post. Ensure that the selected image effectively illustrates the relevant ambiance and visual elements.
 
@@ -434,7 +424,7 @@ You are given a text, and a list of image URLs. Your task is to extract key them
 
 3. **Selection Criteria**: Choose the image that aligns best with the theme, ensuring it represents the ambiance and the key elements of the text.
 
-4. **Explanation**: Provide what you see on the image.
+4. **Explanation**: Provide what you see on the image you will selected from the url.
 
 # Output Format
 
@@ -442,12 +432,12 @@ Provide the output in JSON format as follows:
 \`\`\`json
     {
       "imageUrl": "url",
-      "explanation": "explication de ce qui est présent sur l image"
+      "explanation": "explication de ce qui est présent sur l image selectionné de la liste"
     }
     \`\`\`
 
 - The 'imageUrl' is the URL of the chosen image.
-- Each 'raisonImage' corresponds to an image from the list, with a brief explanation of why it was selected or not selected.
+- Each 'raisonImage' corresponds to an image from the list.
 
 # Examples
 
@@ -461,14 +451,16 @@ Provide the output in JSON format as follows:
 \`\`\`JSON
     {
       "imageUrl": "https://example.com/image1.jpg",
-      "explanation": "Je vois sur l image : ..."
+      "explanation": "Je vois sur l image  à l 'url : https://example.com/image1.jpg ; qui a été sélectionné;  ceci..."
     }
     \`\`\`
     `
-  }
-
-  getPerplexityPromptUserSelectBestImageForChapitresInArticle(article: string, images: any){
-    return `Voici le texte  à analyser : "${article}", ainsi qu'une liste d'URL d'images "${JSON.stringify(images)}".`
+      },
+      userRole: {
+        role: "user",
+        content: `Voici le texte  à analyser : "${article}", ainsi qu'une liste d'URL d'images ${JSON.stringify(images)}.`
+      }
+    }
   }
 
   getOpenAiPromptImageGenerator(description: string): string {

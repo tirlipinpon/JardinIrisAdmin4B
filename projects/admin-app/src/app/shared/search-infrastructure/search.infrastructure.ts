@@ -200,7 +200,7 @@ export class SearchInfrastructure {
   }
 
   formatInStructure(article: string, type: string, postTitreIdNewHref?:{titre: string, id: number, new_href: string}[]): Observable<string> {
-    if(this.isLocalhost() && type !== 'VEGETAL') {
+    if(this.isLocalhost()) {
       return new Observable<string>(subscriber => {
         const mock = ' type=' + type + ' : ' + article;
         setTimeout(() => {
@@ -413,7 +413,7 @@ export class SearchInfrastructure {
   }
 
   addImagesInArticle(getPost: string, getPostId: number): Observable<{success: boolean}> {
-    if(this.isLocalhost()) {
+    if(!this.isLocalhost()) {
       return of({success: true});
     } else {
       return from(this.addImagesToChaptersService.getKeyWordsFromChapitreInArticleAndSetImageUrl(getPost, getPostId));
