@@ -1,4 +1,5 @@
 import {Comment} from "./comment";
+import {ImageChapitre} from "./imageChapitre";
 
 export interface Post {
   id?: number;
@@ -16,7 +17,7 @@ export interface Post {
   valid?: boolean;
   deleted?: boolean;
   video?: string | null;
-  images_chapitres?: any[];
+  images_chapitres?: ImageChapitre[];
   new_href?: string | null;
 }
 

@@ -15,12 +15,11 @@ export interface VideoInfo {
 })
 export class GoogleSearchService {
 
-  private apiKey = environment.googleApi;
-  private cx = 'a4fc854656f5b4b36';
+  private apiKeyVideo = environment.googleApiVideo;
+  private apiKeyImage = environment.googleApiImage;
+  private cx = '21166a71040be463f';
   private searchUrl = 'https://www.googleapis.com/youtube/v3/search';
   private videosUrl = 'https://www.googleapis.com/youtube/v3/videos';
-  private translationApiUrl = 'https://translation.googleapis.com/language/translate/v2';
-
 
   constructor(private http: HttpClient) { }
 
@@ -34,7 +33,7 @@ export class GoogleSearchService {
         maxResults: '5',
         order: 'relevance', // Trier par nombre de vues
         // regionCode: region, // Région à utiliser pour chaque appel
-        key: this.apiKey
+        key: this.apiKeyVideo
       };
       return this.http.get<any>(this.searchUrl, { params });
     });
@@ -51,7 +50,7 @@ export class GoogleSearchService {
         const statsParams = {
           part: 'snippet',
           id: videoIds,
-          key: this.apiKey
+          key: this.apiKeyVideo
         };
 
         // Récupérer les informations des vidéos
@@ -73,6 +72,17 @@ export class GoogleSearchService {
     );
   }
 
-
+  searchImage(query: string) {
+    const encodedQuery = encodeURIComponent(query);
+    return this.http.get<any>(`https://www.googleapis.com/customsearch/v1?key=${this.apiKeyImage}&cx=${this.cx}&q=${encodedQuery}&searchType=image&num=10`).pipe(
+      map(res => res.items.map((item: any) => ({
+        link: item.link,
+        mime: item.mime,
+        width: item.image.width,
+        height: item.image.height,
+        byteSize: item.image.byteSize
+      })))
+    );
+  }
 
 }

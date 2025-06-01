@@ -7,6 +7,7 @@ import {pipe, switchMap, tap} from "rxjs";
 import {rxMethod} from "@ngrx/signals/rxjs-interop";
 import {tapResponse} from "@ngrx/operators";
 import {Comment} from "../../../types/comment";
+import {ImageChapitre} from "../../../types/imageChapitre";
 
 export interface PostState  {
   post: Post[] | null;
@@ -165,15 +166,31 @@ export const PostStore = signalStore(
             )
           }))
       ),
-      editImagesChapitreArticle: rxMethod<{ idImage: number; url: string; key: string, idPost: number}>(
+      editImagesChapitreArticle: rxMethod<{ idImage: number; url: string; searchText: string, idPost: number}>(
         pipe(tap(()=> updateState(store, '[Edit editImages Chapitre Article] loading: true', {loading: true})),
-          switchMap(({ idImage, url, key, idPost}) => {
-            return infra.editImagesChapitreArticle(idImage, url, key).pipe(
+          switchMap(({ idImage, url, searchText, idPost}) => {
+            return infra.editImagesChapitreArticle(idImage, url, searchText).pipe(
               tapResponse({
-                next: (post: Post) => updateState(store, '[valid image chapter] valid', {
-                  post: store.post()?.map(p => p.id === post.id ? { ...p, video: post.video } : p ), //TODO: add postID
+                next: (image: ImageChapitre) => updateState(store, '[valid image chapter] valid', {
+                  post: store.post()?.map(p => {
+                    if (p.id === image.fk_post) {
+                      // Mettre à jour ou ajouter l'image dans images_chapitres[]
+                      const images = p.images_chapitres || [];
+                      const index = images.findIndex(img => img.id === image.id);
+                      if (index >= 0) {
+                        // Mise à jour
+                        images[index] = image;
+                      } else {
+                        // Ajout
+                        images.push(image);
+                      }
+                      return { ...p, images_chapitres: images };
+                    }
+                    return p;
+                  }),
                   loading: false
                 }),
+
                 error: (err) => {
                   patchState(store,{ loading: false, error: err})
                   console.log(err)

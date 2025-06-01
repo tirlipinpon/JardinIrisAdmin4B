@@ -384,7 +384,7 @@ export class SupabaseService {
     try {
       const {data, error} = await this.supabase
         .from('urlImagesChapitres')
-        .update({url_image: url, chapitre_key_word: key})
+        .update({url_Image: url, chapitre_key_word: key, explanation_image: "", explanation_word: ""})
         .eq('id', id)
         .select();
 
@@ -397,27 +397,6 @@ export class SupabaseService {
       throw error;
     }
   }
-
-
-
-  async updatePostNewUrl(postId: number, url: string) {
-    try {
-      const {data, error} = await this.supabase
-        .from('post')
-        .update({new_href: url})
-        .eq('id', postId)
-        .select();
-
-      if (error) {
-        throw error;
-      }
-      console.log(data);
-      return data[0];
-    } catch (error) {
-      throw error;
-    }
-
-}
 
   async uploadImageFromUrlToBucket(postId: number, originalImageUrl: string): Promise<string | null> {
     try {
@@ -460,81 +439,6 @@ export class SupabaseService {
       return null;
     }
   }
-
-  async testAccess() {
-    try {
-      const { data, error } = await this.supabase.storage
-        .from('jardin-iris-images-post')
-        .list('');
-
-      if (error) {
-        console.error('Erreur accès bucket :', error);
-      } else {
-        console.log('Accès au bucket réussi :', data);
-      }
-    } catch (err) {
-      console.error('Erreur critique :', err);
-    }
-  }
-
-
-  async testUpload() {
-    console.log('testUpload aleatoire :', Math.floor(Math.random() * 1000) + 1);
-    const testBlob = new Blob(['Hello worldscscscscscscs'], { type: 'text/plain' });
-
-    try {
-      const { data, error } = await this.supabase.storage
-        .from('jardin-iris-images-post')
-        .upload('test-upload-2-.png', testBlob, {
-          upsert: true,
-        });
-
-      if (error) {
-        console.error('Erreur lors de l\'upload :', error);
-      } else {
-        console.log('Fichier uploadé avec succès :', data);
-      }
-    } catch (err) {
-      console.error('Erreur critique :', err);
-    }
-  }
-
-
-  async testDeleteAndUpload() {
-    const fileName = 'test-upload-2-3.png';
-
-    try {
-      // Supprimer le fichier s'il existe
-      const { error: deleteError } = await this.supabase.storage
-        .from('jardin-iris-images-post')
-        .remove([fileName]);
-
-      if (deleteError) {
-        console.error('Erreur lors de la suppression :', deleteError);
-      } else {
-        console.log('Fichier supprimé avec succès ou inexistant.');
-      }
-
-      // Créer un fichier de test
-      const testBlob = new Blob(['Nouveau contenu'], { type: 'text/plain' });
-
-      // Upload le fichier
-      const { data, error } = await this.supabase.storage
-        .from('jardin-iris-images-post')
-        .upload(fileName, testBlob, { upsert: true });
-
-      if (error) {
-        console.error('Erreur lors de l\'upload :', error);
-      } else {
-        console.log('Fichier uploadé avec succès :', data);
-      }
-    } catch (err) {
-      console.error('Erreur critique :', err);
-    }
-  }
-
-
-
 
 
 }

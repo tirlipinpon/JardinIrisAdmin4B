@@ -243,8 +243,8 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy, AfterV
     });
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);
-      if (result.confirmed && imgElement) {
-        this.store.editImagesChapitreArticle({ idImage: imgElement, url: result.url, key: result.key, idPost: postId })
+      if (result.confirmed && result.selectedUrl) {
+        this.store.editImagesChapitreArticle({ idImage: imageId, url: result.selectedUrl, searchText: result.searchText, idPost: postId })
       }
     });
   }
