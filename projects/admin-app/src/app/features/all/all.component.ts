@@ -18,13 +18,16 @@ import {MatOption, MatSelect} from "@angular/material/select";
 import {MatDialog} from "@angular/material/dialog";
 import {
   DialogDeleteCommentConfirmComponent
-} from "../../shared/dialog/delete-comment-confirm/dialog-delete-comment-confirm.component";
+} from "./services/delete-comment-confirm/dialog-delete-comment-confirm.component";
 import {Comment} from "../../types/comment";
 import {
   DialogDeletePostConfirmComponent
-} from "../../shared/dialog/delete-post-confirm/dialog-delete-post-confirm.component";
+} from "./services/delete-post-confirm/dialog-delete-post-confirm.component";
 import {DomSanitizer, SafeResourceUrl} from "@angular/platform-browser";
-import {DialogEditVideoConfirmComponent} from "../../shared/dialog/edit-image-chapitre-confirm/dialog-edit-video-confirm.component";
+import {DialogEditVideoConfirmComponent} from "./services/edit-video-chapitre-confirm/dialog-edit-video-confirm.component";
+import {
+  DialogEditImageChapitreArticleComponent
+} from "./services/dialog-edit-image-chapitre-article/dialog-edit-image-chapitre-article.component";
 
 @Component({
   selector: 'app-all',
@@ -39,7 +42,7 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy, AfterV
   private readonly formBuilder = inject(FormBuilder);
   isLoading = this.store.loading;
   matSelectedOption: string = "";
-  readonly dialogDeleteConfirm = inject(MatDialog);
+  readonly dialogConfirm = inject(MatDialog);
   clickListener: any;
   // Map pour suivre l'état d'affichage de chaque vidéo (par ID de post)
   videoVisibilityMap = new Map<string | number, boolean>();
@@ -192,7 +195,7 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy, AfterV
   }
 
   openDialogDeleteComment(comment: Comment) {
-    const dialogRef = this.dialogDeleteConfirm.open(DialogDeleteCommentConfirmComponent, {
+    const dialogRef = this.dialogConfirm.open(DialogDeleteCommentConfirmComponent, {
       data: {
         comment: comment,
       },
@@ -203,9 +206,8 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy, AfterV
       }
     });
   }
-
   openDialogDeletePost(post: Post) {
-    const dialogRef = this.dialogDeleteConfirm.open(DialogDeletePostConfirmComponent, {
+    const dialogRef = this.dialogConfirm.open(DialogDeletePostConfirmComponent, {
       data: {
         post: post,
       },
@@ -217,9 +219,8 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy, AfterV
       }
     });
   }
-
   openDialogEditVideoById(id: number, url: string | null) {
-    const dialogRef = this.dialogDeleteConfirm.open(DialogEditVideoConfirmComponent, {
+    const dialogRef = this.dialogConfirm.open(DialogEditVideoConfirmComponent, {
       data: {
         id: id,
         url: url,
@@ -229,6 +230,21 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy, AfterV
       console.log(`Dialog result: ${result}`);
       if (result.confirmed && id) {
         this.store.editPostVideo({ id, idYoutube: result.idYoutube })
+      }
+    });
+  }
+  openDialogEditImagesChapitreArticleById(imgElement: any, imageId: number, postId: number) {
+    const dialogRef = this.dialogConfirm.open(DialogEditImageChapitreArticleComponent, {
+      data: {
+        imgElement: imgElement,
+        postId: postId,
+        imageId: imageId,
+      },
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+      if (result.confirmed && imgElement) {
+        this.store.editImagesChapitreArticle({ idImage: imgElement, url: result.url, key: result.key, idPost: postId })
       }
     });
   }
@@ -253,8 +269,8 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy, AfterV
     this.store.validComment(comment.id)
   }
 
-  addImagesChapitreArticleHtml(id: number | undefined, article: string, images: any[]) {
-    if (id === undefined) return '';
+  addImagesChapitreArticle(postId: number | undefined, article: string, images: any[]) {
+    if (postId === undefined) return '';
 
     // Créer un élément DOM temporaire pour manipuler le HTML
     const tempDiv = document.createElement('div');
@@ -280,11 +296,24 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy, AfterV
           imgElement.style.cssText = 'width: 100%; height: 200px; object-fit: cover; border: 3px solid grey; padding: 1px; margin: 0px 0px 30px; cursor: pointer;'; // Ajout du cursor: pointer
           // Stocker l'ID de l'image comme attribut data
           imgElement.setAttribute('data-image-id', matchingImage?.id.toString());
+          imgElement.setAttribute('data-post-id', postId.toString());
           // Insérer l'image après le h4
           h4.insertAdjacentElement('afterend', imgElement);
         }
     });
     return this.sanitizer.bypassSecurityTrustHtml(tempDiv.innerHTML);
+  }
+
+  onArticleClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (target.tagName.toLowerCase() === 'img' && target.classList.contains('clickable-image')) {
+      const imageId = target.getAttribute('data-image-id');
+      const postId = target.getAttribute('data-post-id');
+      if (imageId) {
+        console.log('Image cliquée avec ID:', imageId);
+        this.openDialogEditImagesChapitreArticleById(target, Number(imageId), Number(postId));
+      }
+    }
   }
 
   handleVideoClick(event: Event) {

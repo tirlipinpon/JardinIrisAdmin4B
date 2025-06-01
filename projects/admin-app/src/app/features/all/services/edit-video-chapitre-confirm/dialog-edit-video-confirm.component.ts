@@ -10,7 +10,7 @@ import {
 import {MatFormField} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {FormsModule} from "@angular/forms";
-import {GoogleSearchService} from "../../google-search/google-search.service";
+import {GoogleSearchService} from "../google-search/google-search.service";
 import {MatCardActions, MatCardContent, MatCardHeader, MatCardModule} from "@angular/material/card";
 import {CommonModule} from "@angular/common";
 import {DomSanitizer, SafeResourceUrl} from "@angular/platform-browser";

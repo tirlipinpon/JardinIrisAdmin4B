@@ -7,16 +7,15 @@ import {
   MatDialogContent,
   MatDialogTitle
 } from "@angular/material/dialog";
-import {getFormattedFullDateTime} from "../../../utils/getFormattedDate";
+import {getFormattedFullDateTime} from "../../../../utils/getFormattedDate";
 
 @Component({
   selector: 'app-dialog-delete-post-confirm',
-  templateUrl: 'dialog-delete-comment-confirm.component.html',
+  templateUrl: 'dialog-delete-post-confirm.component.html',
   standalone: true,
   imports: [MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatButtonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DialogDeleteCommentConfirmComponent {
+export class DialogDeletePostConfirmComponent {
   data: any = inject(MAT_DIALOG_DATA);
-  protected readonly getFormattedDate = getFormattedFullDateTime;
 }

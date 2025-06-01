@@ -27,7 +27,7 @@ export class OpenaiApiService {
         prompt.systemRole,
         prompt.userRole
       ],
-      model: deepseek ? "deepseek-chat" : "gpt-4.1-mini"
+      model: deepseek ? "deepseek-reasoner" : "gpt-4.1-mini"
     });
 
     // console.log('completion.choices[0]= '+ JSON.stringify(completion.choices[0]));

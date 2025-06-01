@@ -14,7 +14,7 @@ import {Post} from "../../types/post";
 import {AddImagesToChaptersService} from "../../features/searchBar/services/add-image-to-chapters/add-images-to-chapters.service";
 import {FormatInStructureService} from "../../features/searchBar/services/format-in-structure/format-in-structure.service";
 import {compressImage} from "../../utils/resizeB64JsonIMage";
-import {GoogleSearchService} from "../google-search/google-search.service";
+import {GoogleSearchService} from "../../features/all/services/google-search/google-search.service";
 import {
   AddScientificNameService
 } from "../../features/searchBar/services/add-scientific-name/add-scientific-name.service";
@@ -413,7 +413,7 @@ export class SearchInfrastructure {
   }
 
   addImagesInArticle(getPost: string, getPostId: number): Observable<{success: boolean}> {
-    if(!this.isLocalhost()) {
+    if(this.isLocalhost()) {
       return of({success: true});
     } else {
       return from(this.addImagesToChaptersService.getKeyWordsFromChapitreInArticleAndSetImageUrl(getPost, getPostId));
@@ -466,6 +466,10 @@ export class SearchInfrastructure {
 
   editPostVideo(id: number, idYoutube: string) {
     return from(this.supabaseService.editPostVideo(id, idYoutube));
+  }
+
+  editImagesChapitreArticle(id: number, url: string, key: string) {
+    return from(this.supabaseService.editImagesChapitreArticle(id, url, key));
   }
 
 

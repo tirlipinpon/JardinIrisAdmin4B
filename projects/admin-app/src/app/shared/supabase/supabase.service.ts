@@ -380,6 +380,26 @@ export class SupabaseService {
     }
   }
 
+  async editImagesChapitreArticle(id: number, url: string, key: string) {
+    try {
+      const {data, error} = await this.supabase
+        .from('urlImagesChapitres')
+        .update({url_image: url, chapitre_key_word: key})
+        .eq('id', id)
+        .select();
+
+      if (error) {
+        throw error;
+      }
+      console.log(data);
+      return data[0];
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+
   async updatePostNewUrl(postId: number, url: string) {
     try {
       const {data, error} = await this.supabase

@@ -165,5 +165,22 @@ export const PostStore = signalStore(
             )
           }))
       ),
+      editImagesChapitreArticle: rxMethod<{ idImage: number; url: string; key: string, idPost: number}>(
+        pipe(tap(()=> updateState(store, '[Edit editImages Chapitre Article] loading: true', {loading: true})),
+          switchMap(({ idImage, url, key, idPost}) => {
+            return infra.editImagesChapitreArticle(idImage, url, key).pipe(
+              tapResponse({
+                next: (post: Post) => updateState(store, '[valid image chapter] valid', {
+                  post: store.post()?.map(p => p.id === post.id ? { ...p, video: post.video } : p ), //TODO: add postID
+                  loading: false
+                }),
+                error: (err) => {
+                  patchState(store,{ loading: false, error: err})
+                  console.log(err)
+                }
+              })
+            )
+          }))
+      ),
   }))
 )

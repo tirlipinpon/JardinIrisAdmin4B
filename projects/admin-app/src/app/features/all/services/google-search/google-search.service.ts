@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {forkJoin, Observable, of, switchMap} from "rxjs";
-import {environment} from "../../../../../../environment";
+import {environment} from "../../../../../../../../environment";
 import {map} from "rxjs/operators";
 export interface VideoInfo {
   videoId: string;
