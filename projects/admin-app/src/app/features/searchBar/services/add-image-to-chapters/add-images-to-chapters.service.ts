@@ -85,7 +85,6 @@ export class AddImagesToChaptersService {
             const jsonBlock = extractJSONBlock(bestImageResponse!);
             if (jsonBlock) {
               dataUrl = JSON.parse(jsonBlock);
-              chapitreExplanationImage = dataUrl.explanation;
             } else {
               // Gérer le cas où aucun bloc JSON n'a été trouvé
               console.error("Aucun bloc JSON trouvé dans la réponse");
@@ -96,7 +95,7 @@ export class AddImagesToChaptersService {
           }
           // Sauvegarde de l'URL de l'image pour le chapitre dans Supabase
           try {
-            await this.supabaseService.setNewUrlImagesChapitres(dataUrl.imageUrl, chapitreId, articleId, chapitreKeyWord, chapitreExplanationWord, chapitreExplanationImage);
+            await this.supabaseService.setNewUrlImagesChapitres(dataUrl.imageUrl, chapitreId, articleId, chapitreKeyWord, chapitreExplanationWord);
             console.log("URL d'image enregistrée avec succès:", dataUrl);
           } catch (saveError) {
             console.error("Erreur lors de la sauvegarde de l'URL de l'image dans Supabase :", saveError);

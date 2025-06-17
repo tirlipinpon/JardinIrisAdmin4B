@@ -143,11 +143,11 @@ Provide the enhanced blog segment in a valid JSON format as follows: {"upgraded"
      Intégrer des balises HTML aux textes afin de structurer le contenu et en améliorer la lisibilité, sans modifier le contenu texte ou les balises HTML déjà présentes.
 - Respecter les étapes suivantes pour la mise en forme.
 # Steps
-1. Entourer les phrases clés avec la balise \`<b>\` pour les mettre en évidence et attirer l'attention du lecteur.
-2. Intégrer un emoji pertinent illustrant le sujet du paragraphe à l'intérieur du titre en \`<h4>\` déjà présent sans ajouter de nouveaux \`<h4>\`.
+1. Entourer une phrase clés avec la balise \`<b>\` pour le mettre en évidence et attirer l'attention du lecteur.
+2. Intégrer un emoji pertinent illustrant le sujet du paragraphe à l'intérieur du titre en \`<h5>\` déjà présent sans ajouter de nouveaux \`<h5>\`.
 3. Adapter le formatage en fonction du type de contenu :
    - Utiliser \`<ol><li></li></ol>\` pour toutes les listes.
-   - Utiliser la balise \`<u>\` pour souligner des informations spécifiques.
+   - Utiliser la balise \`<u>\` pour souligner une seule information spécifique.
    - Utiliser \`<em>\` pour mettre en valeur des termes importants.
    - Encapsuler le contenu tabulaire dans des balises \`<table><tr><td></td></tr></table>\`.
 # Output Format
@@ -160,7 +160,7 @@ Présenter le résultat sous la forme d'un JSON valide structuré comme suit :
 Un texte avec du contenu varié, incluant des phrases clés, des titres, des listes et des informations tabulaires existantes.
 **Output**:
 {
-  "upgraded": "<h4>🎨 Présentation du Projet </h4><b>Phrases clés importantes.</b><ul><li>Point 1</li><li>Point 2</li></ul><table><tr><td>Valeur</td></tr></table>"
+  "upgraded": "<h5>🎨 Présentation du Projet </h5><br><b>Phrase clés importante.</b><ul><li>Point 1</li><li>Point 2</li></ul><table><tr><td>Valeur</td></tr></table>"
 }
 *Note: Les phrases clés, listes, et contenus tabulaires dans la réponse réelle doivent correspondre à ce qui est fourni dans le texte original.*
 # Notes
@@ -412,19 +412,20 @@ Extrait un seul mot-clé du titre du blog. Assure-toi que ce mot résume efficac
     return {
       systemRole: {
         role: "system",
-        content:  `Analyse the provided text to identify the main themes and concepts, then select the most representative image from the provided list for a gardening blog post.
+        content:  `Analyse the provided text to identify the main themes and concepts, then select the most representative image from the provided list
+         for a gardening blog post.
 
-You are given a text, and a list of image URLs. Your task is to extract key themes and concepts from the text and choose one image from the list that best represents these elements for inclusion in a blog post. Ensure that the selected image effectively illustrates the relevant ambiance and visual elements.
+You are given a text, and a list of image URLs. Your task is to extract key themes and concepts from the text and choose one image from the list that
+best represents these elements for inclusion in a blog post. Ensure that the selected image effectively illustrates the relevant ambiance and visual elements.
 
 # Steps
 
-1. **Read and Understand the Text**: Analyze  to identify the main themes and concepts. Focus on identifying elements that are visually significant or central to the message intended for a gardening audience.
+1. **Read and Understand the Text**: Analyze  to identify the main themes and concepts. Focus on identifying elements that are visually significant or
+central to the message intended for a gardening audience.
 
 2. **Evaluate Images**: Examine each image from to determine how well it matches the identified themes and concepts.
 
 3. **Selection Criteria**: Choose the image that aligns best with the theme, ensuring it represents the ambiance and the key elements of the text.
-
-4. **Explanation**: Provide what you see on the image you will selected from the url.
 
 # Output Format
 
@@ -432,7 +433,6 @@ Provide the output in JSON format as follows:
 \`\`\`json
     {
       "imageUrl": "url",
-      "explanation": "explication de ce qui est présent sur l image selectionné de la liste"
     }
     \`\`\`
 
@@ -451,7 +451,6 @@ Provide the output in JSON format as follows:
 \`\`\`JSON
     {
       "imageUrl": "https://example.com/image1.jpg",
-      "explanation": "Je vois sur l image  à l 'url : https://example.com/image1.jpg ; qui a été sélectionné;  ceci..."
     }
     \`\`\`
     `

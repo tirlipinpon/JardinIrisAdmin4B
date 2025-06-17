@@ -165,7 +165,7 @@ export class SupabaseService {
     }
   }
 
-  async setNewUrlImagesChapitres(url: string, chapitreId: number, postId: number, chapitreKeyWord: string, chapitreExplanationWord: string, chapitreExplanationImage: string): Promise<any> {
+  async setNewUrlImagesChapitres(url: string, chapitreId: number, postId: number, chapitreKeyWord: string, chapitreExplanationWord: string): Promise<any> {
     try {
       const {data, error} = await this.supabase
         .from('urlImagesChapitres')
@@ -175,8 +175,7 @@ export class SupabaseService {
             url_Image: url,
             chapitre_id: chapitreId,
             chapitre_key_word: chapitreKeyWord,
-            explanation_word: chapitreExplanationWord,
-            explanation_image: chapitreExplanationImage
+            explanation_word: chapitreExplanationWord
           }
         ]);
 
@@ -219,24 +218,6 @@ export class SupabaseService {
       } else {
         query = query.order('created_at', {ascending: false});
       }
-
-      const {data, error} = await query;
-
-      if (error) {
-        throw error;
-      }
-      return data;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async getAllComments() {
-    try {
-      let query = this.supabase
-        .from('comments')
-        .select('*')
-        .order('id', {ascending: true});
 
       const {data, error} = await query;
 
