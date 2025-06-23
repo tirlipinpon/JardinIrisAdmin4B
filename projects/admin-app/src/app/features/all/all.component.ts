@@ -46,7 +46,7 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy, AfterV
   clickListener: any;
   // Map pour suivre l'état d'affichage de chaque vidéo (par ID de post)
   videoVisibilityMap = new Map<string | number, boolean>();
-
+  private vegetalInitAttempts = 0;
 
   constructor(private sanitizer: DomSanitizer, private renderer: Renderer2) { }
 
@@ -80,8 +80,13 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy, AfterV
     const vegeElements = document.querySelectorAll('.inat-vegetal');
 
     if (vegeElements.length === 0) {
-      console.log("Pas encore d'éléments .inat-vegetal, nouvelle tentative dans 500ms");
-      setTimeout(() => this.initializeVegetalElements(), 500);
+      if (this.vegetalInitAttempts < 10) {
+        this.vegetalInitAttempts++;
+        console.log(`Tentative ${this.vegetalInitAttempts}/10 : pas encore d'éléments .inat-vegetal`);
+        setTimeout(() => this.initializeVegetalElements(), 500);
+      } else {
+        console.warn("Abandon après 10 tentatives.");
+      }
       return;
     }
 

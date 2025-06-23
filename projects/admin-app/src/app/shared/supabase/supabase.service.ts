@@ -336,7 +336,7 @@ export class SupabaseService {
         console.error('Erreur lors de l’appel de la fonction :', error);
         return error;
       } else {
-        return data;
+        return data?.slice(0, 3);
       }
     } catch (error) {
       throw error;
