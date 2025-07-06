@@ -515,7 +515,7 @@ Embed a specific hyperlink into an article using an HTML tag, following the deta
    - Analysez les titres dans le JSON et le contenu de l'article pour identifier une correspondance avec les mots-clés dans le texte.
 
 2. **Insérer la Balise de Lien Hypertexte**:
-   - Si {new_href} existe and not NUll : '<a class="myTooltip" href="https://jardin-iris.be/jardinier-paysagiste-belgique-blog/${newHref}.html?post={id}" title="{titre}">{mots_clés}<span class="myTooltiptext">{titre}</span></a>'
+   - Si {new_href} existe and not NUll : '<a class="myTooltip" href="https://jardin-iris.be/jardinier-paysagiste-belgique-blog/${newHref}.html" title="{titre}">{mots_clés}<span class="myTooltiptext">{titre}</span></a>'
    - Sinon : '<a class="myTooltip" href="https://jardin-iris.be/blog-detail.html?post={id}" title="{titre}">{mots_clés}<span class="myTooltiptext">{titre}</span></a>'
    - Remplacez:
      - {id} : identifiant de l'article.
