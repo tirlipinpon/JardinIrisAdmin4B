@@ -7,7 +7,6 @@ import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {SearchApplication} from "../../services/search.application";
 import { MatRadioModule } from '@angular/material/radio';
 import {RouterLink} from "@angular/router";
-import {SupabaseService} from "../../../../shared/supabase/supabase.service";
 
 @Component({
   imports: [FormsModule, MatProgressSpinnerModule, MatRadioModule
@@ -26,7 +25,7 @@ export class SearchWithFormComponent implements OnInit, OnDestroy  {
   selectedOption: string = 'all';
   editPostId = this.application.getPostId;
 
-  constructor(private supabase: SupabaseService) {
+  constructor() {
   }
 
   onOptionChange() {

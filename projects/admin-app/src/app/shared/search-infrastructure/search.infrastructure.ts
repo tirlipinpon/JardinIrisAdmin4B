@@ -128,34 +128,6 @@ export class SearchInfrastructure {
 
   }
 
-  faq(articleUpgraded: string): Observable<{question: string; response: string}[]> {
-    if(this.isLocalhost()) {
-      return new Observable<{question: string; response: string}[]>(subscriber => {
-        const mock = [
-          {question: 'question 1', response: 'response 1'},
-          {question: 'question 2', response: 'response 2'},
-          {question: 'question 3', response: 'response 3'},
-        ]
-        setTimeout(() => {
-          subscriber.next(mock);
-          subscriber.complete();
-        }, 1000);
-      });
-    } else {
-      const prompt = this.getPromptsService.getPromptFaq(articleUpgraded);
-      return from(this.openaiApiService.fetchData(prompt, true)).pipe(
-        map(result => {
-          if (result === null) {
-            throw new Error('Aucun résultat retourné par l\'API OpenAI');
-          }
-          const data: {question: string; response: string}[]  = JSON.parse(extractJSONBlock(result))
-          return data;
-        })
-      );
-    }
-
-  }
-
   generateArticle(url_post?: string): Observable<Post> {
     if(this.isLocalhost()) {
       return new Observable<Post>(subscriber => {
@@ -233,7 +205,35 @@ export class SearchInfrastructure {
       return  this.addScientificNameService.processAddUrlFromScientificNameInHtml(article);
     }
   }
+  // async
+  faq(articleUpgraded: string): Observable<{question: string; response: string}[]> {
+    if(this.isLocalhost()) {
+      return new Observable<{question: string; response: string}[]>(subscriber => {
+        const mock = [
+          {question: 'question 1', response: 'response 1'},
+          {question: 'question 2', response: 'response 2'},
+          {question: 'question 3', response: 'response 3'},
+        ]
+        setTimeout(() => {
+          subscriber.next(mock);
+          subscriber.complete();
+        }, 1000);
+      });
+    } else {
+      const prompt = this.getPromptsService.getPromptFaq(articleUpgraded);
+      return from(this.openaiApiService.fetchData(prompt, true)).pipe(
+        map(result => {
+          if (result === null) {
+            throw new Error('Aucun résultat retourné par l\'API OpenAI');
+          }
+          const data: {question: string; response: string}[]  = JSON.parse(extractJSONBlock(result))
+          return data;
+        })
+      );
+    }
 
+  }
+  // async
   checkMeteo(): Observable<string> {
     if(this.isLocalhost()) {
       return new Observable<string>(subscriber => {
@@ -259,7 +259,7 @@ export class SearchInfrastructure {
     }
 
   }
-
+  // async
   addVideo(postTitle: string): Observable<any> {
     if(this.isLocalhost()) {
       return new Observable<string>(subscriber => {
@@ -292,7 +292,7 @@ export class SearchInfrastructure {
         );
     }
   }
-
+  // async
   generateSeoNewHref(postTitre: string): Observable<string> {
     if(this.isLocalhost()) {
       return new Observable<string>(subscriber => {
@@ -411,7 +411,7 @@ export class SearchInfrastructure {
       return from(this.supabaseService.updateIdeaPostById(ideaPostId, postId));
     }
   }
-
+  // async
   addImagesInArticle(getPost: string, getPostId: number): Observable<{success: boolean}> {
     if(this.isLocalhost()) {
       return of({success: true});
@@ -419,7 +419,7 @@ export class SearchInfrastructure {
       return from(this.addImagesToChaptersService.getKeyWordsFromChapitreInArticleAndSetImageUrl(getPost, getPostId));
     }
   }
-
+  // async
   async generateImageIa(description: string, postId: number) {
     if(this.isLocalhost()) {
       return of({success: true});
@@ -444,6 +444,8 @@ export class SearchInfrastructure {
     return from(this.supabaseService.getOneOrManyPostForm(postId));
   }
 
+
+  /*  CRUD    */
   getPostWithCommentsAndImages(id?: number | null, orderBySelected?: string | null): Observable<Post[]> {
       return from(this.supabaseService.getPostWithCommentsAndImages(id, orderBySelected));
   }
@@ -471,6 +473,5 @@ export class SearchInfrastructure {
   editImagesChapitreArticle(id: number, url: string, key: string) {
     return from(this.supabaseService.editImagesChapitreArticle(id, url, key));
   }
-
 
 }

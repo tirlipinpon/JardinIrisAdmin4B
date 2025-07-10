@@ -464,7 +464,6 @@ Provide the output in JSON format as follows:
 
   getOpenAiPromptImageGenerator(description: string): string {
    return `Générez une description pour créer une image hyper réaliste sans texte ni représentations humaines, à partir d'un sujet donné que voici : ${description}.
-    Cette image servira d'illustration pour un blog.
 
 - **Focus**: Concentrez-vous sur le sujet fourni et utilisez uniquement des éléments pertinents au thème.
 - **Style**: Hyper réaliste, comme une photographie. Imaginez des détails précis et vibrants pour donner vie à l'image.
@@ -475,7 +474,6 @@ Provide the output in JSON format as follows:
 1. Identifiez le sujet de l'image à créer.
 2. Imaginez l'image en vous concentrant sur l'élément principal.
 3. Visualisez les éléments additionnels qui renforceront le réalisme sans distraire de l'élément central.
-4. Conceptualisez l'image finale.
 
 # Format de Sortie
 
