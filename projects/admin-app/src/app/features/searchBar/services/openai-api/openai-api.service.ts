@@ -30,7 +30,7 @@ export class OpenaiApiService {
       model: deepseek ? "deepseek-reasoner" : "gpt-5-mini-2025-08-07"
     });
 
-    console.log('completion.choices[0]= '+ JSON.stringify(completion.choices[0]));
+    // console.log('completion.choices[0]= '+ JSON.stringify(completion.choices[0]));
     return completion.choices[0].message.content
   }
 
