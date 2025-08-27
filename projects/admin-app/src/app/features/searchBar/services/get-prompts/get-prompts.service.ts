@@ -59,50 +59,44 @@ Le résultat doit être un JSON strictement valide comme ceci:
   generateArticle(article?: any): any {
     return {
       systemRole: {"role": "system","content":`
+Tu es un rédacteur humain jardinier paysagiste qui écrit un blog pour proposer ses ervicess, pas une IA. Écris comme si tu racontais, avec un ton naturel, vivant et parfois familier. Varie la longueur des phrases, évite les structures trop parfaites et bannis les conclusions scolaires.
+Ajoute des digressions légères, des détails techniques récents et concrets, ainsi qu’un peu d’imprévu comme dans une vraie conversation. Insère des exemples vécus proffessionel, des conseils pratiques et une touche d’humour subtile.
+N’hésite pas à employer "je", "tu" ou "on" et laisse passer de petites imperfections pour garder un style spontané.
+Tu dois réécrire un article détaillé pour un blog de jardinage situé à Bruxelles en respectant les normes SEO. Intègre les mots-clés suivants : "${afficherRandomSeoKeyWords()}", et applique les critères EEAT (Expertise, Experience, Authoritativeness, Trustworthiness).
+Conserve un maximum de détails techniques pertinents et ajoute de nouveaux éléments utiles, adaptés au contexte écologique et local.
+L’article doit être présenté sous format JSON valide selon la structure définie ci-dessous, et rédigé en HTML minifié (une seule ligne, sans retour à la ligne, avec les caractères spéciaux échappés).
+Instructions de génération
+Titre : Formule une question informationnelle courte et pertinente qui donne envie de lire.
+Phrase accroche : Environ 45 mots, style transactionnel, incitant à la lecture.
+Article : 6 paragraphes structurés comme suit :
 
-       Tu es chargé de réécrire un article détaillé pour un blog de jardinage situé à Bruxelles en utilisant
-       les informations fournies et respectant les normes SEO pour ces mots clefs: "${afficherRandomSeoKeyWords()}",
-       en préservant un maximum de détails techniques récentes et contextuels tout en intégrant de nouveaux éléments pertinents avec exemples et conseils.
-       Inclue une touche d'humour subtilement. Élabore un article structuré en HTML valide tenant compte des enjeux écologiques.
-       Présente l'article sous forme de JSON en respectant la structure fournie.
+<span id="paragraphe-{n}">
+  <h4>Une question informationnelle comme titre</h4>
+  <ul><li>Un sous-titre accrocheur d’environ 10 mots</li></ul>
+  <article>Texte du paragraphe d’au moins 200 mots, riche, concret, humain, détaillé, avec des conseils pratiques, une touche d’humour subtile et une fluidité naturelle.</article>
+</span>
 
-# Instructions
-- **Titre**: Crée un titre court et pertinent pour l'article qui succite la lecture.
-- **Phrase accroche**: Rédige une phrase accrocheuse d'environ 45 mots pour encourager la lecture.
-- **Article**: Écris l'article en HTML valide, minifié sur une seule ligne avec des caractères spéciaux échappés, suivant cette structure :
-  - 6 paragraphes, chaque paragraphe avec :
-    - **Texte du paragraphe** sous forme <span id="paragraphe-{n}">
-    <h4>Ecris un titre accrocheur du paragraphe {n}</h4>
-    <ul><li>Trouve une question en sous-titre du paragraphe {n} (environ 10 mots)</li></ul>
-    <article>Rédige un texte du paragraphe {n} avec minimum 200 mots et pas moins !</article>
-    </span>
-    - **Citation**: Trouve et inclue une citation célèbre qui se rapporte au sujet traité, (sans double guillemets dans le texte).
-    - **Liens**: Mentionne le premier lien utilisé pour rédiger le post sous "lien1".
-    - **Catégorie**: Choisis une catégorie adéquate parmi celles fournies par "${afficherCategories(', ')}", et exclisivement une seule de celle la.
-
-  # Output Format
-    Présente le résultat sous la forme d'un JSON valide structuré comme suit :
+Chaque paragraphe doit contenir au moins 200 mots réels (pas moins !).
+Inclure une citation célèbre pertinente en lien avec le jardinage, la nature ou la vie (sans doubles guillemets dans le texte, auteur si connu).
+Mentionner le premier lien utilisé dans "lien1".
+Sélectionner une seule catégorie parmi celles proposées par : "${afficherCategories(', ')}".
+Format de sortie attendu (strictement un seul objet JSON, rien d’autre) :
 {
   "titre": "Titre court pertinent pour le post.",
   "phrase_accroche": "Phrase accrocheuse d'environ 45 mots.",
-  "article": "
-  <span id="paragraphe-1">
-  <h4>Ecris un titre accrocheur du paragraphe 1</h4>
-  <ul><li>Trouve une question en sous-titre du paragraphe 1 (environ 10 mots)</li></ul>
-  <article>Rédige un texte du paragraphe 1 avec minimum 200 mots et pas moins !</article>
-  </span> (Continuer ainsi pour tous les paragraphes avec minimum 200 mots et pas moins par paragraphe !, minifié sur une seule ligne).",
-  "citation": "Citation célèbre pertinente avec son auteur si connu.",
+  "article": "<span id=\"paragraphe-1\"><h4>Titre questionnel</h4><ul><li>Sous-titre accrocheur</li></ul><article>Texte du paragraphe (200 mots minimum).</article></span> ... (jusqu'à paragraphe-6, minifié sur une ligne)",
+  "citation": "Citation pertinente avec auteur.",
   "lien_url_article": {
     "lien1": "URL du premier lien utilisé."
   },
   "categorie": "Catégorie choisie parmi celles proposées."
 }
 
-  # Notes
-    - Ne renvoie qu'un seul objet JSON sans autre texte ou structuration.
-    - Assure l'articulation logique et l'alignement du contenu avec le thème pour le lecteur cible.
-    - Utilise des balises HTML appropriées et garantis la validité du code généré.
-      `},
+Notes
+Rédige avec un style humain et vivant, sans ton académique ni IA.
+Assure la validité HTML et JSON.
+Aligne chaque paragraphe avec les enjeux écologiques et pratiques du jardinage à Bruxelles.
+`},
       userRole: { "role": "user", "content": `utilise les informations contenu sur la page dont les infos se trouve ici:  "${article}" pour remplir les infos.` }
     }
   }
@@ -147,7 +141,7 @@ Provide the enhanced blog segment in a valid JSON format as follows: {"upgraded"
 2. Intégrer un emoji pertinent illustrant le sujet du paragraphe à l'intérieur du titre en \`<h5>\` déjà présent sans ajouter de nouveaux \`<h5>\`.
 3. Adapter le formatage en fonction du type de contenu :
    - Utiliser \`<ol><li></li></ol>\` pour toutes les listes.
-   - Utiliser la balise \`<u>\` pour souligner une seule information spécifique.
+   - Utiliser la balise \`<u>\` pour souligner une seule phrase spécifique.
    - Utiliser \`<em>\` pour mettre en valeur des termes importants.
    - Encapsuler le contenu tabulaire dans des balises \`<table><tr><td></td></tr></table>\`.
 # Output Format
@@ -178,7 +172,7 @@ Un texte avec du contenu varié, incluant des phrases clés, des titres, des lis
       systemRole: {"role": "system","content":`
  Créez une prévision météorologique  en +-50 mots pour le blog d’un jardinier, en intégrant vos perspectives de météorologue basé sur l'institut météorologique Belge (IRM).
  Une prévision météorologique factuelle pour Bruxelles, doit comprendre la température minimale et maximale et levée du soleil  sur le courent de la journée,
- la vitesse du vent et la durée d'ensoleillement et la pluviométrie ansi que le couché du soleil pour la date d'aujourd'hui.
+ la vitesse du vent et la durée d'ensoleillement et la pluviométrie ansi que le levé et le couché du soleil pour la date d'aujourd'hui.
  Ajouter icones qui illustre le texte.
 
 # Output Format
@@ -485,7 +479,7 @@ Fournir une description détaillée en texte décrivant visuellement l'image.
 - Vérifiez que les éléments choisis sont en accord avec le thème choisi, tout en respectant l'interdiction de tout texte ou forme humaine.`
   }
 
-  getPromptGenericAddInternalLinkInArticle(article: any, listTitreIdHref: any): any {
+  addInternalLinkInArticle(article: any, listTitreIdHref: any): any {
     return {
       systemRole: {
         role: "system",
@@ -513,8 +507,8 @@ Embed a specific hyperlink into an article using an HTML tag, following the deta
    - Analysez les titres dans le JSON et le contenu de l'article pour identifier une correspondance avec les mots-clés dans le texte.
 
 2. **Insérer la Balise de Lien Hypertexte**:
-   - Si {new_href} existe and not NUll : '<a class="myTooltip" href="https://jardin-iris.be/jardinier-paysagiste-belgique-blog/${newHref}.html" title="{titre}">{mots_clés}<span class="myTooltiptext">{titre}</span></a>'
-   - Sinon : '<a class="myTooltip" href="https://jardin-iris.be/blog-detail.html?post={id}" title="{titre}">{mots_clés}<span class="myTooltiptext">{titre}</span></a>'
+   - Si {new_href} existe and not NUll : '<a class="myTooltip" href="https://www.jardin-iris.be/jardinier-paysagiste-belgique-blog/${newHref}.html" title="{titre}">{mots_clés}<span class="myTooltiptext">{titre}</span></a>'
+   - Sinon : '<a class="myTooltip" href="https://www.jardin-iris.be/blog-detail.html?post={id}" title="{titre}">{mots_clés}<span class="myTooltiptext">{titre}</span></a>'
    - Remplacez:
      - {id} : identifiant de l'article.
      - {titre} : titre de l'article.
@@ -551,19 +545,21 @@ JSON
       systemRole: {
         role: "system",
         content:  `
-Tu es un botaniste expert. Analyse le texte suivant et identifie les noms de plantes ou de végétaux spécifiques,
-c’est-à-dire ceux qui désignent une espèce ou un genre bien défini en botanique.
-Ne retiens pas les mots trop vagues, courants ou génériques qui désignent simplement la nature ou des éléments non identifiables
- avec précision (comme les mots servant à parler de manière générale de la flore ou du paysage). Entoure chaque mot identifié avec une balise <span>
-       formatée pour un usage potentiel dans le cadre de recherches futures via inaturalist.org.
-       Retourne le texte modifié sans aucun commentaire ou ajout supplémentaire, et sans modifier le texte de l’article en dehors de l’insertion des balises.
-        Le but n'est pas de trouver tous les noms les plus communs comme herbe ou gazon branche haie... mais d aider des lecteurs qui ne connaitraient pas.
+Tu es un botaniste expert. Analyse le texte suivant et identifie les noms de plantes ou de végétaux spécifiques, c’est-à-dire ceux qui désignent une espèce ou un genre bien défini en botanique.
+Ne retiens pas les mots trop vagues, courants ou génériques qui désignent simplement la nature ou des éléments non identifiables avec précision (comme les mots servant à parler de manière générale de la flore ou du paysage).
+⚠️ Chaque élément trouvé doit être unique : si un même nom de plante apparaît plusieurs fois dans le texte, il ne doit être balisé qu’une seule fois (aucune duplication).
+Entoure chaque mot identifié avec une balise <span> formatée pour un usage potentiel dans le cadre de recherches futures via inaturalist.org.
+Retourne le texte modifié sans aucun commentaire ou ajout supplémentaire, et sans modifier le texte de l’article en dehors de l’insertion des balises.
+Le but n'est pas de trouver tous les noms les plus communs comme herbe, gazon, branche, haie... mais d’aider des lecteurs qui ne connaîtraient pas.
+
 Étapes
-Identifier les noms de plantes qui sont tous en français: Analyser le texte pour trouver les mots ou expressions qui correspondent à des noms de plantes.
-Rechercher les noms scientifiques : Pour chaque nom de plante identifié, déterminer son nom scientifique le plus précis.
-Format en HTML : Entourer chaque nom de plante identifié avec des balises <span> incluant les attributs class, data-taxon-name data-paragraphe-id.
-Remplacer les espaces réservés : Remplacer "NOM_SCIENTIFIQUE" dans l’attribut data-taxon-name et alt par le nom scientifique précis et incrementer la valeur "X" de data-paragraphe-id="${paragrapheId}-X".
-Format de sortie
+Identifier les noms de plantes qui sont tous en français : analyser le texte pour trouver les mots ou expressions qui correspondent à des noms de plantes.
+Rechercher les noms scientifiques : pour chaque nom de plante identifié, déterminer son nom scientifique le plus précis.
+Assurer l’unicité : si un nom est répété, ne conserver qu’une seule occurrence balisée.
+Format en HTML : entourer chaque nom de plante identifié avec des balises <span> incluant les attributs class, data-taxon-name, data-paragraphe-id.
+Remplacer les espaces réservés : remplacer "NOM_SCIENTIFIQUE" dans l’attribut data-taxon-name et alt par le nom scientifique précis et incrémenter la valeur "X" de data-paragraphe-id="${paragrapheId}-X".
+
+Format de sortie attendu
 Retourner dans un json valide {"upgraded": "TEXTE_MODIFIE" } le texte modifié avec tous les noms de plantes entourés par des balises span formatées :
 {
 "upgraded": "<span class="inat-vegetal" data-taxon-name="NOM_SCIENTIFIQUE" data-paragraphe-id="${paragrapheId}-X">MOT_CORRESPONDANCE<div class="inat-vegetal-tooltip"><img src="" alt="NOM_SCIENTIFIQUE"/></div></span>"

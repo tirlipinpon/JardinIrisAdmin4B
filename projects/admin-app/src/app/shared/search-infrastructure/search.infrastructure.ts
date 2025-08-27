@@ -19,6 +19,7 @@ import {
   AddScientificNameService
 } from "../../features/searchBar/services/add-scientific-name/add-scientific-name.service";
 import {GeminiApiService} from "../../features/searchBar/services/gemini-api/gemini-api.service";
+import {base64ToBlob} from "../../utils/base64ToBlob";
 
 @Injectable({
   providedIn: 'root',
@@ -181,13 +182,6 @@ export class SearchInfrastructure {
         }, 1000);
       });
     } else {
-      // return new Observable<string>(subscriber => {
-      //   const mock = ' type=' + type + ' : ' + "<span id=\"paragraphe-1\"><h4>Le jardin de la biodiversité</h4><ul><li>Les pivoines sont des fleurs magnifiques qui attirent les abeilles.</li></ul><p>Le <span class=\"inat-vegetal\" data-taxon-name=\"Quercus\" data-paragraphe-id=\"1-1\">chêne<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Quercus\"/></div></span> majestueux est un arbre vieux de plusieurs siècles. Les hérissons se réfugient souvent sous ses racines. Le <span class=\"inat-vegetal\" data-taxon-name=\"Ocimum basilicum\" data-paragraphe-id=\"1-2\">basilic<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Ocimum basilicum\"/></div></span> pousse bien en été et parfume les plats méditerranéens.</p></span> <span id=\"paragraphe-2\"><h4>La vie sauvage autour du jardin</h4><ul><li>Les libellules volent autour des étangs, capturant les moustiques.</li></ul><p>Les <span class=\"inat-vegetal\" data-taxon-name=\"Prunus\" data-paragraphe-id=\"2-1\">cerisiers<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Prunus\"/></div></span> offrent des fruits délicieux au printemps. Le <span class=\"inat-vegetal\" data-taxon-name=\"Salix babylonica\" data-paragraphe-id=\"2-2\">saule pleureur<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Salix babylonica\"/></div></span> est souvent planté près des rivières pour ses racines profondes. Les lapins apprécient les jardins où ils peuvent se cacher dans les herbes hautes.</p></span> <span id=\"paragraphe-3\"><h4>Les plantes vivaces</h4><ul><li>Les lavandes sont idéales pour repousser les moustiques.</li></ul><p>Le <span class=\"inat-vegetal\" data-taxon-name=\"Ficus carica\" data-paragraphe-id=\"3-1\">figuier<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Ficus carica\"/></div></span> produit des fruits sucrés en fin d'été. Le <span class=\"inat-vegetal\" data-taxon-name=\"Rosa\" data-paragraphe-id=\"3-2\">rosier grimpant<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Rosa\"/></div></span> ajoute une touche romantique aux murs du jardin. Les oiseaux chantent souvent dans les arbres fruitiers comme les <span class=\"inat-vegetal\" data-taxon-name=\"Malus domestica\" data-paragraphe-id=\"3-3\">pommiers<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Malus domestica\"/></div></span> et les <span class=\"inat-vegetal\" data-taxon-name=\"Prunus domestica\" data-paragraphe-id=\"3-4\">pruniers<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Prunus domestica\"/></div></span>.</p></span> <span id=\"paragraphe-4\"><h4>Fleurs et insectes au jardin</h4><ul><li>Les tournesols suivent la trajectoire du soleil toute la journée.</li></ul><p>Les frelons peuvent être agressifs mais jouent un rôle dans la pollinisation. Les <span class=\"inat-vegetal\" data-taxon-name=\"Orchidaceae\" data-paragraphe-id=\"4-1\">orchidées<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Orchidaceae\"/></div></span> exotiques apportent une touche colorée aux espaces ombragés. Le <span class=\"inat-vegetal\" data-taxon-name=\"Thymus\" data-paragraphe-id=\"4-2\">thym<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Thymus\"/></div></span>, lorsqu'il fleurit, attire de nombreux pollinisateurs.</p></span> <span id=\"paragraphe-5\"><h4>Un jardin nourrissant</h4><ul><li>Les fraisiers produisent des fruits délicieux tout l'été.</li></ul><p>Les herbes de Provence, comme le <span class=\"inat-vegetal\" data-taxon-name=\"Rosmarinus officinalis\" data-paragraphe-id=\"5-1\">romarin<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Rosmarinus officinalis\"/></div></span>, parfument les plats d'été. Les <span class=\"inat-vegetal\" data-taxon-name=\"Malus domestica\" data-paragraphe-id=\"5-2\">pommiers<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Malus domestica\"/></div></span> offrent une abondance de fruits en automne. Les oiseaux de jardin, comme les mésanges, se nourrissent des graines et des baies des buissons.</p></span> <span id=\"paragraphe-6\"><h4>Un écosystème naturel</h4><ul><li>Les lys apportent des couleurs vives au jardin en été.</li></ul><p>Les écureuils collectent les noix sous les <span class=\"inat-vegetal\" data-taxon-name=\"Quercus\" data-paragraphe-id=\"6-1\">chênes<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Quercus\"/></div></span>. Les <span class=\"inat-vegetal\" data-taxon-name=\"Bambusoideae\" data-paragraphe-id=\"6-2\">bambous<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Bambusoideae\"/></div></span> créent une haie dense et résistante au vent. Les papillons trouvent refuge parmi les fleurs de <span class=\"inat-vegetal\" data-taxon-name=\"Lavandula\" data-paragraphe-id=\"6-3\">lavande<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Lavandula\"/></div></span> et de <span class=\"inat-vegetal\" data-taxon-name=\"Thymus\" data-paragraphe-id=\"6-4\">thym<div class=\"inat-vegetal-tooltip\"><img src=\"\" alt=\"Thymus\"/></div></span>.</p></span>\n";
-      //   setTimeout(() => {
-      //     subscriber.next(mock);
-      //     subscriber.complete();
-      //   }, 1000);
-      // });
       return this.formatInStructureService.formatInStructure(article, type, postTitreIdNewHref);
     }
   }
@@ -421,13 +415,19 @@ export class SearchInfrastructure {
   }
   // async
   async generateImageIa(description: string, postId: number) {
-    if(this.isLocalhost()) {
-      return of({success: true});
+    if (this.isLocalhost()) {
+      return of({ success: true });
     } else {
-      let image_url = await this.openaiApiService.imageGeneratorUrl(this.getPromptsService.getOpenAiPromptImageGenerator(description))
-      let image = await this.supabaseService.uploadImageFromUrlToBucket(postId, image_url!);
-      await this.supabaseService.updateImageUrlPostByIdForm(postId, image!);
-      return of({success: true});
+      // 1️⃣ Générer l'image en base64
+      const b64_json = await this.openaiApiService.imageGeneratorUrl(this.getPromptsService.getOpenAiPromptImageGenerator(description));
+      // 2️⃣ Convertir le base64 en Blob
+      if (b64_json) {
+        // 3️⃣ Uploader le Blob dans Supabase Storage
+        const imageUrl = await this.supabaseService.uploadBase64ToSupabase(postId, b64_json);
+        // 4️⃣ Mettre à jour le post avec l'URL publique
+        await this.supabaseService.updateImageUrlPostByIdForm(postId, imageUrl!);
+      }
+      return of({ success: true });
     }
   }
 

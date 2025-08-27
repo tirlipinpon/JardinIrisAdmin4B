@@ -421,5 +421,83 @@ export class SupabaseService {
     }
   }
 
+  async uploadBase64ViaEdge(postId: number, b64_json: string): Promise<string | null> {
+    try {
+      // 1️⃣ Convertir le base64 en Blob
+      const byteCharacters = atob(b64_json);
+      const byteNumbers = new Array(byteCharacters.length)
+        .fill(0)
+        .map((_, i) => byteCharacters.charCodeAt(i));
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'image/png' });
+
+      // 2️⃣ Convertir le Blob en URL via URL.createObjectURL pour passer à la fonction Edge
+      const blobUrl = URL.createObjectURL(blob);
+
+      // 3️⃣ Appeler la fonction Edge pour upload
+      const proxyFunctionUrl = `https://zmgfaiprgbawcernymqa.supabase.co/functions/v1/fetch-image?imageUrl=${encodeURIComponent(blobUrl)}`;
+      const response = await fetch(proxyFunctionUrl, {
+        headers: {
+          Authorization: `Bearer ${environment.supabaseAnonKey}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur lors du téléchargement proxy de l'image : ${response.statusText}`);
+      }
+
+      const uploadedBlob = await response.blob();
+
+      // 4️⃣ Uploader le fichier final dans Supabase Storage
+      const { data, error } = await this.supabase.storage.from(environment.supabaseBucket)
+        .upload(`${postId}.png`, uploadedBlob, { contentType: uploadedBlob.type, upsert: true });
+
+      if (error) throw error;
+
+      // 5️⃣ Récupérer l'URL publique
+      const { data: publicUrlData } = this.supabase.storage.from(environment.supabaseBucket)
+        .getPublicUrl(`${postId}.png`);
+
+      return publicUrlData?.publicUrl || '';
+    } catch (error) {
+      console.error('Erreur uploadBase64ViaEdge:', error);
+      return null;
+    }
+  }
+
+  async uploadBase64ToSupabase(postId: number, b64_json: string): Promise<string | null> {
+    try {
+      // 1️⃣ Convertir le base64 en Uint8Array
+      const byteCharacters = atob(b64_json);
+      const byteNumbers = new Array(byteCharacters.length)
+        .fill(0)
+        .map((_, i) => byteCharacters.charCodeAt(i));
+      const byteArray = new Uint8Array(byteNumbers);
+
+      // 2️⃣ Upload direct dans Supabase Storage
+      const { data, error } = await this.supabase.storage
+        .from(environment.supabaseBucket)
+        .upload(`${postId}.png`, byteArray, {
+          contentType: "image/png",
+          upsert: true,
+        });
+
+      if (error) throw error;
+
+      // 3️⃣ Récupérer l’URL publique
+      const { data: publicUrlData } = this.supabase.storage
+        .from(environment.supabaseBucket)
+        .getPublicUrl(`${postId}.png`);
+
+      return publicUrlData?.publicUrl || null;
+    } catch (err) {
+      console.error("Erreur uploadBase64ToSupabase:", err);
+      return null;
+    }
+  }
+
+
+
+
 
 }

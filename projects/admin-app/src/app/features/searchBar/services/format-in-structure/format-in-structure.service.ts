@@ -37,7 +37,7 @@ export class FormatInStructureService {
         } else if (type === 'UPGRADE') {
           prompt = this.getPromptsService.upgradeArticle(chapitreText);
         } else if (type === 'LINK') {
-          prompt = this.getPromptsService.getPromptGenericAddInternalLinkInArticle(chapitreText, postTitreAndIdLocal);
+          prompt = this.getPromptsService.addInternalLinkInArticle(chapitreText, postTitreAndIdLocal);
         } else if (type === 'VEGETAL') {
           prompt = this.getPromptsService.getPromptAddVegetalInArticle(chapitreText, chapitreId);
         }

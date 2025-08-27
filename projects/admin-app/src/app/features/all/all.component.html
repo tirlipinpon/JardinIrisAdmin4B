@@ -29,8 +29,8 @@
         <ul style="overflow-wrap: anywhere;">
           <li style="margin: 0 0 10px 0;">{{ post.id }} - {{ post.created_at }} - {{ post.categorie }}  - {{ post.visite }} vues</li>
           <li style="margin: 0 0 10px 0; font-weight: 700;">
-            <a target="_blanc" [href]="post.new_href && post.new_href.length > 5 ? 'https://jardin-iris.be/jardinier-paysagiste-belgique-blog/' + post.new_href + '.html' :
-            'https://jardin-iris.be/blog-detail.html?post=' + post.id">{{ post.titre }}</a></li>
+            <a target="_blanc" [href]="post.new_href && post.new_href.length > 5 ? 'https://www.jardin-iris.be/jardinier-paysagiste-belgique-blog/' + post.new_href + '.html' :
+            'https://www.jardin-iris.be/blog-detail.html?post=' + post.id">{{ post.titre }}</a></li>
           <li><img [src]="post.image_url" alt="Image preview"></li>
           <li style="margin: 0 0 10px 0;border: 1px solid gray;">{{ post.description_meteo }}</li>
           <li style="margin: 0 0 10px 0;border: 1px solid gray;" [innerHTML]="post.phrase_accroche"></li>

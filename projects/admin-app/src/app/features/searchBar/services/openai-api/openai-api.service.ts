@@ -27,10 +27,10 @@ export class OpenaiApiService {
         prompt.systemRole,
         prompt.userRole
       ],
-      model: deepseek ? "deepseek-chat" : "gpt-4.1-mini"
+      model: deepseek ? "deepseek-reasoner" : "gpt-5-mini-2025-08-07"
     });
 
-    // console.log('completion.choices[0]= '+ JSON.stringify(completion.choices[0]));
+    console.log('completion.choices[0]= '+ JSON.stringify(completion.choices[0]));
     return completion.choices[0].message.content
   }
 
@@ -72,20 +72,19 @@ export class OpenaiApiService {
     return image.data[0].b64_json;
   }
 
-  async imageGeneratorUrl(promptText: any) {
+  async imageGeneratorUrl(promptText: string) {
     const image = await this.openai.images.generate({
-      model: "dall-e-3",
+      model: "gpt-image-1",
       prompt: promptText,
       n: 1,
-      size: "1024x1024",
-      response_format: "url"
+      size: "1024x1024"
     });
 
     if (!image.data || image.data.length === 0) {
       throw new Error("Aucune image n'a été générée");
     }
 
-    return image.data[0].url;
+    return image.data[0].b64_json;
   }
 
 
