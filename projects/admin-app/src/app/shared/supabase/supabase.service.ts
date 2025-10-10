@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import {createClient, PostgrestError, SupabaseClient} from "@supabase/supabase-js";
-import {environment} from "../../../../../../environment";
-import {Post} from "../../types/post";
-import {Observable, of} from "rxjs";
+import { createClient, PostgrestError, SupabaseClient } from "@supabase/supabase-js";
+import { environment } from "../../../../../../environment";
+import { Post } from "../../types/post";
+import { Observable, of } from "rxjs";
 
 export interface AuthResponse {
   data: {
@@ -484,7 +484,7 @@ export class SupabaseService {
 
       if (error) throw error;
 
-      // 3️⃣ Récupérer l’URL publique
+      // 3️⃣ Récupérer l'URL publique
       const { data: publicUrlData } = this.supabase.storage
         .from(environment.supabaseBucket)
         .getPublicUrl(`${postId}.png`);
@@ -496,8 +496,88 @@ export class SupabaseService {
     }
   }
 
+  /**
+   * Upload une image de chapitre depuis une URL externe vers le bucket Supabase
+   * @param postId - ID du post
+   * @param chapitreId - ID du chapitre
+   * @param externalImageUrl - URL externe de l'image
+   * @returns L'URL publique de l'image uploadée ou null en cas d'erreur
+   */
+  async uploadImageChapitreFromUrl(postId: number, chapitreId: number, externalImageUrl: string): Promise<string | null> {
+    try {
+      // 1️⃣ Télécharger l'image via la fonction Edge (proxy qui gère CORS)
+      const proxyFunctionUrl = `https://zmgfaiprgbawcernymqa.supabase.co/functions/v1/fetch-image?imageUrl=${encodeURIComponent(externalImageUrl)}`;
+      
+      const response = await fetch(proxyFunctionUrl, {
+        headers: {
+          Authorization: `Bearer ${environment.supabaseAnonKey}`
+        }
+      });
 
+      if (!response.ok) {
+        throw new Error(`Erreur lors du téléchargement proxy de l'image : ${response.statusText}`);
+      }
 
+      const blob = await response.blob();
+      console.log('Blob size:', blob.size, 'Type:', blob.type);
 
+      // 2️⃣ Générer le nom du fichier selon le format demandé
+      const timestamp = Date.now();
+      const fileName = `${postId}_chapitre_${chapitreId}_U_${timestamp}.png`;
+      const filePath = `${postId}/${fileName}`;
+
+      // 3️⃣ Uploader le fichier dans Supabase Storage dans le bucket jardin-iris-images-post
+      const { data, error } = await this.supabase.storage
+        .from('jardin-iris-images-post')
+        .upload(filePath, blob, {
+          contentType: blob.type || 'image/png',
+          upsert: true,
+          headers: {
+            Authorization: `Bearer ${environment.supabaseAnonKey}`
+          }
+        });
+
+      if (error) {
+        throw new Error(`Erreur d'upload : ${error.message}`);
+      }
+
+      // 4️⃣ Récupérer l'URL publique
+      const { data: publicUrlData } = this.supabase.storage
+        .from('jardin-iris-images-post')
+        .getPublicUrl(filePath);
+
+      console.log('Image de chapitre uploadée avec succès:', publicUrlData?.publicUrl);
+      return publicUrlData?.publicUrl || null;
+    } catch (error) {
+      console.error('Erreur uploadImageChapitreFromUrl:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Met à jour l'URL d'une image de chapitre dans la base de données
+   * @param imageId - ID de l'image dans la table urlImagesChapitres
+   * @param newUrl - Nouvelle URL de l'image
+   * @returns Les données mises à jour ou null en cas d'erreur
+   */
+  async updateImageChapitreUrl(imageId: number, newUrl: string): Promise<any> {
+    try {
+      const { data, error } = await this.supabase
+        .from('urlImagesChapitres')
+        .update({ url_Image: newUrl })
+        .eq('id', imageId)
+        .select();
+
+      if (error) {
+        throw error;
+      }
+      
+      console.log('URL de l\'image mise à jour avec succès:', data);
+      return data && data.length > 0 ? data[0] : null;
+    } catch (error) {
+      console.error('Erreur updateImageChapitreUrl:', error);
+      throw error;
+    }
+  }
 
 }

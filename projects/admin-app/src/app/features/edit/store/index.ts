@@ -1,13 +1,13 @@
-import {Post} from "../../../types/post";
-import {patchState, signalStore, withMethods, withState} from "@ngrx/signals";
-import {updateState, withDevtools} from "@angular-architects/ngrx-toolkit";
-import {inject} from "@angular/core";
-import {SearchInfrastructure} from "../../../shared/search-infrastructure/search.infrastructure";
-import {pipe, switchMap, tap} from "rxjs";
-import {rxMethod} from "@ngrx/signals/rxjs-interop";
-import {tapResponse} from "@ngrx/operators";
-import {Comment} from "../../../types/comment";
-import {ImageChapitre} from "../../../types/imageChapitre";
+import { Post } from "../../../types/post";
+import { patchState, signalStore, withMethods, withState } from "@ngrx/signals";
+import { updateState, withDevtools } from "@angular-architects/ngrx-toolkit";
+import { inject } from "@angular/core";
+import { SearchInfrastructure } from "../../../shared/search-infrastructure/search.infrastructure";
+import { pipe, switchMap, tap } from "rxjs";
+import { rxMethod } from "@ngrx/signals/rxjs-interop";
+import { tapResponse } from "@ngrx/operators";
+import { Comment } from "../../../types/comment";
+import { ImageChapitre } from "../../../types/imageChapitre";
 
 export interface PostState  {
   post: Post[] | null;
@@ -178,11 +178,11 @@ export const PostStore = signalStore(
                       const images = p.images_chapitres || [];
                       const index = images.findIndex(img => img.id === image.id);
                       if (index >= 0) {
-                        // Mise à jour
-                        images[index] = image;
+                        // Mise à jour - marquer l'image comme changée pour upload lors de la validation
+                        images[index] = { ...image, changed: true };
                       } else {
                         // Ajout
-                        images.push(image);
+                        images.push({ ...image, changed: true });
                       }
                       return { ...p, images_chapitres: images };
                     }

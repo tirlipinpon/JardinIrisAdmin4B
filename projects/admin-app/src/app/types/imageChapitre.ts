@@ -7,4 +7,5 @@ export interface ImageChapitre {
   explanation_word?: string;
   chapitre_key_word: string;
   explanation_image?: string; // valeur non fournie, optionnelle
+  changed?: boolean; // flag pour tracker si l'image a été modifiée
 }

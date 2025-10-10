@@ -1,25 +1,23 @@
-import {inject, Injectable} from "@angular/core";
+import { inject, Injectable } from "@angular/core";
 import {
   from,
   Observable, of, switchMap
 } from "rxjs";
-import {TheNewsApiService} from "../../features/searchBar/services/the-news-api.service";
-import {OpenaiApiService} from "../../features/searchBar/services/openai-api/openai-api.service";
-import {GetPromptsService} from "../../features/searchBar/services/get-prompts/get-prompts.service";
-import {PerplexityApiService} from "../../features/searchBar/services/perplexity-api/perplexity-api.service";
-import {extractJSONBlock, parseJsonSafe} from "../../utils/cleanJsonObject";
-import {SupabaseService} from "../supabase/supabase.service";
-import {map} from "rxjs/operators";
-import {Post} from "../../types/post";
-import {AddImagesToChaptersService} from "../../features/searchBar/services/add-image-to-chapters/add-images-to-chapters.service";
-import {FormatInStructureService} from "../../features/searchBar/services/format-in-structure/format-in-structure.service";
-import {compressImage} from "../../utils/resizeB64JsonIMage";
-import {GoogleSearchService} from "../../features/all/services/google-search/google-search.service";
+import { TheNewsApiService } from "../../features/searchBar/services/the-news-api.service";
+import { OpenaiApiService } from "../../features/searchBar/services/openai-api/openai-api.service";
+import { GetPromptsService } from "../../features/searchBar/services/get-prompts/get-prompts.service";
+import { PerplexityApiService } from "../../features/searchBar/services/perplexity-api/perplexity-api.service";
+import { extractJSONBlock, parseJsonSafe } from "../../utils/cleanJsonObject";
+import { SupabaseService } from "../supabase/supabase.service";
+import { map } from "rxjs/operators";
+import { Post } from "../../types/post";
+import { AddImagesToChaptersService } from "../../features/searchBar/services/add-image-to-chapters/add-images-to-chapters.service";
+import { FormatInStructureService } from "../../features/searchBar/services/format-in-structure/format-in-structure.service";
+import { GoogleSearchService } from "../../features/all/services/google-search/google-search.service";
 import {
   AddScientificNameService
 } from "../../features/searchBar/services/add-scientific-name/add-scientific-name.service";
-import {GeminiApiService} from "../../features/searchBar/services/gemini-api/gemini-api.service";
-import {base64ToBlob} from "../../utils/base64ToBlob";
+import { GeminiApiService } from "../../features/searchBar/services/gemini-api/gemini-api.service";
 
 @Injectable({
   providedIn: 'root',
@@ -472,6 +470,59 @@ export class SearchInfrastructure {
 
   editImagesChapitreArticle(id: number, url: string, key: string) {
     return from(this.supabaseService.editImagesChapitreArticle(id, url, key));
+  }
+
+  /**
+   * Traite et upload les images de chapitres qui ont été modifiées
+   * @param postId - ID du post
+   * @param imagesChapitres - Array des images de chapitres
+   * @returns Observable avec le résultat du traitement
+   */
+  processChangedImagesChapitres(postId: number, imagesChapitres: any[]): Observable<boolean> {
+    if(this.isLocalhost()) {
+      return of(true);
+    }
+
+    // Filtrer les images qui ont été changées
+    const changedImages = imagesChapitres.filter(img => img.changed === true);
+
+    if (changedImages.length === 0) {
+      // Aucune image changée, on retourne directement true
+      return of(true);
+    }
+
+    console.log(`${changedImages.length} image(s) à uploader pour le post ${postId}`);
+
+    // Traiter chaque image changée séquentiellement
+    return from(changedImages).pipe(
+      switchMap(async (image) => {
+        try {
+          console.log(`Traitement de l'image chapitre ${image.chapitre_id}...`);
+          
+          // 1️⃣ Upload de l'image vers Supabase Storage
+          const newUrl = await this.supabaseService.uploadImageChapitreFromUrl(
+            postId,
+            image.chapitre_id,
+            image.url_Image
+          );
+
+          if (!newUrl) {
+            throw new Error(`Échec de l'upload de l'image pour le chapitre ${image.chapitre_id}`);
+          }
+
+          // 2️⃣ Mise à jour de l'URL dans la base de données
+          await this.supabaseService.updateImageChapitreUrl(image.id, newUrl);
+          
+          console.log(`Image chapitre ${image.chapitre_id} traitée avec succès`);
+          return true;
+        } catch (error) {
+          console.error(`Erreur lors du traitement de l'image chapitre ${image.chapitre_id}:`, error);
+          throw error;
+        }
+      }),
+      // Attendre que toutes les images soient traitées
+      map(() => true)
+    );
   }
 
 }
