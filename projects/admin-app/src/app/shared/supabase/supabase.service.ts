@@ -3,6 +3,7 @@ import { createClient, PostgrestError, SupabaseClient } from "@supabase/supabase
 import { environment } from "../../../../../../environment";
 import { Post } from "../../types/post";
 import { Observable, of } from "rxjs";
+import { processImageChapitre } from "../../utils/processImageChapitre";
 
 export interface AuthResponse {
   data: {
@@ -505,32 +506,57 @@ export class SupabaseService {
    */
   async uploadImageChapitreFromUrl(postId: number, chapitreId: number, externalImageUrl: string): Promise<string | null> {
     try {
-      // 1️⃣ Télécharger l'image via la fonction Edge (proxy qui gère CORS)
-      const proxyFunctionUrl = `https://zmgfaiprgbawcernymqa.supabase.co/functions/v1/fetch-image?imageUrl=${encodeURIComponent(externalImageUrl)}`;
+      // 1️⃣ Télécharger l'image directement depuis le frontend (pas de problème CORS car déjà affiché)
+      let blob: Blob;
       
-      const response = await fetch(proxyFunctionUrl, {
-        headers: {
-          Authorization: `Bearer ${environment.supabaseAnonKey}`
-        }
-      });
+      try {
+        // Essai 1: Fetch direct depuis le frontend
+        const directResponse = await fetch(externalImageUrl, {
+          mode: 'cors',
+          credentials: 'omit'
+        });
 
-      if (!response.ok) {
-        throw new Error(`Erreur lors du téléchargement proxy de l'image : ${response.statusText}`);
+        if (!directResponse.ok) {
+          throw new Error(`Fetch direct échoué: ${directResponse.statusText}`);
+        }
+
+        blob = await directResponse.blob();
+        console.log('✓ Image téléchargée directement - Taille:', (blob.size / 1024).toFixed(2), 'Ko, Type:', blob.type);
+        
+      } catch (directError) {
+        // Essai 2: Si le fetch direct échoue, utiliser la fonction Edge comme fallback
+        console.log('⚠ Fetch direct échoué, tentative via proxy Edge...', directError);
+        
+        const proxyFunctionUrl = `https://zmgfaiprgbawcernymqa.supabase.co/functions/v1/fetch-image?imageUrl=${encodeURIComponent(externalImageUrl)}`;
+        
+        const proxyResponse = await fetch(proxyFunctionUrl, {
+          headers: {
+            Authorization: `Bearer ${environment.supabaseAnonKey}`
+          }
+        });
+
+        if (!proxyResponse.ok) {
+          throw new Error(`Erreur proxy Edge: ${proxyResponse.statusText}`);
+        }
+
+        blob = await proxyResponse.blob();
+        console.log('✓ Image téléchargée via proxy - Taille:', (blob.size / 1024).toFixed(2), 'Ko, Type:', blob.type);
       }
 
-      const blob = await response.blob();
-      console.log('Blob size:', blob.size, 'Type:', blob.type);
+      // 2️⃣ Traiter l'image (resize 700x250, crop center, WebP, compression < 60Ko)
+      const processedBlob = await processImageChapitre(blob, 700, 250, 60);
+      console.log('Image traitée - Taille finale:', (processedBlob.size / 1024).toFixed(2), 'Ko');
 
-      // 2️⃣ Générer le nom du fichier selon le format demandé
+      // 3️⃣ Générer le nom du fichier selon le format demandé (en .webp)
       const timestamp = Date.now();
-      const fileName = `${postId}_chapitre_${chapitreId}_U_${timestamp}.png`;
+      const fileName = `${postId}_chapitre_${chapitreId}_U_${timestamp}.webp`;
       const filePath = `${postId}/${fileName}`;
 
-      // 3️⃣ Uploader le fichier dans Supabase Storage dans le bucket jardin-iris-images-post
+      // 4️⃣ Uploader le fichier traité dans Supabase Storage dans le bucket jardin-iris-images-post
       const { data, error } = await this.supabase.storage
         .from('jardin-iris-images-post')
-        .upload(filePath, blob, {
-          contentType: blob.type || 'image/png',
+        .upload(filePath, processedBlob, {
+          contentType: 'image/webp',
           upsert: true,
           headers: {
             Authorization: `Bearer ${environment.supabaseAnonKey}`
@@ -541,12 +567,12 @@ export class SupabaseService {
         throw new Error(`Erreur d'upload : ${error.message}`);
       }
 
-      // 4️⃣ Récupérer l'URL publique
+      // 5️⃣ Récupérer l'URL publique
       const { data: publicUrlData } = this.supabase.storage
         .from('jardin-iris-images-post')
         .getPublicUrl(filePath);
 
-      console.log('Image de chapitre uploadée avec succès:', publicUrlData?.publicUrl);
+      console.log('✓ Image de chapitre uploadée avec succès:', publicUrlData?.publicUrl);
       return publicUrlData?.publicUrl || null;
     } catch (error) {
       console.error('Erreur uploadImageChapitreFromUrl:', error);
