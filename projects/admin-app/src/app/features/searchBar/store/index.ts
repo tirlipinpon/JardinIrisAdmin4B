@@ -303,23 +303,39 @@ export const SearchStore= signalStore(
           })
         )
       ),
+      // formatInHtmlArticle: rxMethod<void>(
+      //   pipe(
+      //     tap(() => updateState(store, '[formatInHtmlArticle] update loading', { isLoading: true })),
+      //     switchMap(() => {
+      //       const getArticleUpgraded = store.getArticleUpgraded();
+      //       if (!getArticleUpgraded) { patchState(store, { isLoading: false }); return EMPTY; }
+      //       return infra.formatInStructure(getArticleUpgraded, 'HTML').pipe(
+      //         tapResponse({
+      //           next: (formatInHtmlArticle) => {
+      //             patchState(store, { articleHtml: formatInHtmlArticle, isLoading: false });
+      //           },
+      //           error: () => patchState(store, { isLoading: false }),
+      //         })
+      //       );
+      //     })
+      //   )
+      // ),
       formatInHtmlArticle: rxMethod<void>(
         pipe(
           tap(() => updateState(store, '[formatInHtmlArticle] update loading', { isLoading: true })),
           switchMap(() => {
-            const getArticleUpgraded = store.getArticleUpgraded();
-            if (!getArticleUpgraded) { patchState(store, { isLoading: false }); return EMPTY; }
-            return infra.formatInStructure(getArticleUpgraded, 'HTML').pipe(
-              tapResponse({
-                next: (formatInHtmlArticle) => {
-                  patchState(store, { articleHtml: formatInHtmlArticle, isLoading: false });
-                },
-                error: () => patchState(store, { isLoading: false }),
-              })
-            );
+            const article = store.getArticleUpgraded();
+            if (!article) { patchState(store, { isLoading: false }); return EMPTY; }
+            // on envoie directement l'article dans le store
+            patchState(store, {
+              articleHtml: article,
+              isLoading: false,
+            });
+            return EMPTY;
           })
         )
       ),
+
       addInternalLinkByChapter: rxMethod<void>(
         pipe(
           tap(() => updateState(store, '[addInternalLinkByChapter] update loading', { isLoading: true })),

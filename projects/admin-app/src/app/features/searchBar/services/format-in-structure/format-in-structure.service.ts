@@ -42,7 +42,7 @@ export class FormatInStructureService {
           prompt = this.getPromptsService.getPromptAddVegetalInArticle(chapitreText, chapitreId);
         }
 
-        return from(this.openaiApiService.fetchData(prompt, (type !== 'UPGRADE'))).pipe(
+        return from(this.openaiApiService.fetchData(prompt, (type !== 'HTML'))).pipe(
           map(upgradedText => {
             if (!upgradedText) {
               return {
