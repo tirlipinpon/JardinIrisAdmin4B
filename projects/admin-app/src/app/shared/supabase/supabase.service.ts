@@ -505,29 +505,36 @@ export class SupabaseService {
    * @returns L'URL publique de l'image uploadée ou null en cas d'erreur
    */
   async uploadImageChapitreFromUrl(postId: number, chapitreId: number, externalImageUrl: string): Promise<string | null> {
+    console.log(`[uploadImageChapitreFromUrl] Début du traitement pour postId: ${postId}, chapitreId: ${chapitreId}`);
+    console.log(`[uploadImageChapitreFromUrl] URL source: ${externalImageUrl}`);
+    
     try {
       // 1️⃣ Télécharger l'image directement depuis le frontend (pas de problème CORS car déjà affiché)
       let blob: Blob;
+      let downloadMethod = '';
       
       try {
         // Essai 1: Fetch direct depuis le frontend
+        console.log(`[uploadImageChapitreFromUrl] Tentative de téléchargement direct...`);
         const directResponse = await fetch(externalImageUrl, {
           mode: 'cors',
           credentials: 'omit'
         });
 
         if (!directResponse.ok) {
-          throw new Error(`Fetch direct échoué: ${directResponse.statusText}`);
+          throw new Error(`Fetch direct échoué: ${directResponse.statusText} (${directResponse.status})`);
         }
 
         blob = await directResponse.blob();
-        console.log('✓ Image téléchargée directement - Taille:', (blob.size / 1024).toFixed(2), 'Ko, Type:', blob.type);
+        downloadMethod = 'direct';
+        console.log(`[uploadImageChapitreFromUrl] ✓ Image téléchargée directement - Taille: ${(blob.size / 1024).toFixed(2)} Ko, Type: ${blob.type}`);
         
       } catch (directError) {
         // Essai 2: Si le fetch direct échoue, utiliser la fonction Edge comme fallback
-        console.log('⚠ Fetch direct échoué, tentative via proxy Edge...', directError);
+        console.log(`[uploadImageChapitreFromUrl] ⚠ Fetch direct échoué, tentative via proxy Edge...`, directError);
         
         const proxyFunctionUrl = `https://zmgfaiprgbawcernymqa.supabase.co/functions/v1/fetch-image?imageUrl=${encodeURIComponent(externalImageUrl)}`;
+        console.log(`[uploadImageChapitreFromUrl] URL proxy: ${proxyFunctionUrl}`);
         
         const proxyResponse = await fetch(proxyFunctionUrl, {
           headers: {
@@ -536,23 +543,32 @@ export class SupabaseService {
         });
 
         if (!proxyResponse.ok) {
-          throw new Error(`Erreur proxy Edge: ${proxyResponse.statusText}`);
+          throw new Error(`Erreur proxy Edge: ${proxyResponse.statusText} (${proxyResponse.status})`);
         }
 
         blob = await proxyResponse.blob();
-        console.log('✓ Image téléchargée via proxy - Taille:', (blob.size / 1024).toFixed(2), 'Ko, Type:', blob.type);
+        downloadMethod = 'proxy';
+        console.log(`[uploadImageChapitreFromUrl] ✓ Image téléchargée via proxy - Taille: ${(blob.size / 1024).toFixed(2)} Ko, Type: ${blob.type}`);
+      }
+
+      // Vérifier que le blob n'est pas vide
+      if (!blob || blob.size === 0) {
+        throw new Error(`Blob vide ou invalide après téléchargement (méthode: ${downloadMethod})`);
       }
 
       // 2️⃣ Traiter l'image (resize 700x250, crop center, WebP, compression < 60Ko)
+      console.log(`[uploadImageChapitreFromUrl] Début du traitement d'image (resize 700x250, WebP, <60Ko)...`);
       const processedBlob = await processImageChapitre(blob, 700, 250, 60);
-      console.log('Image traitée - Taille finale:', (processedBlob.size / 1024).toFixed(2), 'Ko');
+      console.log(`[uploadImageChapitreFromUrl] ✓ Image traitée - Taille finale: ${(processedBlob.size / 1024).toFixed(2)} Ko`);
 
       // 3️⃣ Générer le nom du fichier selon le format demandé (en .webp)
       const timestamp = Date.now();
       const fileName = `${postId}_chapitre_${chapitreId}_U_${timestamp}.webp`;
       const filePath = `${postId}/${fileName}`;
+      console.log(`[uploadImageChapitreFromUrl] Nom du fichier: ${fileName}, Chemin: ${filePath}`);
 
       // 4️⃣ Uploader le fichier traité dans Supabase Storage dans le bucket jardin-iris-images-post
+      console.log(`[uploadImageChapitreFromUrl] Début de l'upload vers Supabase Storage...`);
       const { data, error } = await this.supabase.storage
         .from('jardin-iris-images-post')
         .upload(filePath, processedBlob, {
@@ -564,18 +580,30 @@ export class SupabaseService {
         });
 
       if (error) {
-        throw new Error(`Erreur d'upload : ${error.message}`);
+        throw new Error(`Erreur d'upload Supabase Storage: ${error.message}`);
       }
+
+      console.log(`[uploadImageChapitreFromUrl] ✓ Upload réussi vers Supabase Storage`);
 
       // 5️⃣ Récupérer l'URL publique
       const { data: publicUrlData } = this.supabase.storage
         .from('jardin-iris-images-post')
         .getPublicUrl(filePath);
 
-      console.log('✓ Image de chapitre uploadée avec succès:', publicUrlData?.publicUrl);
-      return publicUrlData?.publicUrl || null;
+      const publicUrl = publicUrlData?.publicUrl || null;
+      console.log(`[uploadImageChapitreFromUrl] ✓ Image de chapitre uploadée avec succès: ${publicUrl}`);
+      console.log(`[uploadImageChapitreFromUrl] Résumé: ${downloadMethod} → traitement → upload → ${publicUrl}`);
+      
+      return publicUrl;
     } catch (error) {
-      console.error('Erreur uploadImageChapitreFromUrl:', error);
+      console.error(`[uploadImageChapitreFromUrl] ❌ Erreur complète:`, {
+        postId,
+        chapitreId,
+        externalImageUrl,
+        error: error,
+        errorMessage: error instanceof Error ? error.message : 'Erreur inconnue',
+        errorStack: error instanceof Error ? error.stack : undefined
+      });
       return null;
     }
   }

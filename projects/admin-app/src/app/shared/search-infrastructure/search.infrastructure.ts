@@ -1,7 +1,7 @@
 import { inject, Injectable } from "@angular/core";
 import {
   from,
-  Observable, of, switchMap
+  Observable, of, switchMap, toArray
 } from "rxjs";
 import { TheNewsApiService } from "../../features/searchBar/services/the-news-api.service";
 import { OpenaiApiService } from "../../features/searchBar/services/openai-api/openai-api.service";
@@ -487,41 +487,119 @@ export class SearchInfrastructure {
     const changedImages = imagesChapitres.filter(img => img.changed === true);
 
     if (changedImages.length === 0) {
-      // Aucune image changée, on retourne directement true
+      console.log(`[processChangedImagesChapitres] Aucune image changée pour le post ${postId}`);
       return of(true);
     }
 
-    console.log(`${changedImages.length} image(s) à uploader pour le post ${postId}`);
+    console.log(`[processChangedImagesChapitres] ${changedImages.length} image(s) à uploader pour le post ${postId}`);
+    console.log(`[processChangedImagesChapitres] Images à traiter:`, changedImages.map(img => ({
+      id: img.id,
+      chapitre_id: img.chapitre_id,
+      url: img.url_Image,
+      key_word: img.chapitre_key_word
+    })));
 
-    // Traiter chaque image changée séquentiellement
+    // Traiter chaque image changée séquentiellement avec retry
     return from(changedImages).pipe(
       switchMap(async (image) => {
-        try {
-          console.log(`Traitement de l'image chapitre ${image.chapitre_id}...`);
-          
-          // 1️⃣ Upload de l'image vers Supabase Storage
-          const newUrl = await this.supabaseService.uploadImageChapitreFromUrl(
-            postId,
-            image.chapitre_id,
-            image.url_Image
-          );
+        const maxRetries = 3;
+        let lastError: Error | null = null;
+        
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+          try {
+            console.log(`[processChangedImagesChapitres] Tentative ${attempt}/${maxRetries} pour l'image chapitre ${image.chapitre_id} (ID: ${image.id})`);
+            console.log(`[processChangedImagesChapitres] URL source: ${image.url_Image}`);
+            
+            // 1️⃣ Upload de l'image vers Supabase Storage
+            const newUrl = await this.supabaseService.uploadImageChapitreFromUrl(
+              postId,
+              image.chapitre_id,
+              image.url_Image
+            );
 
-          if (!newUrl) {
-            throw new Error(`Échec de l'upload de l'image pour le chapitre ${image.chapitre_id}`);
+            if (!newUrl) {
+              throw new Error(`Échec de l'upload de l'image pour le chapitre ${image.chapitre_id} - URL retournée null`);
+            }
+
+            console.log(`[processChangedImagesChapitres] ✓ Upload réussi pour chapitre ${image.chapitre_id}, nouvelle URL: ${newUrl}`);
+
+            // 2️⃣ Mise à jour de l'URL dans la base de données
+            const updateResult = await this.supabaseService.updateImageChapitreUrl(image.id, newUrl);
+            
+            if (!updateResult) {
+              throw new Error(`Échec de la mise à jour en base de données pour l'image ID ${image.id}`);
+            }
+            
+            console.log(`[processChangedImagesChapitres] ✓ Image chapitre ${image.chapitre_id} traitée avec succès (tentative ${attempt})`);
+            return { success: true, imageId: image.id, chapitreId: image.chapitre_id, newUrl };
+            
+          } catch (error) {
+            lastError = error as Error;
+            console.error(`[processChangedImagesChapitres] ❌ Erreur tentative ${attempt}/${maxRetries} pour l'image chapitre ${image.chapitre_id}:`, {
+              error: error,
+              imageId: image.id,
+              chapitreId: image.chapitre_id,
+              url: image.url_Image,
+              attempt: attempt
+            });
+            
+            // Si ce n'est pas la dernière tentative, attendre avant de réessayer
+            if (attempt < maxRetries) {
+              const delay = Math.pow(2, attempt - 1) * 1000; // Délai exponentiel: 1s, 2s, 4s
+              console.log(`[processChangedImagesChapitres] Attente de ${delay}ms avant la tentative ${attempt + 1}...`);
+              await new Promise(resolve => setTimeout(resolve, delay));
+            }
           }
-
-          // 2️⃣ Mise à jour de l'URL dans la base de données
-          await this.supabaseService.updateImageChapitreUrl(image.id, newUrl);
-          
-          console.log(`Image chapitre ${image.chapitre_id} traitée avec succès`);
-          return true;
-        } catch (error) {
-          console.error(`Erreur lors du traitement de l'image chapitre ${image.chapitre_id}:`, error);
-          throw error;
         }
+        
+        // Si toutes les tentatives ont échoué
+        console.error(`[processChangedImagesChapitres] ❌ ÉCHEC DÉFINITIF pour l'image chapitre ${image.chapitre_id} après ${maxRetries} tentatives:`, {
+          imageId: image.id,
+          chapitreId: image.chapitre_id,
+          url: image.url_Image,
+          lastError: lastError
+        });
+        
+        // Retourner un objet d'erreur au lieu de throw pour continuer le traitement des autres images
+        return { 
+          success: false, 
+          imageId: image.id, 
+          chapitreId: image.chapitre_id, 
+          error: lastError,
+          url: image.url_Image
+        };
       }),
-      // Attendre que toutes les images soient traitées
-      map(() => true)
+      // Collecter tous les résultats et les traiter
+      toArray(),
+      map((results) => {
+        const successful = results.filter(r => r.success);
+        const failed = results.filter(r => !r.success);
+        
+        console.log(`[processChangedImagesChapitres] Résumé du traitement pour le post ${postId}:`);
+        console.log(`[processChangedImagesChapitres] - Images traitées avec succès: ${successful.length}`);
+        console.log(`[processChangedImagesChapitres] - Images en échec: ${failed.length}`);
+        
+        if (successful.length > 0) {
+          console.log(`[processChangedImagesChapitres] Images traitées avec succès:`, successful.map(s => ({
+            imageId: s.imageId,
+            chapitreId: s.chapitreId,
+            newUrl: s.newUrl
+          })));
+        }
+        
+        if (failed.length > 0) {
+          console.error(`[processChangedImagesChapitres] Images en échec:`, failed.map(f => ({
+            imageId: f.imageId,
+            chapitreId: f.chapitreId,
+            url: f.url,
+            error: f.error?.message
+          })));
+        }
+        
+        // Retourner true si au moins une image a été traitée avec succès
+        // ou si aucune image n'a été traitée (cas où toutes les images étaient déjà uploadées)
+        return successful.length > 0 || failed.length === 0;
+      })
     );
   }
 

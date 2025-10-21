@@ -6,7 +6,7 @@
   </mat-dialog-actions>
 
   <mat-form-field appearance="outline" style="width: 100%;">
-    <input matInput [(ngModel)]="searchText" placeholder="Enter text" />
+    <textarea matInput [(ngModel)]="searchText" placeholder="Enter text" rows="3" cdkTextareaAutosize></textarea>
   </mat-form-field>
   <button mat-button (click)="onSearch()">Search</button>
 
