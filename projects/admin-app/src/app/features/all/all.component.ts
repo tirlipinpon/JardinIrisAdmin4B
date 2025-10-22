@@ -270,28 +270,37 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy, AfterV
 
     // Vérifier si des images_chapitres ont été modifiées
     const imagesChapitres = currentPost.images_chapitres || [];
-    const hasChangedImages = imagesChapitres.some(img => img.changed === true);
+    const hasChangedImagesChapitres = imagesChapitres.some(img => img.changed === true);
 
-    if (hasChangedImages) {
-      console.log(`Des images ont été modifiées pour le post ${id}, traitement en cours...`);
+    // Vérifier si l'image principale doit être traitée
+    // (Si c'est une URL externe et pas déjà uploadée dans Supabase Storage)
+    const imageUrl = currentPost.image_url || '';
+    const isExternalImage = !!(imageUrl && 
+                           !imageUrl.includes('zmgfaiprgbawcernymqa.supabase.co') &&
+                           (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')));
+
+    if (hasChangedImagesChapitres || isExternalImage) {
+      console.log(`[validPostById] Post ${id} nécessite un traitement d'images:`);
+      console.log(`  - Images chapitres changées: ${hasChangedImagesChapitres}`);
+      console.log(`  - Image principale à traiter: ${isExternalImage}`);
       
-      // Traiter les images changées avant de valider le post
-      this.searchInfra.processChangedImagesChapitres(id, imagesChapitres).subscribe({
+      // Traiter les images avant de valider le post
+      this.searchInfra.processPostImages(id, imagesChapitres, imageUrl, isExternalImage).subscribe({
         next: (success) => {
           if (success) {
-            console.log('Images traitées avec succès, validation du post...');
-            // Une fois les images uploadées et mises à jour, valider le post
+            console.log('[validPostById] ✓ Toutes les images traitées avec succès, validation du post...');
+            // Une fois toutes les images uploadées et mises à jour, valider le post
             this.store.validPost(id);
           }
         },
         error: (error) => {
-          console.error('Erreur lors du traitement des images:', error);
+          console.error('[validPostById] ❌ Erreur lors du traitement des images:', error);
           alert('Erreur lors du traitement des images. Veuillez réessayer.');
         }
       });
     } else {
-      // Aucune image changée, validation directe
-      console.log('Aucune image modifiée, validation directe du post');
+      // Aucune image à traiter, validation directe
+      console.log('[validPostById] Aucune image à traiter, validation directe du post');
       this.store.validPost(id);
     }
   }

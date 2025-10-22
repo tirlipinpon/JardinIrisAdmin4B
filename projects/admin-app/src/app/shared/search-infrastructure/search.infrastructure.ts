@@ -473,6 +473,75 @@ export class SearchInfrastructure {
   }
 
   /**
+   * Traite et upload toutes les images d'un post (principale + chapitres)
+   * @param postId - ID du post
+   * @param imagesChapitres - Array des images de chapitres
+   * @param mainImageUrl - URL de l'image principale
+   * @param shouldProcessMainImage - Si true, traiter l'image principale
+   * @returns Observable avec le résultat du traitement
+   */
+  processPostImages(
+    postId: number, 
+    imagesChapitres: any[], 
+    mainImageUrl: string, 
+    shouldProcessMainImage: boolean
+  ): Observable<boolean> {
+    if (this.isLocalhost()) {
+      return of(true);
+    }
+
+    return new Observable<boolean>((observer) => {
+      const processImages = async () => {
+        try {
+          // 1️⃣ Traiter l'image principale si nécessaire
+          if (shouldProcessMainImage && mainImageUrl) {
+            console.log(`[processPostImages] 📸 Traitement de l'image principale pour le post ${postId}...`);
+            console.log(`[processPostImages] URL source: ${mainImageUrl}`);
+            
+            const newMainImageUrl = await this.supabaseService.uploadMainImageWithAI(postId, mainImageUrl);
+            
+            if (newMainImageUrl) {
+              console.log(`[processPostImages] ✓ Image principale uploadée: ${newMainImageUrl}`);
+              // Mettre à jour l'image_url du post dans la DB
+              await this.supabaseService.updateImageUrlPostByIdForm(postId, newMainImageUrl);
+              console.log(`[processPostImages] ✓ Image principale mise à jour dans la DB`);
+            } else {
+              console.warn(`[processPostImages] ⚠ Échec de l'upload de l'image principale, continuation...`);
+            }
+          }
+
+          // 2️⃣ Traiter les images de chapitres si nécessaire
+          const changedImages = imagesChapitres.filter(img => img.changed === true);
+          
+          if (changedImages.length > 0) {
+            console.log(`[processPostImages] 📚 Traitement de ${changedImages.length} image(s) de chapitres...`);
+            
+            // Utiliser la méthode existante via un Observable
+            await new Promise<boolean>((resolve, reject) => {
+              this.processChangedImagesChapitres(postId, imagesChapitres).subscribe({
+                next: (success) => resolve(success),
+                error: (error) => reject(error)
+              });
+            });
+            
+            console.log(`[processPostImages] ✓ Images de chapitres traitées`);
+          }
+
+          console.log(`[processPostImages] ✓ Traitement complet terminé pour le post ${postId}`);
+          observer.next(true);
+          observer.complete();
+          
+        } catch (error) {
+          console.error(`[processPostImages] ❌ Erreur lors du traitement des images:`, error);
+          observer.error(error);
+        }
+      };
+
+      processImages();
+    });
+  }
+
+  /**
    * Traite et upload les images de chapitres qui ont été modifiées
    * @param postId - ID du post
    * @param imagesChapitres - Array des images de chapitres
@@ -510,28 +579,34 @@ export class SearchInfrastructure {
             console.log(`[processChangedImagesChapitres] Tentative ${attempt}/${maxRetries} pour l'image chapitre ${image.chapitre_id} (ID: ${image.id})`);
             console.log(`[processChangedImagesChapitres] URL source: ${image.url_Image}`);
             
-            // 1️⃣ Upload de l'image vers Supabase Storage
-            const newUrl = await this.supabaseService.uploadImageChapitreFromUrl(
+            // 1️⃣ Upload de l'image vers Supabase Storage avec analyse IA pour titre SEO
+            const result = await this.supabaseService.uploadImageChapitreFromUrl(
               postId,
               image.chapitre_id,
               image.url_Image
             );
 
-            if (!newUrl) {
-              throw new Error(`Échec de l'upload de l'image pour le chapitre ${image.chapitre_id} - URL retournée null`);
+            if (!result) {
+              throw new Error(`Échec de l'upload de l'image pour le chapitre ${image.chapitre_id} - Résultat null`);
             }
 
-            console.log(`[processChangedImagesChapitres] ✓ Upload réussi pour chapitre ${image.chapitre_id}, nouvelle URL: ${newUrl}`);
+            console.log(`[processChangedImagesChapitres] ✓ Upload réussi pour chapitre ${image.chapitre_id}`);
+            console.log(`[processChangedImagesChapitres]   - Nouvelle URL: ${result.url}`);
+            console.log(`[processChangedImagesChapitres]   - Titre SEO IA: "${result.seoTitle}"`);
 
-            // 2️⃣ Mise à jour de l'URL dans la base de données
-            const updateResult = await this.supabaseService.updateImageChapitreUrl(image.id, newUrl);
+            // 2️⃣ Mise à jour de l'URL et du titre SEO dans la base de données
+            const updateResult = await this.supabaseService.updateImageChapitreUrl(
+              image.id, 
+              result.url, 
+              result.seoTitle
+            );
             
             if (!updateResult) {
               throw new Error(`Échec de la mise à jour en base de données pour l'image ID ${image.id}`);
             }
             
             console.log(`[processChangedImagesChapitres] ✓ Image chapitre ${image.chapitre_id} traitée avec succès (tentative ${attempt})`);
-            return { success: true, imageId: image.id, chapitreId: image.chapitre_id, newUrl };
+            return { success: true, imageId: image.id, chapitreId: image.chapitre_id, newUrl: result.url, seoTitle: result.seoTitle };
             
           } catch (error) {
             lastError = error as Error;

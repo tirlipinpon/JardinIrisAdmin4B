@@ -1,9 +1,11 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { createClient, PostgrestError, SupabaseClient } from "@supabase/supabase-js";
 import { environment } from "../../../../../../environment";
 import { Post } from "../../types/post";
 import { Observable, of } from "rxjs";
 import { processImageChapitre } from "../../utils/processImageChapitre";
+import { OpenaiApiService } from "../../features/searchBar/services/openai-api/openai-api.service";
+import { textToSlug } from "../../utils/textToSlug";
 
 export interface AuthResponse {
   data: {
@@ -19,6 +21,7 @@ export interface AuthResponse {
 })
 export class SupabaseService {
   private supabase: SupabaseClient
+  private openaiService = inject(OpenaiApiService);
 
   constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey)
@@ -498,13 +501,101 @@ export class SupabaseService {
   }
 
   /**
+   * Upload l'image principale d'un post avec analyse IA pour générer un nom de fichier SEO
+   * @param postId - ID du post
+   * @param imageUrl - URL de l'image à uploader
+   * @returns L'URL publique de l'image uploadée ou null en cas d'erreur
+   */
+  async uploadMainImageWithAI(postId: number, imageUrl: string): Promise<string | null> {
+    console.log(`[uploadMainImageWithAI] Début du traitement pour postId: ${postId}`);
+    console.log(`[uploadMainImageWithAI] URL source: ${imageUrl}`);
+    
+    try {
+      // 1️⃣ Télécharger l'image via proxy
+      const proxyFunctionUrl = `https://zmgfaiprgbawcernymqa.supabase.co/functions/v1/fetch-image?imageUrl=${encodeURIComponent(imageUrl)}`;
+      
+      const response = await fetch(proxyFunctionUrl, {
+        headers: {
+          Authorization: `Bearer ${environment.supabaseAnonKey}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur lors du téléchargement proxy de l'image : ${response.statusText}`);
+      }
+
+      const blob = await response.blob();
+      console.log(`[uploadMainImageWithAI] ✓ Image téléchargée - Taille: ${(blob.size / 1024).toFixed(2)} Ko, Type: ${blob.type}`);
+
+      // 2️⃣ Analyser l'image avec l'IA pour générer un titre SEO
+      let fileName: string;
+      
+      try {
+        console.log(`[uploadMainImageWithAI] 🤖 Analyse de l'image par IA pour générer un titre SEO...`);
+        const aiDescription = await this.openaiService.describeImage(imageUrl);
+        
+        if (aiDescription) {
+          const slug = textToSlug(aiDescription);
+          fileName = `${slug}.png`;
+          console.log(`[uploadMainImageWithAI] ✓ Titre SEO généré par IA: "${aiDescription}"`);
+          console.log(`[uploadMainImageWithAI] ✓ Nom de fichier SEO: ${fileName}`);
+        } else {
+          throw new Error('IA a retourné null');
+        }
+      } catch (aiError) {
+        // Si l'IA échoue, utiliser le format avec postId (fallback)
+        console.warn(`[uploadMainImageWithAI] ⚠ Échec de l'analyse IA, utilisation du format standard:`, aiError);
+        fileName = `${postId}.png`;
+      }
+
+      // 3️⃣ Uploader le fichier dans Supabase Storage
+      console.log(`[uploadMainImageWithAI] Début de l'upload vers Supabase Storage...`);
+      const { data, error } = await this.supabase.storage
+        .from(environment.supabaseBucket)
+        .upload(fileName, blob, {
+          contentType: blob.type,
+          upsert: true,
+          headers: {
+            Authorization: `Bearer ${environment.supabaseAnonKey}`
+          }
+        });
+
+      if (error) {
+        throw new Error(`Erreur d'upload : ${error.message}`);
+      }
+
+      console.log(`[uploadMainImageWithAI] ✓ Upload réussi vers Supabase Storage`);
+
+      // 4️⃣ Récupérer l'URL publique
+      const { data: publicUrlData } = this.supabase.storage
+        .from(environment.supabaseBucket)
+        .getPublicUrl(fileName);
+
+      const publicUrl = publicUrlData?.publicUrl || '';
+      console.log(`[uploadMainImageWithAI] ✓ Image principale uploadée avec succès: ${publicUrl}`);
+      console.log(`[uploadMainImageWithAI] Résumé: download → IA SEO → upload → ${publicUrl}`);
+      
+      return publicUrl;
+    } catch (error) {
+      console.error(`[uploadMainImageWithAI] ❌ Erreur complète:`, {
+        postId,
+        imageUrl,
+        error: error,
+        errorMessage: error instanceof Error ? error.message : 'Erreur inconnue',
+        errorStack: error instanceof Error ? error.stack : undefined
+      });
+      return null;
+    }
+  }
+
+  /**
    * Upload une image de chapitre depuis une URL externe vers le bucket Supabase
    * @param postId - ID du post
    * @param chapitreId - ID du chapitre
    * @param externalImageUrl - URL externe de l'image
-   * @returns L'URL publique de l'image uploadée ou null en cas d'erreur
+   * @returns Objet contenant l'URL publique et le titre SEO généré par l'IA, ou null en cas d'erreur
    */
-  async uploadImageChapitreFromUrl(postId: number, chapitreId: number, externalImageUrl: string): Promise<string | null> {
+  async uploadImageChapitreFromUrl(postId: number, chapitreId: number, externalImageUrl: string): Promise<{ url: string, seoTitle: string } | null> {
     console.log(`[uploadImageChapitreFromUrl] Début du traitement pour postId: ${postId}, chapitreId: ${chapitreId}`);
     console.log(`[uploadImageChapitreFromUrl] URL source: ${externalImageUrl}`);
     
@@ -561,10 +652,35 @@ export class SupabaseService {
       const processedBlob = await processImageChapitre(blob, 700, 250, 60);
       console.log(`[uploadImageChapitreFromUrl] ✓ Image traitée - Taille finale: ${(processedBlob.size / 1024).toFixed(2)} Ko`);
 
-      // 3️⃣ Générer le nom du fichier selon le format demandé (en .webp)
-      const timestamp = Date.now();
-      const fileName = `${postId}_chapitre_${chapitreId}_U_${timestamp}.webp`;
-      const filePath = `${postId}/${fileName}`;
+      // 3️⃣ Analyser l'image avec l'IA pour générer un titre SEO
+      let seoTitle: string | null = null;
+      let fileName: string;
+      let filePath: string;
+      
+      try {
+        console.log(`[uploadImageChapitreFromUrl] 🤖 Analyse de l'image par IA pour générer un titre SEO...`);
+        // Utiliser l'URL externe pour l'analyse (plus fiable que le blob)
+        const aiDescription = await this.openaiService.describeImage(externalImageUrl);
+        
+        if (aiDescription) {
+          seoTitle = aiDescription;
+          const slug = textToSlug(aiDescription);
+          fileName = `${slug}.webp`;
+          filePath = `${postId}/${fileName}`;
+          console.log(`[uploadImageChapitreFromUrl] ✓ Titre SEO généré par IA: "${seoTitle}"`);
+          console.log(`[uploadImageChapitreFromUrl] ✓ Nom de fichier SEO: ${fileName}`);
+        } else {
+          throw new Error('IA a retourné null');
+        }
+      } catch (aiError) {
+        // Si l'IA échoue, utiliser le format avec timestamp (fallback)
+        console.warn(`[uploadImageChapitreFromUrl] ⚠ Échec de l'analyse IA, utilisation du format timestamp:`, aiError);
+        const timestamp = Date.now();
+        fileName = `${postId}_chapitre_${chapitreId}_U_${timestamp}.webp`;
+        filePath = `${postId}/${fileName}`;
+        seoTitle = `chapitre-${chapitreId}`; // Titre par défaut
+      }
+
       console.log(`[uploadImageChapitreFromUrl] Nom du fichier: ${fileName}, Chemin: ${filePath}`);
 
       // 4️⃣ Uploader le fichier traité dans Supabase Storage dans le bucket jardin-iris-images-post
@@ -590,11 +706,11 @@ export class SupabaseService {
         .from('jardin-iris-images-post')
         .getPublicUrl(filePath);
 
-      const publicUrl = publicUrlData?.publicUrl || null;
+      const publicUrl = publicUrlData?.publicUrl || '';
       console.log(`[uploadImageChapitreFromUrl] ✓ Image de chapitre uploadée avec succès: ${publicUrl}`);
-      console.log(`[uploadImageChapitreFromUrl] Résumé: ${downloadMethod} → traitement → upload → ${publicUrl}`);
+      console.log(`[uploadImageChapitreFromUrl] Résumé: ${downloadMethod} → traitement → IA SEO → upload → ${publicUrl}`);
       
-      return publicUrl;
+      return { url: publicUrl, seoTitle: seoTitle || `chapitre-${chapitreId}` };
     } catch (error) {
       console.error(`[uploadImageChapitreFromUrl] ❌ Erreur complète:`, {
         postId,
@@ -612,13 +728,22 @@ export class SupabaseService {
    * Met à jour l'URL d'une image de chapitre dans la base de données
    * @param imageId - ID de l'image dans la table urlImagesChapitres
    * @param newUrl - Nouvelle URL de l'image
+   * @param seoTitle - Titre SEO optionnel généré par l'IA à sauvegarder dans chapitre_key_word
    * @returns Les données mises à jour ou null en cas d'erreur
    */
-  async updateImageChapitreUrl(imageId: number, newUrl: string): Promise<any> {
+  async updateImageChapitreUrl(imageId: number, newUrl: string, seoTitle?: string): Promise<any> {
     try {
+      const updateData: any = { url_Image: newUrl };
+      
+      // Si un titre SEO est fourni, l'ajouter à la mise à jour
+      if (seoTitle) {
+        updateData.chapitre_key_word = seoTitle;
+        console.log(`[updateImageChapitreUrl] Mise à jour avec titre SEO: "${seoTitle}"`);
+      }
+      
       const { data, error } = await this.supabase
         .from('urlImagesChapitres')
-        .update({ url_Image: newUrl })
+        .update(updateData)
         .eq('id', imageId)
         .select();
 
@@ -626,10 +751,10 @@ export class SupabaseService {
         throw error;
       }
       
-      console.log('URL de l\'image mise à jour avec succès:', data);
+      console.log('[updateImageChapitreUrl] ✓ URL et titre SEO mis à jour avec succès:', data);
       return data && data.length > 0 ? data[0] : null;
     } catch (error) {
-      console.error('Erreur updateImageChapitreUrl:', error);
+      console.error('[updateImageChapitreUrl] ❌ Erreur:', error);
       throw error;
     }
   }

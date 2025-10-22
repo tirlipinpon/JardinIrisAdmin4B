@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {environment} from "../../../../../../../../environment";
+import { environment } from "../../../../../../../../environment";
 import OpenAI from "openai";
 
 @Injectable({
@@ -101,7 +101,43 @@ export class OpenaiApiService {
     console.log(image.data);
   }
 
+  /**
+   * Décrit une image en utilisant OpenAI Vision API
+   * @param imageUrl URL de l'image à analyser
+   * @returns Description courte de l'image (max 50 chars pour SEO)
+   */
+  async describeImage(imageUrl: string): Promise<string | null> {
+    try {
+      const completion = await this.openai.chat.completions.create({
+        model: "gpt-4.1-mini",
+        messages: [
+          {
+            role: "system",
+            content: "Tu es un expert en description d'images pour le référencement SEO. Génère une description courte (maximum 8 mots) qui décrit précisément le contenu de l'image pour un nom de fichier SEO. Utilise uniquement des mots simples en français, sans articles."
+          },
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: "Décris cette image en maximum 8 mots pour créer un nom de fichier SEO optimisé pour un blog de jardinage."
+              },
+              {
+                type: "image_url",
+                image_url: { url: imageUrl }
+              }
+            ]
+          }
+        ],
+        max_tokens: 50
+      });
 
+      return completion.choices[0]?.message?.content || null;
+    } catch (error) {
+      console.error('❌ Erreur OpenAI Vision:', error);
+      return null;
+    }
+  }
 
 
 }
