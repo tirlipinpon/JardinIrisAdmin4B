@@ -28,6 +28,8 @@ import {
   DialogEditImageChapitreArticleComponent
 } from "./services/dialog-edit-image-chapitre-article/dialog-edit-image-chapitre-article.component";
 import { SearchInfrastructure } from "../../shared/search-infrastructure/search.infrastructure";
+import { PostImageInjectorService } from "./services/post-image-injector/post-image-injector.service";
+import { PostValidationService } from "./services/post-validation/post-validation.service";
 
 @Component({
   selector: 'app-all',
@@ -39,6 +41,8 @@ import { SearchInfrastructure } from "../../shared/search-infrastructure/search.
 export class AllComponent implements OnInit, AfterViewChecked, OnDestroy, AfterViewInit {
   private readonly store = inject(PostStore);
   private readonly searchInfra = inject(SearchInfrastructure);
+  private readonly postImageInjector = inject(PostImageInjectorService);
+  private readonly postValidation = inject(PostValidationService);
   post: Post[] | null = null;
   private readonly formBuilder = inject(FormBuilder);
   isLoading = this.store.loading;
@@ -259,50 +263,22 @@ export class AllComponent implements OnInit, AfterViewChecked, OnDestroy, AfterV
     this.openDialogDeletePost(post)
   }
 
-  validPostById(id: any) {
-    // Récupérer le post avec ses images_chapitres
-    const currentPost = this.store.post()?.find(p => p.id === id);
-    
-    if (!currentPost) {
-      console.error(`Post avec l'id ${id} introuvable`);
+  validPostById(id: number | undefined): void {
+    if (!id) {
+      console.error('ID du post manquant');
       return;
     }
-
-    // Vérifier si des images_chapitres ont été modifiées
-    const imagesChapitres = currentPost.images_chapitres || [];
-    const hasChangedImagesChapitres = imagesChapitres.some(img => img.changed === true);
-
-    // Vérifier si l'image principale doit être traitée
-    // (Si c'est une URL externe et pas déjà uploadée dans Supabase Storage)
-    const imageUrl = currentPost.image_url || '';
-    const isExternalImage = !!(imageUrl && 
-                           !imageUrl.includes('zmgfaiprgbawcernymqa.supabase.co') &&
-                           (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')));
-
-    if (hasChangedImagesChapitres || isExternalImage) {
-      console.log(`[validPostById] Post ${id} nécessite un traitement d'images:`);
-      console.log(`  - Images chapitres changées: ${hasChangedImagesChapitres}`);
-      console.log(`  - Image principale à traiter: ${isExternalImage}`);
-      
-      // Traiter les images avant de valider le post
-      this.searchInfra.processPostImages(id, imagesChapitres, imageUrl, isExternalImage).subscribe({
-        next: (success) => {
-          if (success) {
-            console.log('[validPostById] ✓ Toutes les images traitées avec succès, validation du post...');
-            // Une fois toutes les images uploadées et mises à jour, valider le post
-            this.store.validPost(id);
-          }
-        },
-        error: (error) => {
-          console.error('[validPostById] ❌ Erreur lors du traitement des images:', error);
-          alert('Erreur lors du traitement des images. Veuillez réessayer.');
+    this.postValidation.validatePost(id).subscribe({
+      next: (success) => {
+        if (success) {
+          console.log(`[validPostById] ✓ Post ${id} validé avec succès`);
         }
-      });
-    } else {
-      // Aucune image à traiter, validation directe
-      console.log('[validPostById] Aucune image à traiter, validation directe du post');
-      this.store.validPost(id);
-    }
+      },
+      error: (error) => {
+        console.error(`[validPostById] ❌ Erreur lors de la validation du post ${id}:`, error);
+        alert('Erreur lors de la validation du post. Veuillez réessayer.');
+      }
+    });
   }
 
   getValidCommentsCount(comments: any) {

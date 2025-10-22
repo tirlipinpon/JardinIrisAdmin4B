@@ -270,7 +270,7 @@ export class SupabaseService {
     }
   }
 
-  async updatePostByPostForm(dataPost: Post) {
+  async updatePostByPostForm(dataPost: Post | any) {
     try {
       const {data, error} = await this.supabase
         .from('post')
