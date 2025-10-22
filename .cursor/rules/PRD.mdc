@@ -1,0 +1,80 @@
+---
+alwaysApply: true
+---
+
+## 🧩 Objectif du produit
+
+Cette application Angular (v20, standalone components) permet de **générer automatiquement du contenu pour des articles de blog** via IA.  
+L’utilisateur peut saisir une idée ou en récupérer une depuis Supabase, générer un article complet, enrichir le contenu, puis tout sauvegarder dans Supabase.
+
+## 👤 Utilisateur cible
+
+Usage personnel et professionnel par un développeur unique, pour alimenter un site web vitrine avec du contenu optimisé SEO.
+
+## ⚙️ Fonctionnalités principales
+
+1. **Authentification** via Supabase (auth, base, stockage images).
+2. Page `create` avec formulaire d’idée d’article (optionnel).
+   - Si vide, récupérer une idée depuis Supabase.
+3. **Génération automatique** par IA (OpenAI, Perplexity, DeepSeek) :
+   - Insertion initiale dans la table `post` pour obtenir l’ID.
+   - Article complet avec titre, intro, FAQ, QCM.
+   - Image générée (OpenAI DALL·E).
+   - Recherche vidéo YouTube via API v3.
+   - Récupération des 10 derniers titres dans Supabase.
+   - Ajout de la météo du jour.
+   - Génération du nom de fichier HTML optimisé SEO.
+4. **Workflow d’amélioration** :
+   - Upgrade/réécriture de l’article.
+   - Ajout d’images issues d’API externes via mots-clés.
+5. **Workflow final** :
+   - Ajout de liens internes/externes (noms scientifiques végétaux via iNaturalist).
+   - Design HTML finalisé.
+   - Sauvegarde complète dans la table `post`.
+
+## 🧱 Contraintes techniques
+
+- Frontend : Angular 20, composants standalone
+- Backend : Supabase (auth, base, stockage images)
+- IA : APIs OpenAI, Perplexity, DeepSeek
+- Images : génération via OpenAI DALL·E
+- Vidéos : YouTube API v3
+- Hébergement : One.com
+- HTML généré côté frontend
+
+## 🔗 Endpoints et APIs
+
+- CRUD complet sur `post`, `faq`, `urlImagesChapitres` via Supabase
+- YouTube API v3 (`search`, `videos`)
+- Pexels API (recherche images)
+- OpenAI API (`dall-e-3` pour images, GPT pour texte)
+- Perplexity API (génération article)
+- iNaturalist API (noms scientifiques végétaux)
+
+## 🏗 Architecture Angular
+
+### Feature `create` (standalone components)
+
+- `components/` : `CreatePostComponent`, `ArticleEditorComponent`, `FaqComponent`, `QcmComponent`
+- `services/` : `PostService`, `ImageService`, `VideoService`, `ArticleGenerationService`, `PlantService`
+- `store/` : actions, reducers, selectors (RxJS)
+
+### Feature `auth` (standalone)
+
+- `LoginComponent`
+- `AuthService`
+
+## 🔄 Architecture logicielle - Flux de données
+
+1. **Composant UI** émet une action vers le
+2. **Composant Application** qui prépare la donnée et la transmet au
+3. **Store** (RxJS) qui orchestre la logique et appelle la
+4. **Infrastructure** pour gérer les règles métier et les appels vers
+5. **ApiServices** spécialisés (OpenAI, YouTube, Supabase, etc.).  
+   Les réponses remontent dans cet ordre jusqu’au store pour mise à jour, puis notifie les composants.
+
+---
+
+_Fin du document._
+
+---
