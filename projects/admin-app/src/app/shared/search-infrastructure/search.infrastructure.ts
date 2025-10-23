@@ -1,7 +1,7 @@
 import { inject, Injectable } from "@angular/core";
 import {
-  from,
-  Observable, of, switchMap, toArray
+    from,
+    Observable, of, switchMap, toArray
 } from "rxjs";
 import { TheNewsApiService } from "../../features/searchBar/services/the-news-api.service";
 import { OpenaiApiService } from "../../features/searchBar/services/openai-api/openai-api.service";
@@ -15,7 +15,7 @@ import { AddImagesToChaptersService } from "../../features/searchBar/services/ad
 import { FormatInStructureService } from "../../features/searchBar/services/format-in-structure/format-in-structure.service";
 import { GoogleSearchService } from "../../features/all/services/google-search/google-search.service";
 import {
-  AddScientificNameService
+    AddScientificNameService
 } from "../../features/searchBar/services/add-scientific-name/add-scientific-name.service";
 import { GeminiApiService } from "../../features/searchBar/services/gemini-api/gemini-api.service";
 
@@ -486,53 +486,145 @@ export class SearchInfrastructure {
     mainImageUrl: string, 
     shouldProcessMainImage: boolean
   ): Observable<boolean> {
+    console.log(`[SearchInfrastructure] 🚀 Début du traitement des images pour le post ${postId}`);
+    console.log(`[SearchInfrastructure] 📊 Configuration du traitement:`, {
+      postId,
+      mainImageUrl,
+      shouldProcessMainImage,
+      imagesChapitresCount: imagesChapitres?.length || 0,
+      changedImagesCount: imagesChapitres?.filter(img => img.changed === true).length || 0,
+      imagesChapitres: imagesChapitres?.map(img => ({
+        id: img.id,
+        chapitre_id: img.chapitre_id,
+        url: img.url_Image,
+        changed: img.changed,
+        key_word: img.chapitre_key_word
+      }))
+    });
+
     if (this.isLocalhost()) {
+      console.log(`[SearchInfrastructure] 🏠 Mode localhost détecté, simulation du traitement`);
       return of(true);
     }
 
     return new Observable<boolean>((observer) => {
       const processImages = async () => {
+        const startTime = Date.now();
+        let mainImageSuccess = false;
+        let chaptersImagesSuccess = false;
+        const errors: Array<{type: string, error: any}> = [];
+
         try {
           // 1️⃣ Traiter l'image principale si nécessaire
           if (shouldProcessMainImage && mainImageUrl) {
-            console.log(`[processPostImages] 📸 Traitement de l'image principale pour le post ${postId}...`);
-            console.log(`[processPostImages] URL source: ${mainImageUrl}`);
+            console.log(`[SearchInfrastructure] 📸 Traitement de l'image principale pour le post ${postId}...`);
+            console.log(`[SearchInfrastructure] URL source: ${mainImageUrl}`);
             
-            const newMainImageUrl = await this.supabaseService.uploadMainImageWithAI(postId, mainImageUrl);
-            
-            if (newMainImageUrl) {
-              console.log(`[processPostImages] ✓ Image principale uploadée: ${newMainImageUrl}`);
-              // Mettre à jour l'image_url du post dans la DB
-              await this.supabaseService.updateImageUrlPostByIdForm(postId, newMainImageUrl);
-              console.log(`[processPostImages] ✓ Image principale mise à jour dans la DB`);
-            } else {
-              console.warn(`[processPostImages] ⚠ Échec de l'upload de l'image principale, continuation...`);
+            try {
+              const newMainImageUrl = await this.supabaseService.uploadMainImageWithAI(postId, mainImageUrl);
+              
+              if (newMainImageUrl) {
+                console.log(`[SearchInfrastructure] ✅ Image principale uploadée avec succès:`, {
+                  originalUrl: mainImageUrl,
+                  newUrl: newMainImageUrl,
+                  isSupabaseUrl: newMainImageUrl.includes('zmgfaiprgbawcernymqa.supabase.co'),
+                  isWebpFormat: newMainImageUrl.toLowerCase().includes('.webp')
+                });
+                
+                // Mettre à jour l'image_url du post dans la DB
+                await this.supabaseService.updateImageUrlPostByIdForm(postId, newMainImageUrl);
+                console.log(`[SearchInfrastructure] ✅ Image principale mise à jour dans la DB`);
+                mainImageSuccess = true;
+              } else {
+                console.warn(`[SearchInfrastructure] ⚠️ Échec de l'upload de l'image principale, continuation...`);
+                errors.push({type: 'main_image_upload', error: 'Résultat null'});
+              }
+            } catch (mainImageError) {
+              console.error(`[SearchInfrastructure] ❌ Erreur lors de l'upload de l'image principale:`, mainImageError);
+              errors.push({type: 'main_image_upload', error: mainImageError});
             }
+          } else {
+            console.log(`[SearchInfrastructure] ⏭️ Image principale non traitée:`, {
+              shouldProcessMainImage,
+              hasMainImageUrl: !!mainImageUrl
+            });
+            mainImageSuccess = true; // Pas d'erreur si pas de traitement nécessaire
           }
 
           // 2️⃣ Traiter les images de chapitres si nécessaire
           const changedImages = imagesChapitres.filter(img => img.changed === true);
           
           if (changedImages.length > 0) {
-            console.log(`[processPostImages] 📚 Traitement de ${changedImages.length} image(s) de chapitres...`);
+            console.log(`[SearchInfrastructure] 📚 Traitement de ${changedImages.length} image(s) de chapitres...`);
+            console.log(`[SearchInfrastructure] Images à traiter:`, changedImages.map(img => ({
+              id: img.id,
+              chapitre_id: img.chapitre_id,
+              url: img.url_Image,
+              key_word: img.chapitre_key_word
+            })));
             
-            // Utiliser la méthode existante via un Observable
-            await new Promise<boolean>((resolve, reject) => {
-              this.processChangedImagesChapitres(postId, imagesChapitres).subscribe({
-                next: (success) => resolve(success),
-                error: (error) => reject(error)
+            try {
+              // Utiliser la méthode existante via un Observable
+              await new Promise<boolean>((resolve, reject) => {
+                this.processChangedImagesChapitres(postId, imagesChapitres).subscribe({
+                  next: (success) => {
+                    console.log(`[SearchInfrastructure] ✅ Images de chapitres traitées avec succès:`, { success });
+                    chaptersImagesSuccess = success;
+                    resolve(success);
+                  },
+                  error: (error) => {
+                    console.error(`[SearchInfrastructure] ❌ Erreur lors du traitement des images de chapitres:`, error);
+                    errors.push({type: 'chapters_images', error});
+                    chaptersImagesSuccess = false;
+                    reject(error);
+                  }
+                });
               });
-            });
-            
-            console.log(`[processPostImages] ✓ Images de chapitres traitées`);
+            } catch (chaptersError) {
+              console.error(`[SearchInfrastructure] ❌ Erreur lors du traitement des images de chapitres:`, chaptersError);
+              errors.push({type: 'chapters_images', error: chaptersError});
+              chaptersImagesSuccess = false;
+            }
+          } else {
+            console.log(`[SearchInfrastructure] ⏭️ Aucune image de chapitre à traiter`);
+            chaptersImagesSuccess = true; // Pas d'erreur si pas de traitement nécessaire
           }
 
-          console.log(`[processPostImages] ✓ Traitement complet terminé pour le post ${postId}`);
-          observer.next(true);
-          observer.complete();
+          const processingTime = Date.now() - startTime;
+          const overallSuccess = mainImageSuccess && chaptersImagesSuccess;
+
+          console.log(`[SearchInfrastructure] 📈 Résumé du traitement pour le post ${postId}:`, {
+            processingTimeMs: processingTime,
+            mainImageSuccess,
+            chaptersImagesSuccess,
+            overallSuccess,
+            errorsCount: errors.length,
+            errors: errors.map(e => ({ type: e.type, message: e.error?.message || e.error }))
+          });
+
+          if (overallSuccess) {
+            console.log(`[SearchInfrastructure] ✅ Traitement complet terminé avec succès pour le post ${postId}`);
+            observer.next(true);
+            observer.complete();
+          } else {
+            console.error(`[SearchInfrastructure] ❌ Échec partiel du traitement pour le post ${postId}:`, {
+              mainImageSuccess,
+              chaptersImagesSuccess,
+              errors
+            });
+            // Même en cas d'échec partiel, on continue pour ne pas bloquer le processus
+            observer.next(true);
+            observer.complete();
+          }
           
         } catch (error) {
-          console.error(`[processPostImages] ❌ Erreur lors du traitement des images:`, error);
+          const processingTime = Date.now() - startTime;
+          console.error(`[SearchInfrastructure] ❌ Erreur critique lors du traitement des images pour le post ${postId}:`, {
+            error,
+            processingTimeMs: processingTime,
+            mainImageSuccess,
+            chaptersImagesSuccess
+          });
           observer.error(error);
         }
       };
@@ -606,6 +698,19 @@ export class SearchInfrastructure {
             }
             
             console.log(`[processChangedImagesChapitres] ✓ Image chapitre ${image.chapitre_id} traitée avec succès (tentative ${attempt})`);
+            
+            // 3️⃣ Mettre à jour l'image dans le tableau imagesChapitres avec la nouvelle URL
+            const imageIndex = imagesChapitres.findIndex(img => img.id === image.id);
+            if (imageIndex !== -1) {
+              imagesChapitres[imageIndex] = {
+                ...imagesChapitres[imageIndex],
+                url_Image: result.url,
+                chapitre_key_word: result.seoTitle || imagesChapitres[imageIndex].chapitre_key_word,
+                changed: false // Marquer comme traité
+              };
+              console.log(`[processChangedImagesChapitres] ✓ Image mise à jour dans le tableau local avec la nouvelle URL: ${result.url}`);
+            }
+            
             return { success: true, imageId: image.id, chapitreId: image.chapitre_id, newUrl: result.url, seoTitle: result.seoTitle };
             
           } catch (error) {
