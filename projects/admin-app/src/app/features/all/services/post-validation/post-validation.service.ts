@@ -53,8 +53,18 @@ export class PostValidationService {
 
   private isExternalImage(imageUrl?: string): boolean {
     if (!imageUrl) return false;
-    return !imageUrl.includes('zmgfaiprgbawcernymqa.supabase.co') &&
-           (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'));
+    
+    console.log(`[PostValidationService.isExternalImage] Vérification URL: ${imageUrl}`);
+    
+    // Vérifier si l'image est externe (pas Supabase) ou non optimisée
+    const isExternal = !imageUrl.includes('zmgfaiprgbawcernymqa.supabase.co') &&
+                      (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'));
+    const isNotOptimized = !imageUrl.includes('.webp') || !imageUrl.includes('/jardin-iris-images-post/');
+    
+    const result = isExternal || isNotOptimized;
+    console.log(`[PostValidationService.isExternalImage] Résultat: ${result} (isExternal: ${isExternal}, isNotOptimized: ${isNotOptimized})`);
+    
+    return result;
   }
 
   private processImagesAndValidate(post: Post): Observable<boolean> {
@@ -62,29 +72,39 @@ export class PostValidationService {
     const imageUrl = post.image_url || '';
     const isExternalImage = this.isExternalImage(imageUrl);
 
+    console.log(`[PostValidationService.processImagesAndValidate] Post ${post.id}:`);
+    console.log(`  - Image principale: ${imageUrl}`);
+    console.log(`  - Image principale externe: ${isExternalImage}`);
+    console.log(`  - Images chapitres: ${imagesChapitres.length}`);
+    console.log(`  - Images changées: ${imagesChapitres.filter(img => img.changed).length}`);
+
     return this.searchInfra.processPostImages(post.id!, imagesChapitres, imageUrl, isExternalImage).pipe(
       switchMap(success => {
+        console.log(`[PostValidationService.processImagesAndValidate] Traitement des images: ${success}`);
+        
         if (!success) {
           return throwError(() => new Error('Échec du traitement des images'));
         }
         
-        // Mettre à jour le post avec les images chapitres mises à jour
-        const updatedPost = { ...post, images_chapitres: imagesChapitres };
-        
-        // Mettre à jour le store AVANT l'injection des images
-        this.updateStoreWithPost(updatedPost);
-        console.log('[PostValidationService] ✓ Store mis à jour avec les nouvelles URLs d\'images');
-        
-        // Vérifier que les URLs ont bien été mises à jour
-        const hasUpdatedUrls = updatedPost.images_chapitres?.some(img => 
-          img.changed === false && img.url_Image?.includes('zmgfaiprgbawcernymqa.supabase.co')
-        );
-        
-        if (hasUpdatedUrls) {
-          console.log('[PostValidationService] ✓ URLs d\'images mises à jour détectées, injection dans l\'article...');
+        // Utiliser directement le post du store qui a été mis à jour en temps réel
+        console.log(`[PostValidationService.processImagesAndValidate] Utilisation du post mis à jour depuis le store...`);
+        const updatedPostFromStore = this.getPostById(post.id!);
+        if (!updatedPostFromStore) {
+          return throwError(() => new Error(`Post ${post.id} introuvable dans le store`));
         }
         
-        return this.injectImagesAndValidate(updatedPost);
+        console.log(`[PostValidationService.processImagesAndValidate] Post récupéré du store:`, {
+          id: updatedPostFromStore.id,
+          imagesChapitresCount: updatedPostFromStore.images_chapitres?.length || 0,
+          imagesChapitres: updatedPostFromStore.images_chapitres?.map(img => ({
+            id: img.id,
+            chapitre_id: img.chapitre_id,
+            url_Image: img.url_Image,
+            changed: img.changed
+          }))
+        });
+        
+        return this.injectImagesAndValidate(updatedPostFromStore);
       }),
       catchError(error => {
         console.error('[PostValidationService] Erreur lors du traitement des images:', error);
@@ -94,21 +114,9 @@ export class PostValidationService {
   }
 
   private injectImagesAndValidate(post: Post): Observable<boolean> {
-    console.log(`[PostValidationService] 🖼️ Début de l'injection d'images pour le post ${post.id}`);
-    console.log(`[PostValidationService] 📊 Données du post:`, {
-      postId: post.id,
-      articleLength: post.article?.length || 0,
-      imagesChapitresCount: post.images_chapitres?.length || 0,
-      imagesChapitres: post.images_chapitres?.map(img => ({
-        id: img.id,
-        chapitre_id: img.chapitre_id,
-        url: img.url_Image,
-        changed: img.changed,
-        key_word: img.chapitre_key_word
-      }))
-    });
-
-    const updatedArticle = this.imageInjector.injectImagesIntoPost(
+    console.log(`[PostValidationService.injectImagesAndValidate] Début injection pour post ${post.id}`);
+    
+    const updatedArticle = this.imageInjector.injectImagesIntoPostForValidation(
       post.id!, 
       post.article || '', 
       post.images_chapitres || []
@@ -118,62 +126,32 @@ export class PostValidationService {
     const imagesInjectedCount = this.imageInjector.countInjectedImages(updatedArticle);
     const originalImagesCount = this.imageInjector.countInjectedImages(post.article || '');
 
-    console.log(`[PostValidationService] 📈 Résultat de l'injection:`, {
-      postId: post.id,
-      originalImagesCount,
-      newImagesCount: imagesInjectedCount,
-      imagesAdded: imagesInjectedCount - originalImagesCount,
-      contentChanged: updatedArticle !== post.article
-    });
+    console.log(`[PostValidationService.injectImagesAndValidate] Résultats injection:`);
+    console.log(`  - Images injectées: ${imagesInjectedCount}`);
+    console.log(`  - Images originales: ${originalImagesCount}`);
+    console.log(`  - Article modifié: ${updatedArticle !== post.article}`);
 
     if (updatedArticle === post.article) {
-      console.log(`[PostValidationService] ⏭️ Aucune modification nécessaire pour le post ${post.id}, validation directe`);
+      console.log(`[PostValidationService.injectImagesAndValidate] Aucune modification, validation directe`);
       this.store.validPost(post.id!);
       return of(true);
     }
 
-    // Effectuer un diagnostic détaillé
-    const diagnostic = this.imageDiagnostic.diagnosePostImages(
-      post.id!, 
-      updatedArticle, 
-      post.images_chapitres || []
-    );
-    
-    // Log du diagnostic
-    this.imageDiagnostic.logDiagnostic(diagnostic);
-
     // Vérifier que l'injection a bien fonctionné
     if (imagesInjectedCount === 0 && post.images_chapitres && post.images_chapitres.length > 0) {
-      console.error(`[PostValidationService] ❌ Échec de l'injection d'images pour le post ${post.id}:`, {
-        expectedImages: post.images_chapitres.length,
-        actualImages: imagesInjectedCount,
-        imagesChapitres: post.images_chapitres,
-        diagnostic: diagnostic.summary
-      });
-      
-      // Essayer une solution alternative : injection manuelle
+      console.error(`[PostValidationService] Échec injection images post ${post.id}: ${post.images_chapitres.length} attendues, ${imagesInjectedCount} injectées`);
       return this.tryAlternativeImageInjection(post);
     }
 
-    // Vérifier le taux d'injection
-    const injectionRate = diagnostic.summary.injectionRate;
-    if (injectionRate < 100) {
-      console.warn(`[PostValidationService] ⚠️ Injection partielle pour le post ${post.id}:`, {
-        injectionRate: `${injectionRate}%`,
-        missingImages: diagnostic.summary.missingImages,
-        recommendations: diagnostic.recommendations
-      });
-    }
-
-    console.log(`[PostValidationService] ✅ Injection réussie pour le post ${post.id} (${injectionRate}%), mise à jour en cours...`);
-    
     // Mettre à jour le post avec le nouvel article
     const updatedPost = { ...post, article: updatedArticle };
-    
+    console.log(`[PostValidationService.injectImagesAndValidate] Article mis à jour, sauvegarde en cours...`);
     return this.updatePostAndValidate(updatedPost);
   }
 
   private updatePostAndValidate(post: Post): Observable<boolean> {
+    console.log(`[PostValidationService.updatePostAndValidate] Début sauvegarde post ${post.id}`);
+    
     // Sauvegarder l'état précédent du store pour rollback en cas d'erreur
     const previousPosts = this.store.post();
     
@@ -183,8 +161,15 @@ export class PostValidationService {
     // 2. Convertir le Post en PostDatabase pour la sauvegarde
     const postDatabase = postToDatabase(post);
     
+    console.log(`[PostValidationService.updatePostAndValidate] Post converti pour sauvegarde:`, {
+      id: postDatabase.id,
+      article_length: postDatabase.article?.length || 0,
+      image_url: postDatabase.image_url
+    });
+    
     return this.searchInfra.setPost(postDatabase).pipe(
-      switchMap(() => {
+      switchMap((savedPost) => {
+        console.log(`[PostValidationService.updatePostAndValidate] Post sauvegardé avec succès:`, savedPost);
         // 3. Valider le post après sauvegarde réussie
         this.store.validPost(post.id!);
         return of(true);
@@ -204,7 +189,11 @@ export class PostValidationService {
   private updateStoreWithPost(updatedPost: Post): void {
     const currentPosts = this.store.post();
     if (currentPosts) {
-      const updatedPosts = currentPosts.map((p: Post) => p.id === updatedPost.id ? updatedPost : p);
+      // Filtrer les posts undefined/null et mapper les posts valides
+      const updatedPosts = currentPosts
+        .filter((p: Post) => p && p.id !== undefined)
+        .map((p: Post) => p.id === updatedPost.id ? updatedPost : p);
+      
       // Utiliser patchState pour mettre à jour le store
       patchState(this.store as any, { post: updatedPosts });
     }
@@ -216,10 +205,7 @@ export class PostValidationService {
    * @returns Observable avec le résultat
    */
   private tryAlternativeImageInjection(post: Post): Observable<boolean> {
-    console.log(`[PostValidationService] 🔄 Tentative d'injection alternative pour le post ${post.id}`);
-    
     if (!post.images_chapitres || post.images_chapitres.length === 0) {
-      console.log(`[PostValidationService] ⏭️ Aucune image à injecter en mode fallback pour le post ${post.id}`);
       this.store.validPost(post.id!);
       return of(true);
     }
@@ -232,11 +218,6 @@ export class PostValidationService {
       // Parcourir chaque image et essayer de l'injecter manuellement
       for (const image of post.images_chapitres) {
         if (!image.url_Image || !image.chapitre_id) {
-          console.warn(`[PostValidationService] ⚠️ Image invalide ignorée en mode fallback:`, {
-            imageId: image.id,
-            chapitreId: image.chapitre_id,
-            url: image.url_Image
-          });
           continue;
         }
 
@@ -270,53 +251,31 @@ export class PostValidationService {
               // Remplacer dans l'article
               updatedArticle = updatedArticle.replace(fullMatch, fullMatch.replace(content, newContent));
               successCount++;
-              
-              console.log(`[PostValidationService] ✅ Image injectée en mode fallback avant <article> pour le chapitre ${image.chapitre_id}:`, {
-                imageUrl: image.url_Image,
-                altText,
-                keyWord: image.chapitre_key_word,
-                articleIndex
-              });
             } else {
               // Fallback : injecter à la fin du contenu si pas d'<article>
               const newContent = content + imgTag;
               updatedArticle = updatedArticle.replace(fullMatch, fullMatch.replace(content, newContent));
               successCount++;
-              
-              console.log(`[PostValidationService] ✅ Image injectée en mode fallback à la fin du chapitre ${image.chapitre_id}:`, {
-                imageUrl: image.url_Image,
-                altText,
-                keyWord: image.chapitre_key_word
-              });
             }
           } else {
-            console.log(`[PostValidationService] ℹ️ Image déjà présente pour le chapitre ${image.chapitre_id}`);
             successCount++;
           }
-        } else {
-          console.warn(`[PostValidationService] ⚠️ Span non trouvé pour le chapitre ${image.chapitre_id} en mode fallback`);
         }
       }
-
-      console.log(`[PostValidationService] 📊 Résultat de l'injection fallback pour le post ${post.id}:`, {
-        totalImages: post.images_chapitres.length,
-        successCount,
-        successRate: `${Math.round((successCount / post.images_chapitres.length) * 100)}%`
-      });
 
       if (successCount > 0) {
         // Mettre à jour le post avec le nouvel article
         const updatedPost = { ...post, article: updatedArticle };
         return this.updatePostAndValidate(updatedPost);
       } else {
-        console.error(`[PostValidationService] ❌ Échec complet de l'injection fallback pour le post ${post.id}`);
+        console.error(`[PostValidationService] Échec injection fallback post ${post.id}: ${successCount}/${post.images_chapitres.length} images`);
         // Valider quand même le post sans les images
         this.store.validPost(post.id!);
         return of(true);
       }
 
     } catch (error) {
-      console.error(`[PostValidationService] ❌ Erreur lors de l'injection fallback pour le post ${post.id}:`, error);
+      console.error(`[PostValidationService] Erreur injection fallback post ${post.id}:`, error);
       // Valider quand même le post sans les images
       this.store.validPost(post.id!);
       return of(true);
@@ -335,12 +294,6 @@ export class PostValidationService {
 
     const imagesInArticle = this.imageInjector.countInjectedImages(post.article);
     const expectedImages = post.images_chapitres.length;
-
-    console.log(`[PostValidationService] 🔍 Vérification de l'injection pour le post ${post.id}:`, {
-      expectedImages,
-      actualImages: imagesInArticle,
-      match: imagesInArticle === expectedImages
-    });
 
     return imagesInArticle === expectedImages;
   }

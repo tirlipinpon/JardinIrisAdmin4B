@@ -9,7 +9,6 @@
  */
 export function extractSlugFromSupabaseUrl(url: string): string {
   if (!url || typeof url !== 'string') {
-    console.warn('[SupabaseImageUtils] URL invalide pour extraction du slug:', { url });
     return url;
   }
 
@@ -21,91 +20,67 @@ export function extractSlugFromSupabaseUrl(url: string): string {
     const fullFilename = match[1];
     // Extraire le nom sans extension
     const slug = removeFileExtension(fullFilename);
-    
-    console.log('[SupabaseImageUtils] Slug extrait:', {
-      originalUrl: url,
-      fullFilename,
-      slug
-    });
-    
     return slug;
   }
   
   // Si ce n'est pas une URL Supabase, retourner l'URL originale
-  console.log('[SupabaseImageUtils] URL non-Supabase, retour de l\'URL originale:', { url });
   return url;
 }
 
 /**
  * Génère l'alt text à partir d'une URL Supabase
  * @param url - URL complète Supabase
- * @param keyWord - Mot-clé optionnel
+ * @param keyWord - Mot-clé optionnel (priorité absolue)
  * @returns Alt text SEO-friendly
  */
 export function generateAltTextFromUrl(url: string, keyWord?: string): string {
-  if (keyWord && keyWord.trim()) {
-    // Utiliser le key_word comme base pour l'alt text
+  // Priorité 1: Utiliser le key_word s'il est fourni et valide
+  if (keyWord && keyWord.trim() && keyWord.trim() !== '') {
     const altText = textToSlug(keyWord);
-    console.log('[SupabaseImageUtils] Alt text généré à partir du key_word:', {
-      keyWord,
-      altText,
-      url
-    });
     return altText;
   }
   
-  // Extraire le slug de l'URL Supabase
-  const slug = extractSlugFromSupabaseUrl(url);
-  
-  // Si c'est une URL Supabase, utiliser le slug
-  if (slug !== url) {
-    console.log('[SupabaseImageUtils] Alt text généré à partir du slug Supabase:', {
-      url,
-      slug,
-      altText: slug
-    });
-    return slug;
+  // Priorité 2: Extraire le slug de l'URL Supabase
+  if (isSupabaseImageUrl(url)) {
+    const urlInfo = parseSupabaseUrl(url);
+    if (urlInfo.isValid && urlInfo.slug) {
+      return urlInfo.slug;
+    }
   }
   
-  // Fallback: utiliser le nom de fichier sans extension
+  // Priorité 3: Fallback - utiliser le nom de fichier sans extension
   const altText = removeFileExtension(url);
-  console.log('[SupabaseImageUtils] Alt text généré à partir de l\'URL (fallback):', {
-    url,
-    altText
-  });
-  
   return altText;
 }
 
 /**
- * Génère le src pour l'image avec l'URL complète du site
- * @param url - URL complète Supabase
- * @param postId - ID du post (optionnel, extrait de l'URL si non fourni)
- * @returns URL complète du site avec le slug
+ * Génère le src pour l'image en convertissant l'URL Supabase vers l'URL jardin-iris.be
+ * @param url - URL complète Supabase stockée en base de données
+ * @param postId - ID du post (optionnel, pour logging)
+ * @returns URL jardin-iris.be (format final attendu)
  */
 export function generateImageSrc(url: string, postId?: number): string {
-  const urlInfo = parseSupabaseUrl(url);
+  console.log(`[generateImageSrc] Transformation URL: ${url}`);
   
-  // Utiliser le postId fourni ou extraire de l'URL
-  const finalPostId = postId || (urlInfo.isValid ? urlInfo.postId : null);
-  
-  if (urlInfo.isValid && finalPostId) {
-    // Construire l'URL complète du site
-    const baseUrl = 'https://www.jardin-iris.be/image-blog';
-    const src = `${baseUrl}/${finalPostId}/${urlInfo.filename}`;
+  // Vérifier si c'est une URL Supabase valide
+  if (isSupabaseImageUrl(url)) {
+    console.log(`[generateImageSrc] URL Supabase détectée`);
+    const urlInfo = parseSupabaseUrl(url);
     
-    console.log('[SupabaseImageUtils] Src généré:', {
-      originalUrl: url,
-      postId: finalPostId,
-      filename: urlInfo.filename,
-      generatedSrc: src
-    });
-    
-    return src;
+    if (urlInfo.isValid && urlInfo.postId && urlInfo.filename) {
+      // Construire l'URL jardin-iris.be
+      const jardinIrisUrl = `https://www.jardin-iris.be/image-blog/${urlInfo.postId}/${urlInfo.filename}`;
+      console.log(`[generateImageSrc] URL transformée vers jardin-iris.be: ${jardinIrisUrl}`);
+      return jardinIrisUrl;
+    } else {
+      console.log(`[generateImageSrc] URL Supabase invalide ou incomplète`);
+    }
+  } else {
+    console.log(`[generateImageSrc] URL non-Supabase détectée`);
   }
   
   // Fallback pour les URLs non-Supabase
-  console.log('[SupabaseImageUtils] URL non-Supabase, retour de l\'URL originale:', { url });
+  console.log(`[generateImageSrc] Fallback - URL conservée: ${url}`);
   return url;
 }
 

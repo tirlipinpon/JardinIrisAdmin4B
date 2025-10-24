@@ -1,10 +1,12 @@
 {
   "name": "jardin-iris-admin4-b",
-  "version": "0.0.92",
+  "version": "0.0.124",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "node increment-version.js && ng build --configuration production --base-href /admin/",
+    "build:cache": "node build-with-cache.js",
+    "deploy": "npm run build:cache && node deploy-ftp.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:coverage": "ng test --code-coverage"

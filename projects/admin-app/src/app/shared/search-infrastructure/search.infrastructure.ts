@@ -1,7 +1,7 @@
-import { inject, Injectable } from "@angular/core";
+import { Injectable } from "@angular/core";
 import {
-    from,
-    Observable, of, switchMap, toArray
+  from,
+  Observable, of, switchMap, toArray
 } from "rxjs";
 import { TheNewsApiService } from "../../features/searchBar/services/the-news-api.service";
 import { OpenaiApiService } from "../../features/searchBar/services/openai-api/openai-api.service";
@@ -15,29 +15,12 @@ import { AddImagesToChaptersService } from "../../features/searchBar/services/ad
 import { FormatInStructureService } from "../../features/searchBar/services/format-in-structure/format-in-structure.service";
 import { GoogleSearchService } from "../../features/all/services/google-search/google-search.service";
 import {
-    AddScientificNameService
+  AddScientificNameService
 } from "../../features/searchBar/services/add-scientific-name/add-scientific-name.service";
 import { GeminiApiService } from "../../features/searchBar/services/gemini-api/gemini-api.service";
 
 @Injectable({
-  providedIn: 'root',
-  useFactory: () => {
-    const theNewsApiService = inject(TheNewsApiService);
-    const openaiApiService = inject(OpenaiApiService);
-    const perplexityApiService = inject(PerplexityApiService);
-    const getPromptsService = inject(GetPromptsService);
-    const supabaseService = inject(SupabaseService);
-    const addImagesToChaptersService = inject(AddImagesToChaptersService);
-    const formatInStructureService = inject(FormatInStructureService);
-    const googleSearchService = inject(GoogleSearchService);
-    const addScientificNameService = inject(AddScientificNameService);
-    const geminiApiService = inject(GeminiApiService);
-
-
-    return new SearchInfrastructure(theNewsApiService, openaiApiService, perplexityApiService,
-      getPromptsService, supabaseService, addImagesToChaptersService, formatInStructureService, googleSearchService,
-      addScientificNameService, geminiApiService);
-  }
+  providedIn: 'root'
 })
 export class SearchInfrastructure {
 
@@ -52,6 +35,7 @@ export class SearchInfrastructure {
     , private addScientificNameService: AddScientificNameService
     , private geminiApiService: GeminiApiService
   ) {}
+
 
   isLocalhost(): boolean {
     const hostname = window.location.hostname;
@@ -710,6 +694,8 @@ export class SearchInfrastructure {
               };
               console.log(`[processChangedImagesChapitres] ✓ Image mise à jour dans le tableau local avec la nouvelle URL: ${result.url}`);
             }
+
+            // 4️⃣ Store sera mis à jour via la récupération depuis la DB
             
             return { success: true, imageId: image.id, chapitreId: image.chapitre_id, newUrl: result.url, seoTitle: result.seoTitle };
             
@@ -782,5 +768,6 @@ export class SearchInfrastructure {
       })
     );
   }
+
 
 }

@@ -45,6 +45,15 @@ export function validateImage(imageUrl: string, altText: string, chapitreId?: nu
   if (!isSupabaseUrl) {
     issues.push('URL ne pointe pas vers Supabase Storage');
     recommendations.push('Utiliser Supabase Storage pour de meilleures performances');
+  } else {
+    console.log('[ImageValidation] ✅ URL Supabase détectée:', { imageUrl });
+    
+    // Vérification supplémentaire pour les URLs Supabase
+    const isCorrectBucket = imageUrl.includes('/jardin-iris-images-post/');
+    if (!isCorrectBucket) {
+      issues.push('URL Supabase ne pointe pas vers le bon bucket');
+      recommendations.push('Utiliser le bucket jardin-iris-images-post');
+    }
   }
 
   // Vérification HTTPS
@@ -57,8 +66,10 @@ export function validateImage(imageUrl: string, altText: string, chapitreId?: nu
   // Vérification format WebP
   const isWebpFormat = imageUrl.toLowerCase().includes('.webp');
   if (!isWebpFormat) {
-    issues.push('Format d\'image non optimisé');
+    issues.push('Format d\'image non optimisé (pas de WebP)');
     recommendations.push('Convertir en format WebP pour de meilleures performances');
+  } else {
+    console.log('[ImageValidation] ✅ Format WebP détecté:', { imageUrl });
   }
 
   // Validation du texte alternatif

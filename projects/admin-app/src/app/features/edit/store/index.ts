@@ -179,10 +179,27 @@ export const PostStore = signalStore(
                       const index = images.findIndex(img => img.id === image.id);
                       if (index >= 0) {
                         // Mise à jour - marquer l'image comme changée pour upload lors de la validation
-                        images[index] = { ...image, changed: true };
+                        // Vérifier si l'URL a vraiment changé et si elle n'est pas déjà optimisée
+                        const currentImage = images[index];
+                        const urlChanged = currentImage.url_Image !== image.url_Image;
+                        const needsOptimization = !image.url_Image?.includes('zmgfaiprgbawcernymqa.supabase.co') || 
+                                                !image.url_Image?.includes('.webp') ||
+                                                !image.url_Image?.includes('/jardin-iris-images-post/');
+                        
+                        images[index] = { 
+                          ...image, 
+                          changed: urlChanged && needsOptimization 
+                        };
                       } else {
-                        // Ajout
-                        images.push({ ...image, changed: true });
+                        // Ajout - marquer comme changé si l'URL n'est pas optimisée
+                        const needsOptimization = !image.url_Image?.includes('zmgfaiprgbawcernymqa.supabase.co') || 
+                                                !image.url_Image?.includes('.webp') ||
+                                                !image.url_Image?.includes('/jardin-iris-images-post/');
+                        
+                        images.push({ 
+                          ...image, 
+                          changed: needsOptimization 
+                        });
                       }
                       return { ...p, images_chapitres: images };
                     }

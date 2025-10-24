@@ -527,8 +527,14 @@ export class SupabaseService {
       const blob = await response.blob();
       console.log(`[uploadMainImageWithAI] ✓ Image téléchargée - Taille: ${(blob.size / 1024).toFixed(2)} Ko, Type: ${blob.type}`);
 
-      // 2️⃣ Analyser l'image avec l'IA pour générer un titre SEO
+      // 2️⃣ Traiter l'image (resize, crop, WebP, compression) comme les images de chapitres
+      console.log(`[uploadMainImageWithAI] Début du traitement d'image (resize, WebP, compression)...`);
+      const processedBlob = await processImageChapitre(blob, 700, 250, 60);
+      console.log(`[uploadMainImageWithAI] ✓ Image traitée - Taille finale: ${(processedBlob.size / 1024).toFixed(2)} Ko`);
+
+      // 3️⃣ Analyser l'image avec l'IA pour générer un titre SEO
       let fileName: string;
+      let filePath: string;
       
       try {
         console.log(`[uploadMainImageWithAI] 🤖 Analyse de l'image par IA pour générer un titre SEO...`);
@@ -536,24 +542,29 @@ export class SupabaseService {
         
         if (aiDescription) {
           const slug = textToSlug(aiDescription);
-          fileName = `${slug}.png`;
+          fileName = `${slug}.webp`;
+          filePath = `${postId}/${fileName}`;
           console.log(`[uploadMainImageWithAI] ✓ Titre SEO généré par IA: "${aiDescription}"`);
           console.log(`[uploadMainImageWithAI] ✓ Nom de fichier SEO: ${fileName}`);
         } else {
           throw new Error('IA a retourné null');
         }
       } catch (aiError) {
-        // Si l'IA échoue, utiliser le format avec postId (fallback)
-        console.warn(`[uploadMainImageWithAI] ⚠ Échec de l'analyse IA, utilisation du format standard:`, aiError);
-        fileName = `${postId}.png`;
+        // Si l'IA échoue, utiliser le format avec timestamp (fallback)
+        console.warn(`[uploadMainImageWithAI] ⚠ Échec de l'analyse IA, utilisation du format timestamp:`, aiError);
+        const timestamp = Date.now();
+        fileName = `${postId}_main_${timestamp}.webp`;
+        filePath = `${postId}/${fileName}`;
       }
 
-      // 3️⃣ Uploader le fichier dans Supabase Storage
+      console.log(`[uploadMainImageWithAI] Nom du fichier: ${fileName}, Chemin: ${filePath}`);
+
+      // 4️⃣ Uploader le fichier traité dans Supabase Storage dans le bucket jardin-iris-images-post
       console.log(`[uploadMainImageWithAI] Début de l'upload vers Supabase Storage...`);
       const { data, error } = await this.supabase.storage
-        .from(environment.supabaseBucket)
-        .upload(fileName, blob, {
-          contentType: blob.type,
+        .from('jardin-iris-images-post')
+        .upload(filePath, processedBlob, {
+          contentType: 'image/webp',
           upsert: true,
           headers: {
             Authorization: `Bearer ${environment.supabaseAnonKey}`
@@ -561,15 +572,15 @@ export class SupabaseService {
         });
 
       if (error) {
-        throw new Error(`Erreur d'upload : ${error.message}`);
+        throw new Error(`Erreur d'upload Supabase Storage: ${error.message}`);
       }
 
       console.log(`[uploadMainImageWithAI] ✓ Upload réussi vers Supabase Storage`);
 
-      // 4️⃣ Récupérer l'URL publique
+      // 5️⃣ Récupérer l'URL publique
       const { data: publicUrlData } = this.supabase.storage
-        .from(environment.supabaseBucket)
-        .getPublicUrl(fileName);
+        .from('jardin-iris-images-post')
+        .getPublicUrl(filePath);
 
       const publicUrl = publicUrlData?.publicUrl || '';
       console.log(`[uploadMainImageWithAI] ✓ Image principale uploadée avec succès: ${publicUrl}`);
