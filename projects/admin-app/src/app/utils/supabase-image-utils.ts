@@ -85,17 +85,22 @@ export function generateImageSrc(url: string, postId?: number): string {
 }
 
 /**
- * Supprime l'extension d'un nom de fichier
+ * Supprime l'extension d'un nom de fichier et convertit les tirets en espaces
  * @param filename - Nom du fichier avec extension
- * @returns Nom du fichier sans extension
+ * @returns Nom du fichier sans extension et sans tirets (espaces à la place)
  */
 function removeFileExtension(filename: string): string {
   if (!filename) return '';
   
   const lastDotIndex = filename.lastIndexOf('.');
-  if (lastDotIndex === -1) return filename;
+  if (lastDotIndex === -1) {
+    // Pas d'extension, juste convertir les tirets en espaces
+    return filename.replace(/-/g, ' ');
+  }
   
-  return filename.substring(0, lastDotIndex);
+  const nameWithoutExtension = filename.substring(0, lastDotIndex);
+  // Convertir les tirets en espaces
+  return nameWithoutExtension.replace(/-/g, ' ');
 }
 
 /**
