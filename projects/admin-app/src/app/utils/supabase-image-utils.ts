@@ -30,17 +30,17 @@ export function extractSlugFromSupabaseUrl(url: string): string {
 /**
  * Génère l'alt text à partir d'une URL Supabase
  * @param url - URL complète Supabase
- * @param keyWord - Mot-clé optionnel (priorité absolue)
+ * @param keyWord - Mot-clé optionnel (priorité 3)
  * @returns Alt text SEO-friendly
+ * 
+ * Ordre de priorité :
+ * 1. Slug extrait de l'URL Supabase
+ * 2. Nom de fichier sans extension (fallback)
+ * 3. Mot-clé du chapitre converti en slug
+ * 4. Valeur par défaut "image"
  */
 export function generateAltTextFromUrl(url: string, keyWord?: string): string {
-  // Priorité 1: Utiliser le key_word s'il est fourni et valide
-  if (keyWord && keyWord.trim() && keyWord.trim() !== '') {
-    const altText = textToSlug(keyWord);
-    return altText;
-  }
-  
-  // Priorité 2: Extraire le slug de l'URL Supabase
+  // Priorité 1: Extraire le slug de l'URL Supabase
   if (isSupabaseImageUrl(url)) {
     const urlInfo = parseSupabaseUrl(url);
     if (urlInfo.isValid && urlInfo.slug) {
@@ -48,9 +48,20 @@ export function generateAltTextFromUrl(url: string, keyWord?: string): string {
     }
   }
   
-  // Priorité 3: Fallback - utiliser le nom de fichier sans extension
+  // Priorité 2: Fallback - utiliser le nom de fichier sans extension
   const altText = removeFileExtension(url);
-  return altText;
+  if (altText && altText.trim() !== '') {
+    return altText;
+  }
+  
+  // Priorité 3: Utiliser le key_word s'il est fourni et valide
+  if (keyWord && keyWord.trim() && keyWord.trim() !== '') {
+    const altTextFromKeyword = textToSlug(keyWord);
+    return altTextFromKeyword;
+  }
+  
+  // Dernier recours : retourner une valeur par défaut
+  return 'image';
 }
 
 /**
