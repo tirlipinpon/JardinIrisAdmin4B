@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import {
-  from,
-  Observable, of, switchMap, toArray
+    from,
+    Observable, of, switchMap, toArray
 } from "rxjs";
 import { TheNewsApiService } from "../../features/searchBar/services/the-news-api.service";
 import { OpenaiApiService } from "../../features/searchBar/services/openai-api/openai-api.service";
@@ -15,7 +15,7 @@ import { AddImagesToChaptersService } from "../../features/searchBar/services/ad
 import { FormatInStructureService } from "../../features/searchBar/services/format-in-structure/format-in-structure.service";
 import { GoogleSearchService } from "../../features/all/services/google-search/google-search.service";
 import {
-  AddScientificNameService
+    AddScientificNameService
 } from "../../features/searchBar/services/add-scientific-name/add-scientific-name.service";
 import { GeminiApiService } from "../../features/searchBar/services/gemini-api/gemini-api.service";
 

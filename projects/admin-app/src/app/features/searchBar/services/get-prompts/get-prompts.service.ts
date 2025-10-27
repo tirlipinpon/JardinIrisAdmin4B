@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import {afficherCategories} from "../../../../utils/afficherCategories";
-import {formatCurrentDateUs} from "../../../../utils/getFormattedDate";
-import {VideoInfo} from "../../../all/services/google-search/google-search.service";
-import {afficherRandomSeoKeyWords} from "../../../../utils/afficherRandomSeoKeyWords";
+import { afficherCategories } from "../../../../utils/afficherCategories";
+import { formatCurrentDateUs } from "../../../../utils/getFormattedDate";
+import { VideoInfo } from "../../../all/services/google-search/google-search.service";
+import { afficherRandomSeoKeyWords } from "../../../../utils/afficherRandomSeoKeyWords";
 
 @Injectable({
   providedIn: 'root'
@@ -347,8 +347,7 @@ Comparez ces données pour identifier la vidéo correspondant le mieux au sujet 
 La réponse doit être fournie dans un objet JSON contenant uniquement le lien YouTube de la vidéo trouvée ou une chaîne vide si aucune vidéo ne correspond:
 \`\`\`json
 {
-"video": "LINK YOUTUBE ou une chaine vide si tu ne trouve pas ",
- explanation": "explication de ton choix par rapport au titre du sujet"}
+"video": "LINK YOUTUBE ou une chaine vide si tu ne trouve pas "}
 \`\`\`
       `},
       userRole: { "role": "user", "content": `
@@ -379,19 +378,19 @@ Extrait un seul mot-clé du titre du blog. Assure-toi que ce mot résume efficac
 2. **Explication du Mot-clé**: Explique pourquoi ce mot clefs a été choisis.
 3. **Vérification**: Assure-toi que le mot-clé choisi est général et suffisamment représentatif pour être utilisé efficacement dans une recherche d'image.
 # Output Format
-- Fournis un seul mot en résultat, représentant le mot-clé choisi sous cette forme json {"keyWord":"Mots choisis", "explanation":""}.
+- Fournis un seul mot en résultat, représentant le mot-clé choisi sous cette forme json {"keyWord":"Mots choisis"}.
 # Examples
 **Input**: "Exploration des merveilles de l'océan: secrets des abysses"
 **Reasoning**:
 - Le titre parle de l'océan et des secrets cachés sous l'eau.
 - Le mot "océan" est choisis parce que... .
-**Output**: "{"keyWord":"ocean", "explanation":"Le mot océan est choisis parce que..."} et rien d 'autre, ne rajoute pas de texte ou d explication dans la réponse !
+**Output**: "{"keyWord":"ocean"} et rien d 'autre, ne rajoute pas de texte ou d explication dans la réponse !
 ---
 **Input**: "Les charmes hivernaux des montagnes enneigées"
 **Reasoning**:
 - Ce titre met l'accent sur un paysage spécifique et une ambiance saisonnière.
 - Le mot "montagnes" est central pour la recherche visuelle.
-**Output**: "{"keyWord":"mountains", "explanation":"Le mot montagnes est central pour la recherche visuelle"}"
+**Output**: "{"keyWord":"mountains"}"
 # Notes
 - Si le titre contient plusieurs thèmes, choisis le mot-clé qui représente le mieux le message principal ou l'élément le plus visuel.
 - Le mot-clé choisi doit être suffisamment large pour couvrir un éventail d'images mais précis pour rester pertinent.`

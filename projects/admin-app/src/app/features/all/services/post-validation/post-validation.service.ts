@@ -82,29 +82,46 @@ export class PostValidationService {
       switchMap(success => {
         console.log(`[PostValidationService.processImagesAndValidate] Traitement des images: ${success}`);
         
-        if (!success) {
-          return throwError(() => new Error('Échec du traitement des images'));
+        // Ne pas arrêter le processus même si certaines images ont échoué
+        // on continue avec l'injection des images disponibles
+        console.log(`[PostValidationService.processImagesAndValidate] Traitement terminé, poursuite de la validation...`);
+        
+        // 🔧 SOLUTION: Recharger le post depuis la DB après upload des images
+        // pour garantir qu'on a les nouvelles URLs de Supabase (ou les anciennes si l'upload a échoué)
+        console.log(`[PostValidationService.processImagesAndValidate] Rechargement du post depuis la DB pour récupérer les URLs...`);
+        
+        return this.searchInfra.getOneOrManyPostForm(post.id!);
+      }),
+      switchMap((postsFromDB) => {
+        const updatedPostFromDB = postsFromDB.find(p => p.id === post.id);
+        
+        if (!updatedPostFromDB) {
+          return throwError(() => new Error(`Post ${post.id} introuvable dans la DB`));
         }
         
-        // Utiliser directement le post du store qui a été mis à jour en temps réel
-        console.log(`[PostValidationService.processImagesAndValidate] Utilisation du post mis à jour depuis le store...`);
-        const updatedPostFromStore = this.getPostById(post.id!);
-        if (!updatedPostFromStore) {
-          return throwError(() => new Error(`Post ${post.id} introuvable dans le store`));
-        }
-        
-        console.log(`[PostValidationService.processImagesAndValidate] Post récupéré du store:`, {
-          id: updatedPostFromStore.id,
-          imagesChapitresCount: updatedPostFromStore.images_chapitres?.length || 0,
-          imagesChapitres: updatedPostFromStore.images_chapitres?.map(img => ({
+        console.log(`[PostValidationService.processImagesAndValidate] Post rechargé depuis la DB:`, {
+          id: updatedPostFromDB.id,
+          imagesChapitresCount: updatedPostFromDB.images_chapitres?.length || 0,
+          imagesChapitres: updatedPostFromDB.images_chapitres?.map(img => ({
             id: img.id,
             chapitre_id: img.chapitre_id,
             url_Image: img.url_Image,
-            changed: img.changed
+            isSupabaseUrl: img.url_Image?.includes('zmgfaiprgbawcernymqa.supabase.co')
           }))
         });
         
-        return this.injectImagesAndValidate(updatedPostFromStore);
+        // Mettre à jour le store avec les nouvelles données
+        this.updateStoreWithPost(updatedPostFromDB);
+        
+        // Utiliser le post ORIGINAL avec les images du store au lieu du post rechargé
+        // pour éviter d'utiliser des données incomplètes de la DB
+        const postWithImagesFromStore = (post.images_chapitres && post.images_chapitres.length > 0)
+          ? { ...updatedPostFromDB, images_chapitres: post.images_chapitres }
+          : updatedPostFromDB;
+        
+        console.log(`[PostValidationService.processImagesAndValidate] Injection avec ${postWithImagesFromStore.images_chapitres?.length || 0} images`);
+        
+        return this.injectImagesAndValidate(postWithImagesFromStore);
       }),
       catchError(error => {
         console.error('[PostValidationService] Erreur lors du traitement des images:', error);
@@ -192,7 +209,21 @@ export class PostValidationService {
       // Filtrer les posts undefined/null et mapper les posts valides
       const updatedPosts = currentPosts
         .filter((p: Post) => p && p.id !== undefined)
-        .map((p: Post) => p.id === updatedPost.id ? updatedPost : p);
+        .map((p: Post) => {
+          if (p.id === updatedPost.id) {
+            // Fusion intelligente : ne mettre à jour que les images_chapitres
+            // et conserver toutes les autres données du post existant
+            const mergedPost = {
+              ...p,
+              images_chapitres: updatedPost.images_chapitres // Seulement mettre à jour les images de chapitres
+            };
+            console.log(`[PostValidationService.updateStoreWithPost] Fusion du post ${p.id}:`);
+            console.log(`  - images_chapitres mises à jour: ${updatedPost.images_chapitres?.length || 0}`);
+            console.log(`  - image_url conservée: ${p.image_url}`);
+            return mergedPost;
+          }
+          return p;
+        });
       
       // Utiliser patchState pour mettre à jour le store
       patchState(this.store as any, { post: updatedPosts });

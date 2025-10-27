@@ -4,8 +4,6 @@ export interface ImageChapitre {
   url_Image: string;
   created_at?: string; // ISO date string
   chapitre_id: number;
-  explanation_word?: string;
   chapitre_key_word: string;
-  explanation_image?: string; // valeur non fournie, optionnelle
   changed?: boolean; // flag pour tracker si l'image a été modifiée
 }

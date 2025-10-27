@@ -169,7 +169,7 @@ export class SupabaseService {
     }
   }
 
-  async setNewUrlImagesChapitres(url: string, chapitreId: number, postId: number, chapitreKeyWord: string, chapitreExplanationWord: string): Promise<any> {
+  async setNewUrlImagesChapitres(url: string, chapitreId: number, postId: number, chapitreKeyWord: string): Promise<any> {
     try {
       const {data, error} = await this.supabase
         .from('urlImagesChapitres')
@@ -178,8 +178,7 @@ export class SupabaseService {
             fk_post: postId,
             url_Image: url,
             chapitre_id: chapitreId,
-            chapitre_key_word: chapitreKeyWord,
-            explanation_word: chapitreExplanationWord
+            chapitre_key_word: chapitreKeyWord
           }
         ]);
 
@@ -369,7 +368,7 @@ export class SupabaseService {
     try {
       const {data, error} = await this.supabase
         .from('urlImagesChapitres')
-        .update({url_Image: url, chapitre_key_word: key, explanation_image: "", explanation_word: ""})
+        .update({url_Image: url, chapitre_key_word: key})
         .eq('id', id)
         .select();
 

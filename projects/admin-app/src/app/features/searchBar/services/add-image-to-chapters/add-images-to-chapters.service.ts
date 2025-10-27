@@ -1,12 +1,10 @@
-import { inject, Injectable } from '@angular/core';
-import { Post } from "../../../../types/post";
-import { TheNewsApiService } from "../the-news-api.service";
+import { Injectable } from '@angular/core';
 import { OpenaiApiService } from "../openai-api/openai-api.service";
 import { PerplexityApiService } from "../perplexity-api/perplexity-api.service";
 import { GetPromptsService } from "../get-prompts/get-prompts.service";
 import { UnsplashImageService } from "../unsplash-image/unsplash-image.service";
 import { SupabaseService } from "../../../../shared/supabase/supabase.service";
-import {extractByPositionH4Title, extractJSONBlock, extractSecondSpanContent} from "../../../../utils/cleanJsonObject";
+import { extractByPositionH4Title, extractJSONBlock, extractSecondSpanContent } from "../../../../utils/cleanJsonObject";
 
 /**
  * Service responsable d'ajouter des images aux chapitres d'un article
@@ -39,8 +37,6 @@ export class AddImagesToChaptersService {
       console.log(`Traitement du chapitre ${i}`);
       const chapitreId = i;
       let chapitreKeyWord = "";
-      let chapitreExplanationWord = "";
-      let chapitreExplanationImage = "";
       const extractedTitle = extractByPositionH4Title(article, chapitreId)
       console.log(`Chapitre ${chapitreId} - Titre extrait:`, extractedTitle);
       const extractedParagraphe = extractSecondSpanContent(article, chapitreId)
@@ -60,7 +56,6 @@ export class AddImagesToChaptersService {
                 let test2 = extractJSONBlock(keyWord[0])
                 respKeyword = JSON.parse(test2);
                 chapitreKeyWord = respKeyword.keyWord;
-                chapitreExplanationWord = extractedTitle + "= " + respKeyword.explanation;
               }
               }
             } catch (parseError) {
@@ -95,7 +90,7 @@ export class AddImagesToChaptersService {
           }
           // Sauvegarde de l'URL de l'image pour le chapitre dans Supabase
           try {
-            await this.supabaseService.setNewUrlImagesChapitres(dataUrl.imageUrl, chapitreId, articleId, chapitreKeyWord, chapitreExplanationWord);
+            await this.supabaseService.setNewUrlImagesChapitres(dataUrl.imageUrl, chapitreId, articleId, chapitreKeyWord);
             console.log("URL d'image enregistrée avec succès:", dataUrl);
           } catch (saveError) {
             console.error("Erreur lors de la sauvegarde de l'URL de l'image dans Supabase :", saveError);
