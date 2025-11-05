@@ -68,23 +68,23 @@ L’article doit être présenté sous format JSON valide selon la structure dé
 Instructions de génération
 Titre : Formule une question informationnelle courte et pertinente qui donne envie de lire.
 Phrase accroche : Environ 45 mots, style transactionnel, incitant à la lecture.
-Article : 6 paragraphes structurés comme suit :
+Article : 7 paragraphes structurés comme suit :
 
 <span id="paragraphe-{n}">
   <h4>Une question informationnelle comme titre</h4>
-  <ul><li>Un sous-titre accrocheur d’environ 10 mots</li></ul>
-  <article>Texte du paragraphe d’au moins 200 mots, riche, concret, humain, détaillé, avec des conseils pratiques, une touche d’humour subtile et une fluidité naturelle.</article>
+  <ul><li>Un sous-titre accrocheur d'environ 10 mots</li></ul>
+  <article>Texte du paragraphe d'au moins 250 mots, riche, concret, humain, détaillé, avec des conseils pratiques, une touche d'humour subtile et une fluidité naturelle.</article>
 </span>
 
 Chaque paragraphe doit contenir au moins 200 mots réels (pas moins !).
 Inclure une citation célèbre pertinente en lien avec le jardinage, la nature ou la vie (sans doubles guillemets dans le texte, auteur si connu).
 Mentionner le premier lien utilisé dans "lien1".
 Sélectionner une seule catégorie parmi celles proposées par : "${afficherCategories(', ')}".
-Format de sortie attendu (strictement un seul objet JSON, rien d’autre) :
+Format de sortie attendu (strictement un seul objet JSON, rien d'autre) :
 {
   "titre": "Titre court pertinent pour le post.",
   "phrase_accroche": "Phrase accrocheuse d'environ 45 mots.",
-  "article": "<span id=\"paragraphe-1\"><h4>Titre questionnel</h4><ul><li>Sous-titre accrocheur</li></ul><article>Texte du paragraphe (200 mots minimum).</article></span> ... (jusqu'à paragraphe-6, minifié sur une ligne)",
+  "article": "<span id=\"paragraphe-1\"><h4>Titre questionnel</h4><ul><li>Sous-titre accrocheur</li></ul><article>Texte du paragraphe (250 mots minimum).</article></span> ... (jusqu'à paragraphe-7, minifié sur une ligne)",
   "citation": "Citation pertinente avec auteur.",
   "lien_url_article": {
     "lien1": "URL du premier lien utilisé."

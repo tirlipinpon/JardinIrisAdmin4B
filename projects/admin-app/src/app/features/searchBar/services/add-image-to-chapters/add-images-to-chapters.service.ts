@@ -33,7 +33,7 @@ export class AddImagesToChaptersService {
 
   async getKeyWordsFromChapitreInArticleAndSetImageUrl(article: string, articleId: number) {
     let chapitreKeyWordList: string[] = []
-    for (let i=1; i<=6; i++) {
+    for (let i=1; i<=7; i++) {
       console.log(`Traitement du chapitre ${i}`);
       const chapitreId = i;
       let chapitreKeyWord = "";

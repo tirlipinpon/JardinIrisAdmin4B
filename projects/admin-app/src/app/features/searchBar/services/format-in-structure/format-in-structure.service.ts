@@ -24,7 +24,7 @@ export class FormatInStructureService {
              ,private insertInternalLinkService: InsertInternalLinkService) { }
 
   formatInStructure(article: string, type: string, postTitreAndId?: {titre: string, id: number, new_href: string}[]): Observable<string> {
-    const chapitreIds = [1, 2, 3, 4, 5, 6];
+    const chapitreIds = [1, 2, 3, 4, 5, 6, 7];
     let postTitreAndIdLocal = postTitreAndId ? [...postTitreAndId] : [];
 
     return from(chapitreIds).pipe(
